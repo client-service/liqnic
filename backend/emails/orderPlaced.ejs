@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body { font-family: Arial, sans-serif; color: #333; }
+      .container { max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; }
+      .header { font-size: 24px; font-weight: bold; margin-bottom: 20px; }
+      .item-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+      .item-table th, .item-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+      .total-row { font-weight: bold; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">Thank you for your order!</div>
+      <p>Hi <%= order.customer.first_name || 'Valued Customer' %>,</p>
+      <p>Your order with ID #<%= order.display_id %> has been placed successfully.</p>
+
+      <h3>Order Summary</h3>
+
+      <table class="item-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% order.items.forEach(item => { %>
+            <tr>
+              <td><%= item.title %></td>
+              <td><%= item.quantity %></td>
+              <td><%= (item.total / 100).toFixed(2) %> <%= order.currency_code.toUpperCase() %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+      
+      <table class="item-table">
+        <tbody>
+          <tr>
+            <td>Subtotal</td>
+            <td><%= (order.subtotal / 100).toFixed(2) %> <%= order.currency_code.toUpperCase() %></td>
+          </tr>
+          <tr>
+            <td>Shipping</td>
+            <td><%= (order.shipping_total / 100).toFixed(2) %> <%= order.currency_code.toUpperCase() %></td>
+          </tr>
+          <tr class="total-row">
+            <td>Total</td>
+            <td><%= (order.total / 100).toFixed(2) %> <%= order.currency_code.toUpperCase() %></td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <p>We'll notify you again once your order has shipped.</p>
+      <p>Thanks,</p>
+      <p>The Liqnic Team</p>
+    </div>
+  </body>
+</html>
