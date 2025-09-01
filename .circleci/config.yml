@@ -1,0 +1,121 @@
+version: 2.1
+
+jobs:
+  build-and-test:
+    docker:
+      - image: cimg/node:21.7.1
+    steps:
+      - checkout
+      - run: node --version
+      - run: npm --version
+
+      # Upgrade npm
+      - run:
+          name: Upgrade npm
+          command: npm install -g npm@10.8.2
+
+  docker-build-and-publish:
+    docker:
+      - image: cimg/node:21.7.1
+        auth:
+          username: $DOCKER_USERNAME
+          password: $DOCKER_PASSWORD
+    steps:
+      - checkout
+      - setup_remote_docker
+
+      # Build and push backend
+      - run:
+          name: Build & Push Backend Image
+          command: |
+            if [ "$CIRCLE_BRANCH" = "development" ]; then
+              docker build -t $DOCKER_USERNAME/liqnic-backend:dev ./backend
+              echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+              docker push $DOCKER_USERNAME/liqnic-backend:dev
+            elif [ "$CIRCLE_BRANCH" = "production" ]; then
+              docker build -t $DOCKER_USERNAME/liqnic-backend:latest ./backend
+              echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+              docker push $DOCKER_USERNAME/liqnic-backend:latest
+            fi
+
+      # Build and push dashboard
+      - run:
+          name: Build & Push Dashboard Image
+          command: |
+            if [ "$CIRCLE_BRANCH" = "development" ]; then
+              docker build -t $DOCKER_USERNAME/liqnic-dashboard:dev ./dashboard
+              echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+              docker push $DOCKER_USERNAME/liqnic-dashboard:dev
+            elif [ "$CIRCLE_BRANCH" = "production" ]; then
+              docker build -t $DOCKER_USERNAME/liqnic-dashboard:latest ./dashboard
+              echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+              docker push $DOCKER_USERNAME/liqnic-dashboard:latest
+            fi
+
+      # Build and push storefront
+      - run:
+          name: Build & Push Storefront Image
+          command: |
+            if [ "$CIRCLE_BRANCH" = "development" ]; then
+              docker build -t $DOCKER_USERNAME/liqnic-storefront:dev ./storefront
+              echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+              docker push $DOCKER_USERNAME/liqnic-storefront:dev
+            elif [ "$CIRCLE_BRANCH" = "production" ]; then
+              docker build -t $DOCKER_USERNAME/liqnic-storefront:latest ./storefront
+              echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+              docker push $DOCKER_USERNAME/liqnic-storefront:latest
+            fi
+
+  deploy:
+    machine: true
+    steps:
+      - run:
+          name: Install sshpass
+          command: sudo apt-get install -y sshpass
+
+      - run:
+          name: Deploy Liqnic to VPS
+          command: |
+            if [ "$CIRCLE_BRANCH" = "development" ]; then
+              SSH_COMMAND="sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST"
+              COMPOSE_FILE="/home/docker/dev-server/frontend/dev-liqnic/docker-compose.yml"
+            elif [ "$CIRCLE_BRANCH" = "production" ]; then
+              SSH_COMMAND="sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no $SSH_PROD_USER@$SSH_HOST_PROD"
+              COMPOSE_FILE="/home/docker/frontend/liqnic/docker-compose.yml"
+            fi
+
+            $SSH_COMMAND "
+              docker logout
+              echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+              docker compose -f $COMPOSE_FILE pull
+              docker compose -f $COMPOSE_FILE up -d --force-recreate --remove-orphans
+            "
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build-and-test:
+          filters:
+            branches:
+              only:
+                - development
+                - production
+
+      - docker-build-and-publish:
+          requires:
+            - build-and-test
+          filters:
+            branches:
+              only:
+                - development
+                - production
+
+      - deploy:
+          requires:
+            - docker-build-and-publish
+          filters:
+            branches:
+              only:
+                - development
+                - production
