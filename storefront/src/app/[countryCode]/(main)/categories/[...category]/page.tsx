@@ -16,50 +16,62 @@ type Props = {
 }
 
 export async function generateStaticParams() {
-  const product_categories = await listCategories()
+  try {
+    const product_categories = await listCategories()
+    if (!product_categories) return []
 
-  if (!product_categories) {
+    const countryCodes = await listRegions().then((regions: StoreRegion[]) =>
+      regions?.map((r) => r.countries?.map((c) => c.iso_2)).flat()
+    )
+
+    const categoryHandles = product_categories.map(
+      (category: any) => category.handle
+    )
+
+    const staticParams = countryCodes
+      ?.filter((c): c is string => !!c) // <--- TypeScript fix
+      .map((countryCode) =>
+        categoryHandles.map((handle: string) => ({
+          countryCode,
+          category: [handle],
+        }))
+      )
+      .flat()
+
+    return staticParams
+  } catch (err: any) {
+    console.warn("Failed to generate static paths for categories:", err.message)
     return []
   }
-
-  const countryCodes = await listRegions().then((regions: StoreRegion[]) =>
-    regions?.map((r) => r.countries?.map((c) => c.iso_2)).flat()
-  )
-
-  const categoryHandles = product_categories.map(
-    (category: any) => category.handle
-  )
-
-  const staticParams = countryCodes
-    ?.map((countryCode: string | undefined) =>
-      categoryHandles.map((handle: any) => ({
-        countryCode,
-        category: [handle],
-      }))
-    )
-    .flat()
-
-  return staticParams
 }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params
   try {
     const productCategory = await getCategoryByHandle(params.category)
+    if (!productCategory) {
+      return {
+        title: "Category Not Found",
+        description: "Category data not available",
+      }
+    }
 
     const title = productCategory.name + " | Medusa Store"
-
     const description = productCategory.description ?? `${title} category.`
 
     return {
-      title: `${title} | Medusa Store`,
+      title,
       description,
       alternates: {
         canonical: `${params.category.join("/")}`,
       },
     }
-  } catch (error) {
-    notFound()
+  } catch (err: any) {
+    console.warn("Could not fetch category metadata:", err.message)
+    return {
+      title: "Category Not Available",
+      description: "Category data could not be fetched",
+    }
   }
 }
 
@@ -68,10 +80,15 @@ export default async function CategoryPage(props: Props) {
   const params = await props.params
   const { sortBy, page } = searchParams
 
-  const productCategory = await getCategoryByHandle(params.category)
+  let productCategory = null
+  try {
+    productCategory = await getCategoryByHandle(params.category)
+  } catch (err: any) {
+    console.warn("Could not fetch category:", err.message)
+  }
 
   if (!productCategory) {
-    notFound()
+    return <p>Category data not available at build time.</p>
   }
 
   return (
