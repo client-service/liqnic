@@ -53,21 +53,24 @@ jobs:
             fi
 
       # Build and push storefront
-      - run:
-          name: Build & Push Storefront Image
-          command: |
-            --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
-            --build-arg NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY \
-            -t riviainfosys/liqnic-storefront:dev ./storefront
-            if [ "$CIRCLE_BRANCH" = "development" ]; then
-              docker build -t $DOCKER_USERNAME/liqnic-storefront:dev ./storefront
-              echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-              docker push $DOCKER_USERNAME/liqnic-storefront:dev
-            elif [ "$CIRCLE_BRANCH" = "production" ]; then
-              docker build -t $DOCKER_USERNAME/liqnic-storefront:latest ./storefront
-              echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-              docker push $DOCKER_USERNAME/liqnic-storefront:latest
-            fi
+     - run:
+        name: Build & Push Storefront Image
+        command: |
+          if [ "$CIRCLE_BRANCH" = "development" ]; then
+            docker build \
+              --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
+              --build-arg NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY \
+              -t $DOCKER_USERNAME/liqnic-storefront:dev ./storefront
+            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+            docker push $DOCKER_USERNAME/liqnic-storefront:dev
+          elif [ "$CIRCLE_BRANCH" = "production" ]; then
+            docker build \
+              --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
+              --build-arg NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY \
+              -t $DOCKER_USERNAME/liqnic-storefront:latest ./storefront
+            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+            docker push $DOCKER_USERNAME/liqnic-storefront:latest
+          fi
 
   deploy:
     machine: true
