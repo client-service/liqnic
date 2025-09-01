@@ -1,6 +1,11 @@
-import { loadEnv, defineConfig, Modules, ContainerRegistrationKeys } from '@medusajs/framework/utils'
+import {
+  loadEnv,
+  defineConfig,
+  Modules,
+  ContainerRegistrationKeys,
+} from "@medusajs/framework/utils";
 
-loadEnv(process.env.NODE_ENV || 'development', process.cwd())
+loadEnv(process.env.NODE_ENV || "development", process.cwd());
 
 module.exports = defineConfig({
   admin: {
@@ -21,16 +26,7 @@ module.exports = defineConfig({
             resolve: "@medusajs/medusa/auth-emailpass",
             id: "emailpass",
           },
-          // other providers...
-          {
-            resolve: "@medusajs/medusa/auth-google",
-            id: "google",
-            options: {
-              clientId: process.env.GOOGLE_CLIENT_ID,
-              clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-              callbackUrl: process.env.GOOGLE_CALLBACK_URL,
-            },
-          },
+          // Add more providers here when needed
         ],
       },
     },
@@ -60,16 +56,16 @@ module.exports = defineConfig({
       resolve: "@medusajs/medusa/payment",
       options: {
         providers: [
-          // Uncomment this to enable stripe
-          {
-            resolve: "@medusajs/medusa/payment-stripe",
-            id: "stripe",
-            options: {
-              apiKey: process.env.STRIPE_API_KEY,
-            },
-          },
-        ]
-      }
+          // Uncomment this to enable Stripe later
+          // {
+          //   resolve: "@medusajs/medusa/payment-stripe",
+          //   id: "stripe",
+          //   options: {
+          //     apiKey: process.env.STRIPE_API_KEY,
+          //   },
+          // },
+        ],
+      },
     },
 
     /**
@@ -79,13 +75,12 @@ module.exports = defineConfig({
       key: "eventBus",
       resolve: "@medusajs/event-bus-local",
     },
-    // This module allows you to utilize Redis for the event bus functionality. When installed, the Medusa’s events system is powered by BullMQ and io-redis. 
-    // BullMQ is responsible for the message queue and worker, and io-redis is the underlying Redis client that BullMQ connects to for events storage.
+    // Redis-based Event Bus (for production)
     // {
     //   key: "eventBus",
     //   resolve: "@medusajs/event-bus-redis",
     //   options: {
-    //     redisUrl: process.env.EVENTS_REDIS_URL, // production
+    //     redisUrl: process.env.EVENTS_REDIS_URL,
     //   },
     // },
 
@@ -93,10 +88,9 @@ module.exports = defineConfig({
      * Notifications
      */
     {
-      resolve: '@medusajs/medusa/notification',
+      resolve: "@medusajs/medusa/notification",
       options: {
         providers: [
-          // Default provider
           {
             resolve: "@medusajs/medusa/notification-local",
             id: "local",
@@ -105,6 +99,7 @@ module.exports = defineConfig({
               channels: ["feed"],
             },
           },
+          // Example for custom Resend module
           // {
           //   resolve: "./src/modules/resend",
           //   id: "resend",
@@ -114,7 +109,7 @@ module.exports = defineConfig({
           //     from: process.env.RESEND_FROM_EMAIL,
           //   },
           // },
-        ]
+        ],
       },
     },
 
@@ -122,8 +117,8 @@ module.exports = defineConfig({
      * Custom Modules
      */
     {
-      resolve: "./src/modules/events"
-    }
+      resolve: "./src/modules/events",
+    },
   ],
   plugins: [
     /**
@@ -151,7 +146,6 @@ module.exports = defineConfig({
         templateMap: {
           "invite.created": "inviteCreated",
           "order.placed": "orderPlaced",
-          // Add other events visit https://github.com/minpham-com/medusa-plugin-smtp/blob/main/src/services/smtp.js
         },
       },
     },
@@ -164,6 +158,6 @@ module.exports = defineConfig({
       authCors: process.env.AUTH_CORS!,
       jwtSecret: process.env.JWT_SECRET || "supersecret",
       cookieSecret: process.env.COOKIE_SECRET || "supersecret",
-    }
-  }
-})
+    },
+  },
+});

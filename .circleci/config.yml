@@ -8,8 +8,6 @@ jobs:
       - checkout
       - run: node --version
       - run: npm --version
-
-      # Upgrade npm
       - run:
           name: Upgrade npm
           command: npm install -g npm@10.8.2
@@ -60,6 +58,7 @@ jobs:
               docker build \
                 --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
                 --build-arg NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY \
+                --build-arg MEDUSA_BACKEND_URL=$MEDUSA_BACKEND_URL \
                 -t $DOCKER_USERNAME/liqnic-storefront:dev ./storefront
               echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
               docker push $DOCKER_USERNAME/liqnic-storefront:dev
@@ -67,6 +66,7 @@ jobs:
               docker build \
                 --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
                 --build-arg NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY \
+                --build-arg MEDUSA_BACKEND_URL=$MEDUSA_BACKEND_URL \
                 -t $DOCKER_USERNAME/liqnic-storefront:latest ./storefront
               echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
               docker push $DOCKER_USERNAME/liqnic-storefront:latest
@@ -86,7 +86,7 @@ jobs:
               SSH_COMMAND="sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST"
               COMPOSE_FILE="/home/docker/dev-server/frontend/dev-liqnic/docker-compose.yml"
             elif [ "$CIRCLE_BRANCH" = "production" ]; then
-              SSH_COMMAND="sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no $SSH_PROD_USER@$SSH_HOST_PROD"
+              SSH_COMMAND="sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST"
               COMPOSE_FILE="/home/docker/frontend/liqnic/docker-compose.yml"
             fi
 
