@@ -151,7 +151,10 @@ module.exports = defineConfig({
     },
   ],
   projectConfig: {
-    databaseUrl: process.env.DATABASE_URL,
+    databaseUrl: process.env.DATABASE_URL,    // @ts-ignore
+    databaseExtra: {
+      ssl: false,
+    } as any,
     http: {
       storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,
