@@ -56,6 +56,9 @@ jobs:
       - run:
           name: Build & Push Storefront Image
           command: |
+            --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
+            --build-arg NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY \
+            -t riviainfosys/liqnic-storefront:dev ./storefront
             if [ "$CIRCLE_BRANCH" = "development" ]; then
               docker build -t $DOCKER_USERNAME/liqnic-storefront:dev ./storefront
               echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
