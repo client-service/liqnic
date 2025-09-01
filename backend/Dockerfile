@@ -1,7 +1,19 @@
 FROM node:20-alpine
+
+# Set working directory
 WORKDIR /app
+
+# Copy package files
 COPY package*.json ./
-RUN npm install --production --legacy-peer-deps
+
+# Install all dependencies (include dev for Medusa CLI)
+RUN npm install --legacy-peer-deps
+
+# Copy backend source
 COPY . .
+
+# Expose Medusa port
 EXPOSE 9000
-CMD ["npm", "run", "start"]
+
+# Default command to start Medusa
+CMD ["npx", "medusa", "start"]
