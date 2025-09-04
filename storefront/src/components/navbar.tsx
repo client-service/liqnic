@@ -55,7 +55,7 @@ export default async function Navbar() {
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-[25px]">
+        <div className="hidden lg:flex items-center gap-[25px]">
           {MENU_ITEMS.map((item) =>
             item.dropdown ? (
               <div key={item.label} className="relative group">
@@ -118,11 +118,10 @@ export default async function Navbar() {
           >
             <CartButton />
           </Suspense>
-        </div>
-
-        {/* Mobile Menu */}
-        <div className="md:hidden">
-          <SideMenu regions={regions} />
+          {/* Mobile Menu */}
+          <div className="lg:hidden">
+            <SideMenu regions={regions} />
+          </div>
         </div>
       </div>
     </nav>

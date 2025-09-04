@@ -9,6 +9,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import CountrySelect from "../country-select"
 import { HttpTypes } from "@medusajs/types"
 import { MENU_ITEMS } from "components/navbar"
+import { LuMenu } from "react-icons/lu"
 
 const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
   const toggleState = useToggleState()
@@ -24,7 +25,7 @@ const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
                   data-testid="nav-menu-button"
                   className="relative h-full flex items-center transition-all ease-out duration-200 focus:outline-none hover:text-ui-fg-base"
                 >
-                  Menu
+                  <LuMenu />
                 </Popover.Button>
               </div>
 

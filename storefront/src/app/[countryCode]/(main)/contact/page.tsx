@@ -1,4 +1,5 @@
 "use client"
+import ImageSlider from "components/image-slider-contact"
 import { useState } from "react"
 
 export default function Contact() {
@@ -168,14 +169,7 @@ export default function Contact() {
 
             {/* Right Side - IQOS Showcase */}
             <div>
-              <div
-                className="w-full lg:w-[600px] h-[250px] sm:h-[300px] lg:h-[374px] bg-cover bg-center bg-no-repeat rounded-[10px] relative overflow-hidden"
-                style={{
-                  backgroundImage: `url('https://api.builder.io/api/v1/image/assets/TEMP/e4afc63ab089dd4d655005c1a0b39d88cf39a917?width=1200')`,
-                }}
-              >
-                <div className="absolute inset-0 "></div>
-              </div>
+              <ImageSlider />
               {/* Contact Information Cards */}
               <div className="w-full  py-6 sm:py-8 lg:py-12">
                 <div className="max-w-[1240px] mx-auto">

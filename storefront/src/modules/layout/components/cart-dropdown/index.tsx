@@ -98,7 +98,7 @@ const CartDropdown = ({
                   </span>
                 </div>
               </div>
-              <span className="text-black text-[14.4px] font-medium leading-[150%] font-manrope">
+              <span className="text-black text-[14.4px] font-medium leading-[150%] font-manrope hidden md:flex">
                 {subtotal}
               </span>
             </div>
