@@ -151,7 +151,8 @@ module.exports = defineConfig({
     },
   ],
   projectConfig: {
-    databaseUrl: process.env.DATABASE_URL,    // @ts-ignore
+    databaseUrl: process.env.DATABASE_URL, 
+       // @ts-ignore
     databaseExtra: {
       ssl: false,
     } as any,

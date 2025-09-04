@@ -88,7 +88,30 @@ export default async function CategoryPage(props: Props) {
   }
 
   if (!productCategory) {
-    return <p>Category data not available at build time.</p>
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center w-full py-20 bg-yellow-50 border border-yellow-200 rounded-lg text-center">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-12 w-12 text-yellow-400 mb-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M13 16h-1v-4h-1m0-4h.01M12 12v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <p className="text-yellow-800 text-lg font-medium">
+          Oops! Category data is not available at build time.
+        </p>
+        <p className="text-yellow-700 text-sm mt-1">
+          Please try again later or check back soon.
+        </p>
+      </div>
+    )
   }
 
   return (
