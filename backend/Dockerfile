@@ -1,7 +1,23 @@
-FROM node:20-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm install --production --legacy-peer-deps
+# Development Dockerfile for Medusa
+FROM node:22-alpine
+
+# Set working directory
+WORKDIR /server
+
+# Copy package files and yarn config
+COPY package.json yarn.lock .yarnrc.yml ./
+
+# Install all dependencies using yarn
+RUN yarn install --production
+
+# Copy source code
 COPY . .
+
+# Expose the port Medusa runs on
 EXPOSE 9000
-CMD ["npm", "run", "start"]
+
+# Build the medusajs application
+RUN npm run build
+
+# Run migrations at container startup instead of build
+CMD ["sh", "-c", "npx medusa db:migrate && npm start"]

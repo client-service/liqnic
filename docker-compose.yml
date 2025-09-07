@@ -1,0 +1,61 @@
+services:
+  backend:
+    image: $DOCKER_USERNAME/liqnic-backend:latest
+    container_name: liqnic-backend
+    env_file:
+      - .env
+    ports:
+      - "9000:9000"
+    restart: always
+    # volumes:
+    #   - my-volume:/app/public/uploads
+    networks:
+      - web-traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.liqnic-backend.rule=Host(`api.liqnic.com`)"
+      - "traefik.http.routers.liqnic-backend.entrypoints=websecure"
+      - "traefik.http.routers.liqnic-backend.tls.certresolver=myresolver"
+      - "traefik.http.services.liqnic-backend.loadbalancer.server.port=9000"
+
+  dashboard:
+    image: $DOCKER_USERNAME/liqnic-dashboard:latest
+    container_name: liqnic-dashboard
+    ports:
+      - "8000:80"
+    restart: always
+    networks:
+      - web-traefik
+    depends_on:
+      - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.liqnic-dashboard.rule=Host(`cms.liqnic.com`)"
+      - "traefik.http.routers.liqnic-dashboard.entrypoints=websecure"
+      - "traefik.http.routers.liqnic-dashboard.tls.certresolver=myresolver"
+      - "traefik.http.services.liqnic-dashboard.loadbalancer.server.port=80"
+
+  storefront:
+    image: $DOCKER_USERNAME/liqnic-storefront:latest
+    container_name: liqnic-storefront
+    ports:
+      - "3000:3000"
+    restart: always
+    networks:
+      - web-traefik
+    depends_on:
+      - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.liqnic-storefront.rule=Host(`liqnic.com`)"
+      - "traefik.http.routers.liqnic-storefront.entrypoints=websecure"
+      - "traefik.http.routers.liqnic-storefront.tls.certresolver=myresolver"
+      - "traefik.http.services.liqnic-storefront.loadbalancer.server.port=80"
+
+networks:
+  web-traefik:
+    external: true
+
+volumes:
+  my-volume:
+    name: liqnic-local-storage-prod
