@@ -157,6 +157,11 @@ module.exports = defineConfig({
     },
   ],
   projectConfig: {
+    databaseDriverOptions: {
+      connection: {
+        ssl: false
+      }
+    },
     databaseUrl: process.env.DATABASE_URL,
     http: {
       storeCors: process.env.STORE_CORS!,
