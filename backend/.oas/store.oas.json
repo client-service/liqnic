@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "version": "2.0.0",
-    "title": "Medusa Storefront API",
+    "title": "Liqnic Storefront API",
     "license": {
       "name": "MIT",
       "url": "https://github.com/medusajs/medusa/blob/master/LICENSE"
@@ -786,7 +786,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -909,7 +909,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -997,7 +997,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1139,7 +1139,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1309,7 +1309,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1411,7 +1411,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1511,7 +1511,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1616,7 +1616,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1738,7 +1738,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1858,7 +1858,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1990,7 +1990,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -2084,7 +2084,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -2194,7 +2194,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -2304,7 +2304,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -2405,7 +2405,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -2487,7 +2487,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -3391,7 +3391,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -3472,7 +3472,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -3669,7 +3669,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -3749,7 +3749,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -3861,7 +3861,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -3952,7 +3952,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -4064,7 +4064,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -4289,7 +4289,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -4399,7 +4399,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -4500,7 +4500,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -4612,7 +4612,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -4753,7 +4753,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -4839,7 +4839,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -4930,7 +4930,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -5227,7 +5227,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -5320,7 +5320,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -5422,7 +5422,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -5523,7 +5523,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -5625,7 +5625,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -5729,7 +5729,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -5835,7 +5835,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -5926,7 +5926,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -6115,7 +6115,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -7065,7 +7065,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -7168,7 +7168,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -8023,7 +8023,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -8099,7 +8099,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -8954,7 +8954,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -9034,7 +9034,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -10161,7 +10161,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -10341,7 +10341,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -10632,7 +10632,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -10722,7 +10722,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -10900,7 +10900,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -10976,7 +10976,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -11067,7 +11067,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -11248,7 +11248,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -11360,7 +11360,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -11869,7 +11869,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in the Medusa Admin.",
+            "description": "Publishable API Key created in theLiqnic Admin.",
             "required": true,
             "schema": {
               "type": "string",

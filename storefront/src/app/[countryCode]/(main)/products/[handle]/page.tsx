@@ -11,22 +11,24 @@ type Props = {
 export async function generateStaticParams() {
   try {
     const countryCodes = await listRegions().then((regions) =>
-      regions?.map((r) => r.countries?.map((c) => c.iso_2)).flat()
+      regions
+        ?.map((r) => r.countries?.map((c) => c.iso_2))
+        .flat()
+        .filter(Boolean)
     )
 
-    if (!countryCodes) {
-      return []
-    }
+    if (!countryCodes) return []
 
     const promises = countryCodes.map(async (country) => {
-      const { response } = await listProducts({
-        countryCode: country,
-        queryParams: { limit: 100, fields: "handle" },
-      })
-
-      return {
-        country,
-        products: response.products,
+      try {
+        const { response } = await listProducts({
+          countryCode: country,
+          queryParams: { limit: 100, fields: "handle" },
+        })
+        return { country, products: response.products || [] }
+      } catch (err: any) {
+        console.warn(`Could not fetch products for ${country}:`, err.message)
+        return { country, products: [] }
       }
     })
 
@@ -40,11 +42,10 @@ export async function generateStaticParams() {
         }))
       )
       .filter((param) => param.handle)
-  } catch (error) {
-    console.error(
-      `Failed to generate static paths for product pages: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }.`
+  } catch (err: any) {
+    console.warn(
+      "Failed to generate static paths for product pages:",
+      err.message
     )
     return []
   }
@@ -52,27 +53,45 @@ export async function generateStaticParams() {
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params
-  const { handle } = params
-  const region = await getRegion(params.countryCode)
+  const { handle, countryCode } = params
 
-  if (!region) {
-    notFound()
+  let region = null
+  try {
+    region = await getRegion(countryCode)
+  } catch (err: any) {
+    console.warn("Could not fetch region:", err.message)
   }
 
-  const product = await listProducts({
-    countryCode: params.countryCode,
-    queryParams: { handle },
-  }).then(({ response }) => response.products[0])
+  if (!region) {
+    return {
+      title: "Product Not Found",
+      description: "Region not available",
+    }
+  }
+
+  let product = null
+  try {
+    const { response } = await listProducts({
+      countryCode,
+      queryParams: { handle },
+    })
+    product = response.products[0]
+  } catch (err: any) {
+    console.warn("Could not fetch product metadata:", err.message)
+  }
 
   if (!product) {
-    notFound()
+    return {
+      title: "Product Not Found",
+      description: "Product data not available",
+    }
   }
 
   return {
-    title: `${product.title} | Medusa Store`,
+    title: `${product.title} | Liqnic Store`,
     description: `${product.title}`,
     openGraph: {
-      title: `${product.title} | Medusa Store`,
+      title: `${product.title} | Liqnic Store`,
       description: `${product.title}`,
       images: product.thumbnail ? [product.thumbnail] : [],
     },
@@ -81,26 +100,39 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 export default async function ProductPage(props: Props) {
   const params = await props.params
-  const region = await getRegion(params.countryCode)
+  const { countryCode, handle } = params
 
-  if (!region) {
-    notFound()
+  let region = null
+  try {
+    region = await getRegion(countryCode)
+  } catch (err: any) {
+    console.warn("Could not fetch region:", err.message)
   }
 
-  const pricedProduct = await listProducts({
-    countryCode: params.countryCode,
-    queryParams: { handle: params.handle },
-  }).then(({ response }) => response.products[0])
+  if (!region) {
+    return <p>Region data not available at build time.</p>
+  }
 
-  if (!pricedProduct) {
-    notFound()
+  let product = null
+  try {
+    const { response } = await listProducts({
+      countryCode,
+      queryParams: { handle },
+    })
+    product = response.products[0]
+  } catch (err: any) {
+    console.warn("Could not fetch product:", err.message)
+  }
+
+  if (!product) {
+    return <p>Product data not available at build time.</p>
   }
 
   return (
     <ProductTemplate
-      product={pricedProduct}
+      product={product}
       region={region}
-      countryCode={params.countryCode}
+      countryCode={countryCode}
     />
   )
 }

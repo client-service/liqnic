@@ -8,13 +8,8 @@ import { Fragment } from "react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CountrySelect from "../country-select"
 import { HttpTypes } from "@medusajs/types"
-
-const SideMenuItems = {
-  Home: "/",
-  Store: "/store",
-  Account: "/account",
-  Cart: "/cart",
-}
+import { MENU_ITEMS } from "components/navbar"
+import { LuMenu } from "react-icons/lu"
 
 const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
   const toggleState = useToggleState()
@@ -30,7 +25,7 @@ const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
                   data-testid="nav-menu-button"
                   className="relative h-full flex items-center transition-all ease-out duration-200 focus:outline-none hover:text-ui-fg-base"
                 >
-                  Menu
+                  <LuMenu />
                 </Popover.Button>
               </div>
 
@@ -55,20 +50,34 @@ const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
                       </button>
                     </div>
                     <ul className="flex flex-col gap-6 items-start justify-start">
-                      {Object.entries(SideMenuItems).map(([name, href]) => {
-                        return (
-                          <li key={name}>
+                      {MENU_ITEMS.map((item) => (
+                        <li key={item.label}>
+                          {item.href ? (
                             <LocalizedClientLink
-                              href={href}
-                              className="text-3xl leading-10 hover:text-ui-fg-disabled"
+                              href={item.href}
                               onClick={close}
-                              data-testid={`${name.toLowerCase()}-link`}
                             >
-                              {name}
+                              {item.label}
                             </LocalizedClientLink>
-                          </li>
-                        )
-                      })}
+                          ) : item.dropdown && item.children ? (
+                            <div className="flex flex-col gap-2">
+                              <span>{item.label}</span>
+                              <ul className="ml-4 flex flex-col gap-1">
+                                {item.children.map((child) => (
+                                  <li key={child.label}>
+                                    <LocalizedClientLink
+                                      href={child.href!}
+                                      onClick={close}
+                                    >
+                                      {child.label}
+                                    </LocalizedClientLink>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ) : null}
+                        </li>
+                      ))}
                     </ul>
                     <div className="flex flex-col gap-y-6">
                       <div
@@ -90,7 +99,7 @@ const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
                         />
                       </div>
                       <Text className="flex justify-between txt-compact-small">
-                        © {new Date().getFullYear()} Medusa Store. All rights
+                        © {new Date().getFullYear()} Liqnic Store. All rights
                         reserved.
                       </Text>
                     </div>

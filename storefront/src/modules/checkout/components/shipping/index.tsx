@@ -10,6 +10,7 @@ import { Button, Heading, Text, clx } from "@medusajs/ui"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import Divider from "@modules/common/components/divider"
 import MedusaRadio from "@modules/common/components/radio"
+import { Span } from "next/dist/trace"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -192,6 +193,7 @@ const Shipping: React.FC<ShippingProps> = ({
                 How would you like you order delivered
               </span>
             </div>
+
             <div data-testid="delivery-options-container">
               <div className="pb-8 md:pt-0 pt-2">
                 {hasPickupOptions && (
