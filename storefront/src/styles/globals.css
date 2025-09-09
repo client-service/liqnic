@@ -2,6 +2,14 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+:root {
+  --font-manrope: 'Manrope', sans-serif;
+}
+
+html {
+  font-family: var(--font-manrope);
+}
+
 @layer utilities {
   /* Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
@@ -108,5 +116,9 @@
 
   .text-3xl-semi {
     @apply text-[32px] leading-[44px] font-semibold;
+  }
+
+  .component-px {
+    @apply px-4 sm:px-8 md:px-16 lg:px-20
   }
 }

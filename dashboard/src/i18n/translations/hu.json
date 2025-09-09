@@ -2675,7 +2675,7 @@
     "emailTooltip": "Az email cím nem módosítható. Ha másik email címet szeretne használni, új meghívót kell küldeni.",
     "invalidInvite": "A meghívó érvénytelen vagy lejárt.",
     "successTitle": "Fiókja regisztrálva lett",
-    "successHint": "Kezdje el azonnal használni a Medusa Admin-t.",
+    "successHint": "Kezdje el azonnal használni aLiqnic Admin-t.",
     "successAction": "Medusa Admin indítása",
     "invalidTokenTitle": "Meghívó tokenje érvénytelen",
     "invalidTokenHint": "Próbáljon új meghívó linket kérni.",

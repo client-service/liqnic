@@ -2731,7 +2731,7 @@
     "emailTooltip": "Nie można zmienić Twojego adresu e-mail. Jeśli chcesz skorzystać z innego adresu e-mail, należy wysłać nowe zaproszenie.",
     "invalidInvite": "Zaproszenie jest nieprawidłowe lub wygasło.",
     "successTitle": "Twoje konto zostało zarejestrowane",
-    "successHint": "Zacznij od razu z Medusa Admin.",
+    "successHint": "Zacznij od razu zLiqnic Admin.",
     "successAction": "Uruchom administratora Meduzy",
     "invalidTokenTitle": "Twój token zaproszenia jest nieprawidłowy",
     "invalidTokenHint": "Spróbuj poprosić o nowy link z zaproszeniem.",

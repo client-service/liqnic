@@ -1,10 +1,16 @@
+"use client"
+
 import { Button, Container, Text } from "@medusajs/ui"
-import { cookies as nextCookies } from "next/headers"
+import Cookies from "js-cookie"
+import { useEffect, useState } from "react"
 
-async function ProductOnboardingCta() {
-  const cookies = await nextCookies()
+function ProductOnboardingCta() {
+  const [isOnboarding, setIsOnboarding] = useState(false)
 
-  const isOnboarding = cookies.get("_medusa_onboarding")?.value === "true"
+  useEffect(() => {
+    const cookieValue = Cookies.get("_medusa_onboarding")
+    setIsOnboarding(cookieValue === "true")
+  }, [])
 
   if (!isOnboarding) {
     return null
@@ -12,7 +18,7 @@ async function ProductOnboardingCta() {
 
   return (
     <Container className="max-w-4xl h-full bg-ui-bg-subtle w-full p-8">
-      <div className="flex flex-col gap-y-4 center">
+      <div className="flex flex-col gap-y-4 items-center text-center">
         <Text className="text-ui-fg-base text-xl">
           Your demo product was successfully created! 🎉
         </Text>
