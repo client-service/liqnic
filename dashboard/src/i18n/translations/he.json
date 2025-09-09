@@ -2688,7 +2688,7 @@
     "invalidInvite": "ההזמנה אינה חוקית או פג תוקפה.",
     "successTitle": "החשבון שלך נרשם",
     "successHint": "התחל להשתמש ב-Medusa Admin מיד.",
-    "successAction": "התחל עם Medusa Admin",
+    "successAction": "התחל עםLiqnic Admin",
     "invalidTokenTitle": "אסימון ההזמנה שלך אינו תקף",
     "invalidTokenHint": "נסה לבקש קישור הזמנה חדש.",
     "passwordMismatch": "הסיסמאות אינן תואמות",

@@ -26,7 +26,7 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
   disabled = false,
   children,
 }) => {
-  const isDevelopment = process.env.NODE_ENV === "development"
+  const isCOD = true
 
   return (
     <RadioGroupOption
@@ -46,18 +46,18 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
           <Radio checked={selectedPaymentOptionId === paymentProviderId} />
           <Text className="text-base-regular">
             {paymentInfoMap[paymentProviderId]?.title || paymentProviderId}
-          </Text>
-          {isManual(paymentProviderId) && isDevelopment && (
+          </Text>{" "}
+          {/* {isManual(paymentProviderId) && isCOD && (
             <PaymentTest className="hidden small:block" />
-          )}
+          )} */}
         </div>
         <span className="justify-self-end text-ui-fg-base">
           {paymentInfoMap[paymentProviderId]?.icon}
         </span>
       </div>
-      {isManual(paymentProviderId) && isDevelopment && (
+      {/* {isManual(paymentProviderId) && isCOD && (
         <PaymentTest className="small:hidden text-[10px]" />
-      )}
+      )} */}
       {children}
     </RadioGroupOption>
   )

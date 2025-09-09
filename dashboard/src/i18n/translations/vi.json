@@ -2719,7 +2719,7 @@
     "invalidInvite": "Lời mời không hợp lệ hoặc đã hết hạn.",
     "successTitle": "Tài khoản của bạn đã được đăng ký",
     "successHint": "Bắt đầu ngay với Medusa Admin.",
-    "successAction": "Khởi động Medusa Admin",
+    "successAction": "Khởi độngLiqnic Admin",
     "invalidTokenTitle": "Mã mời của bạn không hợp lệ",
     "invalidTokenHint": "Hãy thử yêu cầu một liên kết mời mới.",
     "passwordMismatch": "Mật khẩu không khớp",
