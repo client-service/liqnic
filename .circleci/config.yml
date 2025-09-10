@@ -126,9 +126,7 @@ jobs:
     steps:
       - attach_workspace:
           at: .
-
-      - checkout
-
+      
       - setup_remote_docker
 
       # Backend
