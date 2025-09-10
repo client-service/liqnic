@@ -1,9 +1,10 @@
 version: 2.1
 
 executors:
-  docker-executor:
+  node-executor:
     docker:
       - image: cimg/node:22.6
+    working_directory: ~/project
 
 commands:
   check_changes:
@@ -15,11 +16,11 @@ commands:
       - run:
           name: Check changes in << parameters.dir >>
           command: |
-            if git diff --quiet HEAD~1 HEAD ./<< parameters.dir >>; then
-              echo "false" > .changed_<< parameters.dir >>
+            git fetch origin $CIRCLE_BRANCH
+            if git diff --quiet origin/$CIRCLE_BRANCH HEAD -- ./<< parameters.dir >>; then
+              echo "no" > << parameters.dir >>.changed
             else
-              echo "true" > .changed_<< parameters.dir >>
-            fi
+              echo "yes" > << parameters.dir >>.changed
 
   build_and_cache_node:
     description: "Install & build Node project with cache"
@@ -38,7 +39,7 @@ commands:
             - v1-<< parameters.dir >>-deps-{{ checksum "<< parameters.dir >>/<< parameters.lockfile >>" }}
             - v1-<< parameters.dir >>-deps-
       - run:
-          name: Install & build (<< parameters.dir >>)
+          name: Install & build << parameters.dir >>
           command: |
             cd << parameters.dir >>
             << parameters.install_cmd >>
@@ -49,106 +50,61 @@ commands:
           key: v1-<< parameters.dir >>-deps-{{ checksum "<< parameters.dir >>/<< parameters.lockfile >>" }}
 
 jobs:
-  build-and-test:
-    executor: docker-executor
+  detect-changes:
+    executor: node-executor
     steps:
       - checkout
-
-      # Check changes
       - check_changes:
           dir: backend
       - check_changes:
           dir: dashboard
       - check_changes:
           dir: storefront
+      - persist_to_workspace:
+          root: .
+          paths:
+            - backend.changed
+            - dashboard.changed
+            - storefront.changed
 
-      # Backend
-      - run:
-          name: Build backend conditionally
-          command: |
-            if [ "$(cat .changed_backend)" = "true" ]; then
-              echo "Building backend..."
-            else
-              echo "Skipping backend build."
-              exit 0
-            fi
+  build-backend:
+    executor: node-executor
+    steps:
+      - attach_workspace:
+          at: .
       - build_and_cache_node:
           dir: backend
           lockfile: yarn.lock
           install_cmd: yarn install --frozen-lockfile
           build_cmd: yarn build
-
-      # Dashboard
       - run:
-          name: Build dashboard conditionally
+          name: Docker build backend
           command: |
-            if [ "$(cat .changed_dashboard)" = "true" ]; then
-              echo "Building dashboard..."
+            if [ "$(cat backend.changed)" = "yes" ]; then
+              TAG=backend-0.1.$CIRCLE_BUILD_NUM
+              docker pull $DOCKER_USERNAME/liqnic-backend:latest || true
+              docker build --cache-from=$DOCKER_USERNAME/liqnic-backend:latest -t $DOCKER_USERNAME/liqnic-backend:$TAG ./backend
+              docker push $DOCKER_USERNAME/liqnic-backend:$TAG
+              docker tag $DOCKER_USERNAME/liqnic-backend:$TAG $DOCKER_USERNAME/liqnic-backend:latest
+              docker push $DOCKER_USERNAME/liqnic-backend:latest
             else
-              echo "Skipping dashboard build."
-              exit 0
+              echo "Backend not changed, skipping Docker build"
             fi
+
+  build-dashboard:
+    executor: node-executor
+    steps:
+      - attach_workspace:
+          at: .
       - build_and_cache_node:
           dir: dashboard
           lockfile: package-lock.json
           install_cmd: npm ci
           build_cmd: npm run build
-
-      # # Storefront (commented for now)
-      # - run:
-      #     name: Build storefront conditionally
-      #     command: |
-      #       if [ "$(cat .changed_storefront)" = "true" ]; then
-      #         echo "Building storefront..."
-      #       else
-      #         echo "Skipping storefront build."
-      #         exit 0
-      #       fi
-      # - build_and_cache_node:
-      #     dir: storefront
-      #     lockfile: package-lock.json
-      #     install_cmd: npm ci
-      #     build_cmd: npm run build
-
-      # Persist change flags for next jobs
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .changed_backend
-            - .changed_dashboard
-            - .changed_storefront
-
-  docker-build-and-push:
-    docker:
-      - image: cimg/node:22.6
-        auth:
-          username: $DOCKER_USERNAME
-          password: $DOCKER_PASSWORD
-    steps:
-      - checkout
-      - attach_workspace:
-          at: .
-      - setup_remote_docker
-
-      # Backend
-      - run:
-          name: Docker build backend
-          command: |
-            if [ "$(cat .changed_backend)" = "true" ]; then
-              TAG=backend-0.1.$CIRCLE_BUILD_NUM
-              docker pull $DOCKER_USERNAME/liqnic-backend:latest || true
-              docker build --cache-from=$DOCKER_USERNAME/liqnic-backend:latest \
-                -t $DOCKER_USERNAME/liqnic-backend:$TAG ./backend
-              docker push $DOCKER_USERNAME/liqnic-backend:$TAG
-              docker tag $DOCKER_USERNAME/liqnic-backend:$TAG $DOCKER_USERNAME/liqnic-backend:latest
-              docker push $DOCKER_USERNAME/liqnic-backend:latest
-            fi
-
-      # Dashboard
       - run:
           name: Docker build dashboard
           command: |
-            if [ "$(cat .changed_dashboard)" = "true" ]; then
+            if [ "$(cat dashboard.changed)" = "yes" ]; then
               TAG=dashboard-0.1.$CIRCLE_BUILD_NUM
               docker pull $DOCKER_USERNAME/liqnic-dashboard:latest || true
               docker build --cache-from=$DOCKER_USERNAME/liqnic-dashboard:latest \
@@ -159,91 +115,96 @@ jobs:
               docker push $DOCKER_USERNAME/liqnic-dashboard:$TAG
               docker tag $DOCKER_USERNAME/liqnic-dashboard:$TAG $DOCKER_USERNAME/liqnic-dashboard:latest
               docker push $DOCKER_USERNAME/liqnic-dashboard:latest
+            else
+              echo "Dashboard not changed, skipping Docker build"
             fi
 
-      # # Storefront (commented for now)
-      # - run:
-      #     name: Docker build storefront
-      #     command: |
-      #       if [ "$(cat .changed_storefront)" = "true" ]; then
-      #         TAG=storefront-0.1.$CIRCLE_BUILD_NUM
-      #         docker pull $DOCKER_USERNAME/liqnic-storefront:latest || true
-      #         docker build --cache-from=$DOCKER_USERNAME/liqnic-storefront:latest \
-      #           --build-arg MEDUSA_BACKEND_URL=$MEDUSA_BACKEND_URL \
-      #           --build-arg NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY \
-      #           --build-arg NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL \
-      #           --build-arg NEXT_PUBLIC_DEFAULT_REGION=$NEXT_PUBLIC_DEFAULT_REGION \
-      #           -t $DOCKER_USERNAME/liqnic-storefront:$TAG ./storefront
-      #         docker push $DOCKER_USERNAME/liqnic-storefront:$TAG
-      #         docker tag $DOCKER_USERNAME/liqnic-storefront:$TAG $DOCKER_USERNAME/liqnic-storefront:latest
-      #         docker push $DOCKER_USERNAME/liqnic-storefront:latest
-      #       fi
+  build-storefront:
+    executor: node-executor
+    steps:
+      - attach_workspace:
+          at: .
+      - build_and_cache_node:
+          dir: storefront
+          lockfile: package-lock.json
+          install_cmd: npm ci
+          build_cmd: npm run build
+      - run:
+          name: Docker build storefront
+          command: |
+            if [ "$(cat storefront.changed)" = "yes" ]; then
+              TAG=storefront-0.1.$CIRCLE_BUILD_NUM
+              docker pull $DOCKER_USERNAME/liqnic-storefront:latest || true
+              docker build --cache-from=$DOCKER_USERNAME/liqnic-storefront:latest \
+                --build-arg MEDUSA_BACKEND_URL=$MEDUSA_BACKEND_URL \
+                --build-arg NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY \
+                --build-arg NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL \
+                --build-arg NEXT_PUBLIC_DEFAULT_REGION=$NEXT_PUBLIC_DEFAULT_REGION \
+                -t $DOCKER_USERNAME/liqnic-storefront:$TAG ./storefront
+              docker push $DOCKER_USERNAME/liqnic-storefront:$TAG
+              docker tag $DOCKER_USERNAME/liqnic-storefront:$TAG $DOCKER_USERNAME/liqnic-storefront:latest
+              docker push $DOCKER_USERNAME/liqnic-storefront:latest
+            else
+              echo "Storefront not changed, skipping Docker build"
+            fi
 
   deploy:
     machine:
       image: ubuntu-2004:current
-    resource_class: medium
     steps:
       - attach_workspace:
           at: .
       - run:
           name: Install sshpass
-          command: |
-            sudo apt-get update -y
-            sudo apt-get install -y sshpass
+          command: sudo apt-get update && sudo apt-get install -y sshpass
       - run:
-          name: Deploy changed services to VM
+          name: Deploy changed services
           command: |
             if [ "$CIRCLE_BRANCH" = "development" ]; then
-              SSH_COMMAND="sshpass -p $SSH_PASSWORD_DEV ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST_DEV"
-              COMPOSE_DIR="/home/docker/liqnic"
+              SSH_PASS=$SSH_PASSWORD_DEV
+              SSH_HOST=$SSH_HOST_DEV
             elif [ "$CIRCLE_BRANCH" = "production" ]; then
-              SSH_COMMAND="sshpass -p $SSH_PASSWORD_PROD ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST_PROD"
-              COMPOSE_DIR="/home/docker/liqnic"
+              SSH_PASS=$SSH_PASSWORD_PROD
+              SSH_HOST=$SSH_HOST_PROD
             fi
 
-            if [ "$(cat .changed_backend)" = "true" ]; then
-              echo "Deploying backend..."
-              $SSH_COMMAND "cd $COMPOSE_DIR && docker compose up -d backend"
-            fi
+            sshpass -p $SSH_PASS ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << 'EOF'
+              cd /home/docker/liqnic
 
-            if [ "$(cat .changed_dashboard)" = "true" ]; then
-              echo "Deploying dashboard..."
-              $SSH_COMMAND "cd $COMPOSE_DIR && docker compose up -d dashboard"
-            fi
+              if [ -f backend.changed ] && [ "$(cat backend.changed)" = "yes" ]; then
+                echo "Deploying backend..."
+                docker pull $DOCKER_USERNAME/liqnic-backend:latest
+                docker compose up -d backend
+              fi
 
-            # if [ "$(cat .changed_storefront)" = "true" ]; then
-            #   echo "Deploying storefront..."
-            #   $SSH_COMMAND "cd $COMPOSE_DIR && docker compose up -d storefront"
-            # fi
+              if [ -f dashboard.changed ] && [ "$(cat dashboard.changed)" = "yes" ]; then
+                echo "Deploying dashboard..."
+                docker pull $DOCKER_USERNAME/liqnic-dashboard:latest
+                docker compose up -d dashboard
+              fi
+
+              if [ -f storefront.changed ] && [ "$(cat storefront.changed)" = "yes" ]; then
+                echo "Deploying storefront..."
+                docker pull $DOCKER_USERNAME/liqnic-storefront:latest
+                docker compose up -d storefront
+              fi
+            EOF
 
 workflows:
-  build-deploy-dev:
-    when:
-      equal: [ development, << pipeline.git.branch >> ]
+  build-deploy-dev-prod:
     jobs:
-      - build-and-test:
-          context: liqnic-dev
-      - docker-build-and-push:
-          context: liqnic-dev
+      - detect-changes
+      - build-backend:
           requires:
-            - build-and-test
+            - detect-changes
+      - build-dashboard:
+          requires:
+            - detect-changes
+      - build-storefront:
+          requires:
+            - detect-changes
       - deploy:
-          context: liqnic-dev
           requires:
-            - docker-build-and-push
-
-  build-deploy-prod:
-    when:
-      equal: [ production, << pipeline.git.branch >> ]
-    jobs:
-      - build-and-test:
-          context: liqnic-prod
-      - docker-build-and-push:
-          context: liqnic-prod
-          requires:
-            - build-and-test
-      - deploy:
-          context: liqnic-prod
-          requires:
-            - docker-build-and-push
+            - build-backend
+            - build-dashboard
+            - build-storefront
