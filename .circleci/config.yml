@@ -62,6 +62,14 @@ jobs:
       - check_changes:
           dir: storefront
 
+      # Persist change flags for later jobs
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .changed_backend
+            - .changed_dashboard
+            - .changed_storefront
+
       # Backend
       - run:
           name: Build backend conditionally
@@ -106,16 +114,9 @@ jobs:
       #       fi
       # - build_and_cache_node:
       #     dir: storefront
-      #     locstepskfile: package-lock.json
+      #     lockfile: package-lock.json
       #     install_cmd: npm ci
       #     build_cmd: npm run build
-
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .changed_backend
-            - .changed_dashboard
-            - .changed_storefront
 
   docker-build-and-push:
     docker:
@@ -124,9 +125,9 @@ jobs:
           username: $DOCKER_USERNAME
           password: $DOCKER_PASSWORD
     steps:
+      - checkout
       - attach_workspace:
           at: .
-      
       - setup_remote_docker
 
       # Backend
@@ -160,23 +161,23 @@ jobs:
               docker push $DOCKER_USERNAME/liqnic-dashboard:latest
             fi
 
-      # Storefront
-      - run:
-          name: Docker build storefront
-          command: |
-            if [ "$(cat .changed_storefront)" = "true" ]; then
-              TAG=storefront-0.1.$CIRCLE_BUILD_NUM
-              docker pull $DOCKER_USERNAME/liqnic-storefront:latest || true
-              docker build --cache-from=$DOCKER_USERNAME/liqnic-storefront:latest \
-                --build-arg MEDUSA_BACKEND_URL=$MEDUSA_BACKEND_URL \
-                --build-arg NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY \
-                --build-arg NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL \
-                --build-arg NEXT_PUBLIC_DEFAULT_REGION=$NEXT_PUBLIC_DEFAULT_REGION \
-                -t $DOCKER_USERNAME/liqnic-storefront:$TAG ./storefront
-              docker push $DOCKER_USERNAME/liqnic-storefront:$TAG
-              docker tag $DOCKER_USERNAME/liqnic-storefront:$TAG $DOCKER_USERNAME/liqnic-storefront:latest
-              docker push $DOCKER_USERNAME/liqnic-storefront:latest
-            fi
+      # # Storefront
+      # - run:
+      #     name: Docker build storefront
+      #     command: |
+      #       if [ "$(cat .changed_storefront)" = "true" ]; then
+      #         TAG=storefront-0.1.$CIRCLE_BUILD_NUM
+      #         docker pull $DOCKER_USERNAME/liqnic-storefront:latest || true
+      #         docker build --cache-from=$DOCKER_USERNAME/liqnic-storefront:latest \
+      #           --build-arg MEDUSA_BACKEND_URL=$MEDUSA_BACKEND_URL \
+      #           --build-arg NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY \
+      #           --build-arg NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL \
+      #           --build-arg NEXT_PUBLIC_DEFAULT_REGION=$NEXT_PUBLIC_DEFAULT_REGION \
+      #           -t $DOCKER_USERNAME/liqnic-storefront:$TAG ./storefront
+      #         docker push $DOCKER_USERNAME/liqnic-storefront:$TAG
+      #         docker tag $DOCKER_USERNAME/liqnic-storefront:$TAG $DOCKER_USERNAME/liqnic-storefront:latest
+      #         docker push $DOCKER_USERNAME/liqnic-storefront:latest
+      #       fi
 
   deploy:
     machine:
@@ -185,7 +186,6 @@ jobs:
     steps:
       - attach_workspace:
           at: .
-
       - run:
           name: Install sshpass
           command: sudo apt-get install -y sshpass
@@ -211,10 +211,10 @@ jobs:
               $SSH_COMMAND "cd $COMPOSE_DIR && docker compose up -d dashboard"
             fi
 
-            if [ "$(cat .changed_storefront)" = "true" ]; then
-              echo "Deploying storefront..."
-              $SSH_COMMAND "cd $COMPOSE_DIR && docker compose up -d storefront"
-            fi
+            # if [ "$(cat .changed_storefront)" = "true" ]; then
+            #   echo "Deploying storefront..."
+            #   $SSH_COMMAND "cd $COMPOSE_DIR && docker compose up -d storefront"
+            # fi
 
 workflows:
   build-deploy-dev:
