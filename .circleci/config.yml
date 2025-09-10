@@ -94,7 +94,7 @@ jobs:
           install_cmd: npm ci
           build_cmd: npm run build
 
-      # # Storefront
+      # # Storefront (commented for now)
       # - run:
       #     name: Build storefront conditionally
       #     command: |
@@ -110,6 +110,14 @@ jobs:
       #     install_cmd: npm ci
       #     build_cmd: npm run build
 
+      # Persist change flags for next jobs
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .changed_backend
+            - .changed_dashboard
+            - .changed_storefront
+
   docker-build-and-push:
     docker:
       - image: cimg/node:22.6
@@ -118,6 +126,8 @@ jobs:
           password: $DOCKER_PASSWORD
     steps:
       - checkout
+      - attach_workspace:
+          at: .
       - setup_remote_docker
 
       # Backend
@@ -151,7 +161,7 @@ jobs:
               docker push $DOCKER_USERNAME/liqnic-dashboard:latest
             fi
 
-      # # Storefront
+      # # Storefront (commented for now)
       # - run:
       #     name: Docker build storefront
       #     command: |
@@ -174,40 +184,37 @@ jobs:
       image: ubuntu-2004:current
     resource_class: medium
     steps:
+      - attach_workspace:
+          at: .
       - run:
           name: Install sshpass
           command: |
             sudo apt-get update -y
             sudo apt-get install -y sshpass
-
       - run:
           name: Deploy changed services to VM
           command: |
             if [ "$CIRCLE_BRANCH" = "development" ]; then
-              VM_HOST=$SSH_HOST_DEV
-              VM_USER=$SSH_USER
-              VM_PASS=$SSH_PASSWORD_DEV
+              SSH_COMMAND="sshpass -p $SSH_PASSWORD_DEV ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST_DEV"
               COMPOSE_DIR="/home/docker/liqnic"
             elif [ "$CIRCLE_BRANCH" = "production" ]; then
-              VM_HOST=$SSH_HOST_PROD
-              VM_USER=$SSH_USER
-              VM_PASS=$SSH_PASSWORD_PROD
+              SSH_COMMAND="sshpass -p $SSH_PASSWORD_PROD ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST_PROD"
               COMPOSE_DIR="/home/docker/liqnic"
             fi
 
             if [ "$(cat .changed_backend)" = "true" ]; then
               echo "Deploying backend..."
-              sshpass -p "$VM_PASS" ssh -o StrictHostKeyChecking=no $VM_USER@$VM_HOST "cd $COMPOSE_DIR && docker compose pull backend && docker compose up -d backend"
+              $SSH_COMMAND "cd $COMPOSE_DIR && docker compose up -d backend"
             fi
 
             if [ "$(cat .changed_dashboard)" = "true" ]; then
               echo "Deploying dashboard..."
-              sshpass -p "$VM_PASS" ssh -o StrictHostKeyChecking=no $VM_USER@$VM_HOST "cd $COMPOSE_DIR && docker compose pull dashboard && docker compose up -d dashboard"
+              $SSH_COMMAND "cd $COMPOSE_DIR && docker compose up -d dashboard"
             fi
 
             # if [ "$(cat .changed_storefront)" = "true" ]; then
             #   echo "Deploying storefront..."
-            #   sshpass -p "$VM_PASS" ssh -o StrictHostKeyChecking=no $VM_USER@$VM_HOST "cd $COMPOSE_DIR && docker compose pull storefront && docker compose up -d storefront"
+            #   $SSH_COMMAND "cd $COMPOSE_DIR && docker compose up -d storefront"
             # fi
 
 workflows:
