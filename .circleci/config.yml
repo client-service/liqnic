@@ -37,14 +37,19 @@ commands:
     steps:
       - restore_cache:
           keys:
-            - v1-deps-<< parameters.project_path >>-{{ checksum "<< parameters.project_path >>/<<# if equals \"npm\" parameters.package_manager >>package-lock.json<</ if >><# if equals \"yarn\" parameters.package_manager >>yarn.lock<</ if >>" }}
+            # Use separate, simpler cache keys. CircleCI will try them in order.
+            - v1-deps-yarn-<< parameters.project_path >>-{{ checksum "<< parameters.project_path >>/yarn.lock" }}
+            - v1-deps-npm-<< parameters.project_path >>-{{ checksum "<< parameters.project_path >>/package-lock.json" }}
+            # Fallback key.
             - v1-deps-<< parameters.project_path >>-
       - run:
           name: Install dependencies for << parameters.project_path >>
           working_directory: << parameters.project_path >>
           command: << parameters.package_manager >> install
       - save_cache:
-          key: v1-deps-<< parameters.project_path >>-{{ checksum "<< parameters.project_path >>/<<# if equals \"npm\" parameters.package_manager >>package-lock.json<</ if >><# if equals \"yarn\" parameters.package_manager >>yarn.lock<</ if >>" }}
+          # For saving, use a conditional to select the correct key based on the package manager.
+          # This syntax is valid as the conditional is not nested inside the checksum function.
+          key: <<# if equals "yarn" parameters.package_manager >>v1-deps-yarn-<< parameters.project_path >>-{{ checksum "<< parameters.project_path >>/yarn.lock" }}<</ if >><<# if equals "npm" parameters.package_manager >>v1-deps-npm-<< parameters.project_path >>-{{ checksum "<< parameters.project_path >>/package-lock.json" }}<</ if >>
           paths:
             - << parameters.project_path >>/node_modules
 
