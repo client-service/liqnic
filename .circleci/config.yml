@@ -47,9 +47,17 @@ commands:
           working_directory: << parameters.project_path >>
           command: << parameters.package_manager >> install
       - save_cache:
-          # For saving, use a conditional to select the correct key based on the package manager.
-          # This syntax is valid as the conditional is not nested inside the checksum function.
-          key: <<# if equals "yarn" parameters.package_manager >>v1-deps-yarn-<< parameters.project_path >>-{{ checksum "<< parameters.project_path >>/yarn.lock" }}<</ if >><<# if equals "npm" parameters.package_manager >>v1-deps-npm-<< parameters.project_path >>-{{ checksum "<< parameters.project_path >>/package-lock.json" }}<</ if >>
+          when:
+            condition:
+              equal: [ "yarn", << parameters.package_manager >> ]
+          key: v1-deps-yarn-<< parameters.project_path >>-{{ checksum "<< parameters.project_path >>/yarn.lock" }}
+          paths:
+            - << parameters.project_path >>/node_modules
+      - save_cache:
+          when:
+            condition:
+              equal: [ "npm", << parameters.package_manager >> ]
+          key: v1-deps-npm-<< parameters.project_path >>-{{ checksum "<< parameters.project_path >>/package-lock.json" }}
           paths:
             - << parameters.project_path >>/node_modules
 
