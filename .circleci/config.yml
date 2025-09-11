@@ -1,8 +1,8 @@
-# CircleCI Configuration for MedusaJS Monorepo (v12 - Final)
+# CircleCI Configuration for MedusaJS Monorepo (v14 - Final)
 # This configuration is complete and includes all requested features.
-# Linter Fix: Removed all 'when' clauses from the workflow. Conditional logic
-# is now handled inside each job with a script that calls 'circleci-agent step halt'
-# to gracefully skip jobs whose conditions are not met.
+# Schema Fix: The 'when' condition is not supported on steps within a reusable command.
+# The save_cache logic has been moved from the 'install_dependencies' command
+# into the individual jobs to resolve the schema violation error.
 version: 2.1
 
 # Orbs are reusable packages of CircleCI configuration.
@@ -37,21 +37,13 @@ commands:
     steps:
       - restore_cache:
           keys:
-            # Use separate, simpler cache keys. CircleCI will try them in order.
             - v1-deps-yarn-<< parameters.project_path >>-{{ checksum "<< parameters.project_path >>/yarn.lock" }}
             - v1-deps-npm-<< parameters.project_path >>-{{ checksum "<< parameters.project_path >>/package-lock.json" }}
-            # Fallback key.
             - v1-deps-<< parameters.project_path >>-
       - run:
           name: Install dependencies for << parameters.project_path >>
           working_directory: << parameters.project_path >>
           command: << parameters.package_manager >> install
-      - save_cache:
-          # For saving, use a conditional to select the correct key based on the package manager.
-          # This syntax is valid as the conditional is not nested inside the checksum function.
-          key: <<# if equals "yarn" parameters.package_manager >>v1-deps-yarn-<< parameters.project_path >>-{{ checksum "<< parameters.project_path >>/yarn.lock" }}<</ if >><<# if equals "npm" parameters.package_manager >>v1-deps-npm-<< parameters.project_path >>-{{ checksum "<< parameters.project_path >>/package-lock.json" }}<</ if >>
-          paths:
-            - << parameters.project_path >>/node_modules
 
 jobs:
   # == TEST & BUILD JOBS ==
@@ -67,6 +59,10 @@ jobs:
             fi
       - checkout
       - install_dependencies: { project_path: backend, package_manager: yarn }
+      - save_cache:
+          key: v1-deps-yarn-backend-{{ checksum "backend/yarn.lock" }}
+          paths:
+            - backend/node_modules
       - run: { name: "Build Backend", working_directory: backend, command: "npm run build" }
 
   test_and_build_dashboard:
@@ -81,6 +77,10 @@ jobs:
             fi
       - checkout
       - install_dependencies: { project_path: dashboard, package_manager: npm }
+      - save_cache:
+          key: v1-deps-npm-dashboard-{{ checksum "dashboard/package-lock.json" }}
+          paths:
+            - dashboard/node_modules
       - run: { name: "Build Dashboard", working_directory: dashboard, command: "npm run build" }
 
   # == DEDICATED DOCKER BUILD & PUSH JOBS ==
@@ -201,8 +201,6 @@ jobs:
           command: |
             SSH_COMMAND="sshpass -p '$SSH_PASSWORD' ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST"
             $SSH_COMMAND "
-              docker logout
-              docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
               set -e
               cd /home/docker/liqnic/dev
               docker-compose pull
@@ -220,8 +218,6 @@ jobs:
           command: |
             SSH_COMMAND="sshpass -p '$SSH_PASSWORD' ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST"
             $SSH_COMMAND "
-              docker logout
-              docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
               set -e
               cd /home/docker/liqnic/prod
               docker-compose pull
