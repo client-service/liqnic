@@ -168,7 +168,7 @@ jobs:
               SSH_HOST=$SSH_HOST_PROD
             fi
 
-            sshpass -p $SSH_PASS ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST 'bash -s' << 'EOF'
+            sshpass -p $SSH_PASS ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST 'bash -s' \<< 'EOF'
               cd /home/docker/liqnic
 
               if [ -f backend.changed ] && [ "$(cat backend.changed)" = "yes" ]; then
