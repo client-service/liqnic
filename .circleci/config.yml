@@ -1,196 +1,280 @@
+# CircleCI Configuration for MedusaJS Monorepo (v12 - Final)
+# This configuration is complete and includes all requested features.
+# Linter Fix: Removed all 'when' clauses from the workflow. Conditional logic
+# is now handled inside each job with a script that calls 'circleci-agent step halt'
+# to gracefully skip jobs whose conditions are not met.
 version: 2.1
 
+# Orbs are reusable packages of CircleCI configuration.
+orbs:
+  path-filtering: circleci/path-filtering@2.0.4
+  docker: circleci/docker@3.0.1
+
+# Pipeline parameters are set by the path-filtering orb at the start of the workflow.
+parameters:
+  build-backend:
+    type: boolean
+    default: false
+  build-dashboard:
+    type: boolean
+    default: false
+
+# Reusable execution environment for Node.js jobs.
 executors:
-  docker-executor:
+  node_executor:
     docker:
-      - image: cimg/node:22.6
+      - image: cimg/node:22.4
 
+# Reusable command to install dependencies with caching.
 commands:
-  check_changes:
-    description: "Check if files in a directory changed"
+  install_dependencies:
     parameters:
-      dir:
+      project_path:
         type: string
-    steps:
-      - run:
-          name: Check changes in << parameters.dir >>
-          command: |
-            if git diff --quiet HEAD~1 HEAD ./<< parameters.dir >>; then
-              echo "false" > .changed_<< parameters.dir >>
-            else
-              echo "true" > .changed_<< parameters.dir >>
-            fi
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .changed_<< parameters.dir >>
-
-  build_and_cache_node:
-    description: "Install & build Node project with cache"
-    parameters:
-      dir:
-        type: string
-      lockfile:
-        type: string
-      install_cmd:
-        type: string
-      build_cmd:
-        type: string
+      package_manager:
+        type: enum
+        enum: ["npm", "yarn"]
     steps:
       - restore_cache:
           keys:
-            - v1-<< parameters.dir >>-deps-{{ checksum "<< parameters.dir >>/<< parameters.lockfile >>" }}
-            - v1-<< parameters.dir >>-deps-
+            # Use separate, simpler cache keys. CircleCI will try them in order.
+            - v1-deps-yarn-<< parameters.project_path >>-{{ checksum "<< parameters.project_path >>/yarn.lock" }}
+            - v1-deps-npm-<< parameters.project_path >>-{{ checksum "<< parameters.project_path >>/package-lock.json" }}
+            # Fallback key.
+            - v1-deps-<< parameters.project_path >>-
       - run:
-          name: Install & build (<< parameters.dir >>)
-          command: |
-            cd << parameters.dir >>
-            << parameters.install_cmd >>
-            << parameters.build_cmd >>
+          name: Install dependencies for << parameters.project_path >>
+          working_directory: << parameters.project_path >>
+          command: << parameters.package_manager >> install
       - save_cache:
+          # For saving, use a conditional to select the correct key based on the package manager.
+          # This syntax is valid as the conditional is not nested inside the checksum function.
+          key: <<# if equals "yarn" parameters.package_manager >>v1-deps-yarn-<< parameters.project_path >>-{{ checksum "<< parameters.project_path >>/yarn.lock" }}<</ if >><<# if equals "npm" parameters.package_manager >>v1-deps-npm-<< parameters.project_path >>-{{ checksum "<< parameters.project_path >>/package-lock.json" }}<</ if >>
           paths:
-            - ./<< parameters.dir >>/node_modules
-          key: v1-<< parameters.dir >>-deps-{{ checksum "<< parameters.dir >>/<< parameters.lockfile >>" }}
+            - << parameters.project_path >>/node_modules
 
 jobs:
-  build-and-test:
-    executor: docker-executor
+  # == TEST & BUILD JOBS ==
+  test_and_build_backend:
+    executor: node_executor
     steps:
+      - run:
+          name: Check if job should run
+          command: |
+            if [ "<< pipeline.parameters.build-backend >>" != "true" ]; then
+              echo "Skipping job: No changes detected in the backend."
+              circleci-agent step halt
+            fi
       - checkout
-      - check_changes:
-          dir: backend
-      - check_changes:
-          dir: dashboard
+      - install_dependencies: { project_path: backend, package_manager: yarn }
+      - run: { name: "Build Backend", working_directory: backend, command: "npm run build" }
 
-      # Backend
-      - attach_workspace:
-          at: .
-      - run:
-          name: Build backend conditionally
-          command: |
-            if [ "$(cat .changed_backend)" = "true" ]; then
-              echo "Building backend..."
-              cd backend
-              yarn install --frozen-lockfile
-              yarn build
-            else
-              echo "Skipping backend build."
-            fi
-
-      # Dashboard
-      - run:
-          name: Build dashboard conditionally
-          command: |
-            if [ "$(cat .changed_dashboard)" = "true" ]; then
-              echo "Building dashboard..."
-              cd dashboard
-              npm ci
-              npm run build
-            else
-              echo "Skipping dashboard build."
-            fi
-
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .changed_backend
-            - .changed_dashboard
-
-  docker-build-and-push:
-    docker:
-      - image: cimg/node:22.6
-        auth:
-          username: $DOCKER_USERNAME
-          password: $DOCKER_PASSWORD
+  test_and_build_dashboard:
+    executor: node_executor
     steps:
+      - run:
+          name: Check if job should run
+          command: |
+            if [ "<< pipeline.parameters.build-dashboard >>" != "true" ]; then
+              echo "Skipping job: No changes detected in the dashboard."
+              circleci-agent step halt
+            fi
       - checkout
-      - attach_workspace:
-          at: .
-      - setup_remote_docker
+      - install_dependencies: { project_path: dashboard, package_manager: npm }
+      - run: { name: "Build Dashboard", working_directory: dashboard, command: "npm run build" }
 
-      # Backend
-      - run:
-          name: Docker build backend
-          command: |
-            if [ "$(cat .changed_backend)" = "true" ]; then
-              TAG=backend-0.1.$CIRCLE_BUILD_NUM
-              docker pull $DOCKER_USERNAME/liqnic-backend:latest || true
-              docker build --cache-from=$DOCKER_USERNAME/liqnic-backend:latest \
-                -t $DOCKER_USERNAME/liqnic-backend:$TAG ./backend
-              docker push $DOCKER_USERNAME/liqnic-backend:$TAG
-              docker tag $DOCKER_USERNAME/liqnic-backend:$TAG $DOCKER_USERNAME/liqnic-backend:latest
-              docker push $DOCKER_USERNAME/liqnic-backend:latest
-            fi
-
-      # Dashboard
-      - run:
-          name: Docker build dashboard
-          command: |
-            if [ "$(cat .changed_dashboard)" = "true" ]; then
-              TAG=dashboard-0.1.$CIRCLE_BUILD_NUM
-              docker pull $DOCKER_USERNAME/liqnic-dashboard:latest || true
-              docker build --cache-from=$DOCKER_USERNAME/liqnic-dashboard:latest \
-                --build-arg VITE_MEDUSA_BASE=$VITE_MEDUSA_BASE \
-                --build-arg VITE_MEDUSA_BACKEND_URL=$VITE_MEDUSA_BACKEND_URL \
-                --build-arg VITE_MEDUSA_STOREFRONT_URL=$VITE_MEDUSA_STOREFRONT_URL \
-                -t $DOCKER_USERNAME/liqnic-dashboard:$TAG ./dashboard
-              docker push $DOCKER_USERNAME/liqnic-dashboard:$TAG
-              docker tag $DOCKER_USERNAME/liqnic-dashboard:$TAG $DOCKER_USERNAME/liqnic-dashboard:latest
-              docker push $DOCKER_USERNAME/liqnic-dashboard:latest
-            fi
-
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .changed_backend
-            - .changed_dashboard
-
-  deploy:
-    machine:
-      image: ubuntu-2004:current
-    resource_class: medium
+  # == DEDICATED DOCKER BUILD & PUSH JOBS ==
+  build_and_push_backend_dev:
+    executor: node_executor
     steps:
-      - attach_workspace:
-          at: .
       - run:
-          name: Install sshpass
-          command: sudo apt-get install -y sshpass
-      - run:
-          name: Deploy changed services to VM
+          name: Check if job should run
           command: |
-            if [ "$CIRCLE_BRANCH" = "development" ]; then
-              SSH_COMMAND="sshpass -p $SSH_PASSWORD_DEV ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST_DEV"
-              COMPOSE_DIR="/home/docker/liqnic"
-            elif [ "$CIRCLE_BRANCH" = "production" ]; then
-              SSH_COMMAND="sshpass -p $SSH_PASSWORD_PROD ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST_PROD"
-              COMPOSE_DIR="/home/docker/liqnic"
+            if [ "<< pipeline.parameters.build-backend >>" != "true" ] || [ "$CIRCLE_BRANCH" != "develop" ]; then
+              echo "Skipping job: Conditions not met (no backend changes or not on develop branch)."
+              circleci-agent step halt
             fi
+      - checkout
+      - setup_remote_docker: { version: 20.10.18 }
+      - docker/check
+      - run: { name: "Log in to Docker Hub", command: "echo \"$DOCKER_PASSWORD\" | docker login -u \"$DOCKER_USERNAME\" --password-stdin" }
+      - run:
+          name: Build and Push Backend Dev Image
+          working_directory: backend
+          command: |
+            docker build -t "$DOCKER_USERNAME/medusa-backend:dev-${CIRCLE_SHA1:0:7}" .
+            docker tag "$DOCKER_USERNAME/medusa-backend:dev-${CIRCLE_SHA1:0:7}" "$DOCKER_USERNAME/medusa-backend:dev"
+            docker push "$DOCKER_USERNAME/medusa-backend" --all-tags
 
-            if [ "$(cat .changed_backend)" = "true" ]; then
-              echo "Deploying backend..."
-              $SSH_COMMAND "cd $COMPOSE_DIR && docker rm -f liqnic-backend || true && docker rmi -f $DOCKER_USERNAME/liqnic-backend:latest || true && docker compose pull backend && docker compose up -d backend"
+  build_and_push_backend_prod:
+    executor: node_executor
+    steps:
+      - run:
+          name: Check if job should run
+          command: |
+            if [ "<< pipeline.parameters.build-backend >>" != "true" ] || [ "$CIRCLE_BRANCH" != "main" ]; then
+              echo "Skipping job: Conditions not met (no backend changes or not on main branch)."
+              circleci-agent step halt
             fi
+      - checkout
+      - setup_remote_docker: { version: 20.10.18 }
+      - docker/check
+      - run: { name: "Log in to Docker Hub", command: "echo \"$DOCKER_PASSWORD\" | docker login -u \"$DOCKER_USERNAME\" --password-stdin" }
+      - run:
+          name: Build and Push Backend Prod Image
+          working_directory: backend
+          command: |
+            docker build -t "$DOCKER_USERNAME/medusa-backend:prod-${CIRCLE_SHA1:0:7}" .
+            docker tag "$DOCKER_USERNAME/medusa-backend:prod-${CIRCLE_SHA1:0:7}" "$DOCKER_USERNAME/medusa-backend:prod"
+            docker push "$DOCKER_USERNAME/medusa-backend" --all-tags
 
-            if [ "$(cat .changed_dashboard)" = "true" ]; then
-              echo "Deploying dashboard..."
-              $SSH_COMMAND "cd $COMPOSE_DIR && docker rm -f liqnic-dashboard || true && docker rmi -f $DOCKER_USERNAME/liqnic-dashboard:latest || true && docker compose pull dashboard && docker compose up -d dashboard"
+  build_and_push_dashboard_dev:
+    executor: node_executor
+    steps:
+      - run:
+          name: Check if job should run
+          command: |
+            if [ "<< pipeline.parameters.build-dashboard >>" != "true" ] || [ "$CIRCLE_BRANCH" != "develop" ]; then
+              echo "Skipping job: Conditions not met (no dashboard changes or not on develop branch)."
+              circleci-agent step halt
             fi
+      - checkout
+      - setup_remote_docker: { version: 20.10.18 }
+      - docker/check
+      - run: { name: "Log in to Docker Hub", command: "echo \"$DOCKER_PASSWORD\" | docker login -u \"$DOCKER_USERNAME\" --password-stdin" }
+      - run:
+          name: Build and Push Dashboard Dev Image
+          working_directory: dashboard
+          command: |
+            echo "Creating .env file for dashboard build..."
+            echo "VITE_MEDUSA_BACKEND_URL=${DASHBOARD_VITE_MEDUSA_BACKEND_URL}" > .env
+            echo "VITE_MEDUSA_BASE=${DASHBOARD_VITE_MEDUSA_BASE}" >> .env
+            echo "VITE_MEDUSA_STOREFRONT_URL=${DASHBOARD_VITE_MEDUSA_STOREFRONT_URL}" >> .env
+            docker build -t "$DOCKER_USERNAME/medusa-dashboard:dev-${CIRCLE_SHA1:0:7}" .
+            docker tag "$DOCKER_USERNAME/medusa-dashboard:dev-${CIRCLE_SHA1:0:7}" "$DOCKER_USERNAME/medusa-dashboard:dev"
+            docker push "$DOCKER_USERNAME/medusa-dashboard" --all-tags
+
+  build_and_push_dashboard_prod:
+    executor: node_executor
+    steps:
+      - run:
+          name: Check if job should run
+          command: |
+            if [ "<< pipeline.parameters.build-dashboard >>" != "true" ] || [ "$CIRCLE_BRANCH" != "main" ]; then
+              echo "Skipping job: Conditions not met (no dashboard changes or not on main branch)."
+              circleci-agent step halt
+            fi
+      - checkout
+      - setup_remote_docker: { version: 20.10.18 }
+      - docker/check
+      - run: { name: "Log in to Docker Hub", command: "echo \"$DOCKER_PASSWORD\" | docker login -u \"$DOCKER_USERNAME\" --password-stdin" }
+      - run:
+          name: Build and Push Dashboard Prod Image
+          working_directory: dashboard
+          command: |
+            echo "Creating .env file for dashboard build..."
+            echo "VITE_MEDUSA_BACKEND_URL=${DASHBOARD_VITE_MEDUSA_BACKEND_URL}" > .env
+            echo "VITE_MEDUSA_BASE=${DASHBOARD_VITE_MEDUSA_BASE}" >> .env
+            echo "VITE_MEDUSA_STOREFRONT_URL=${DASHBOARD_VITE_MEDUSA_STOREFRONT_URL}" >> .env
+            docker build -t "$DOCKER_USERNAME/medusa-dashboard:prod-${CIRCLE_SHA1:0:7}" .
+            docker tag "$DOCKER_USERNAME/medusa-dashboard:prod-${CIRCLE_SHA1:0:7}" "$DOCKER_USERNAME/medusa-dashboard:prod"
+            docker push "$DOCKER_USERNAME/medusa-dashboard" --all-tags
+
+  # == DEPLOYMENT JOBS ==
+  deploy_to_dev:
+    machine: { image: ubuntu-2204:2023.07.2 }
+    steps:
+      - run:
+          name: Check if job should run
+          command: |
+            if [ "$CIRCLE_BRANCH" != "develop" ]; then
+              echo "Skipping dev deployment: Not on develop branch."
+              circleci-agent step halt
+            fi
+            if [ "<< pipeline.parameters.build-backend >>" != "true" ] && [ "<< pipeline.parameters.build-dashboard >>" != "true" ]; then
+              echo "Skipping dev deployment: No changes to deploy."
+              circleci-agent step halt
+            fi
+      - run: { name: "Install sshpass", command: "sudo apt-get update && sudo apt-get install -y sshpass" }
+      - run:
+          name: Deploy to Dev
+          command: |
+            SSH_COMMAND="sshpass -p '$SSH_PASSWORD' ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST"
+            $SSH_COMMAND "
+              docker logout
+              docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+              set -e
+              cd /home/docker/liqnic/dev
+              docker-compose pull
+              docker-compose up -d --remove-orphans
+              docker image prune -af
+              echo '==> Deployment to dev complete!'
+            "
+
+  deploy_to_prod:
+    machine: { image: ubuntu-2204:2023.07.2 }
+    steps:
+      - run: { name: "Install sshpass", command: "sudo apt-get update && sudo apt-get install -y sshpass" }
+      - run:
+          name: Deploy to Prod
+          command: |
+            SSH_COMMAND="sshpass -p '$SSH_PASSWORD' ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST"
+            $SSH_COMMAND "
+              docker logout
+              docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+              set -e
+              cd /home/docker/liqnic/prod
+              docker-compose pull
+              docker-compose up -d --remove-orphans
+              docker image prune -af
+              echo '==> Deployment to prod complete!'
+            "
 
 workflows:
-  build-deploy-dev-prod:
+  commit-pipeline:
     jobs:
-      - build-and-test:
-          context: liqnic-common
-      - docker-build-and-push:
-          context: liqnic-common
+      - path-filtering/filter:
+          name: check-for-changes
+          base-revision: main
+          mapping: |
+            backend/.* build-backend true
+            dashboard/.* build-dashboard true
+
+      - test_and_build_backend:
+          requires: [check-for-changes]
+
+      - test_and_build_dashboard:
+          requires: [check-for-changes]
+
+      - build_and_push_backend_dev:
+          context: liqnic-dev
+          requires: [test_and_build_backend]
+
+      - build_and_push_backend_prod:
+          context: liqnic-prod
+          requires: [test_and_build_backend]
+
+      - build_and_push_dashboard_dev:
+          context: liqnic-dev
+          requires: [test_and_build_dashboard]
+
+      - build_and_push_dashboard_prod:
+          context: liqnic-prod
+          requires: [test_and_build_dashboard]
+
+      - deploy_to_dev:
+          context: liqnic-dev
           requires:
-            - build-and-test
-      - deploy:
-          context: liqnic-common
+            - build_and_push_backend_dev
+            - build_and_push_dashboard_dev
+
+      - hold_for_prod_approval:
+          type: approval
           requires:
-            - docker-build-and-push
-          filters:
-            branches:
-              only:
-                - development
-                - production
+            - build_and_push_backend_prod
+            - build_and_push_dashboard_prod
+
+      - deploy_to_prod:
+          context: liqnic-prod
+          requires: [hold_for_prod_approval]
+
