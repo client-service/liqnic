@@ -168,25 +168,19 @@ jobs:
               SSH_HOST=$SSH_HOST_PROD
             fi
 
-            sshpass -p $SSH_PASS ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << 'EOF'
+            sshpass -p $SSH_PASS ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST 'bash -s' << 'EOF'
               cd /home/docker/liqnic
 
               if [ -f backend.changed ] && [ "$(cat backend.changed)" = "yes" ]; then
                 echo "Deploying backend..."
-                docker pull $DOCKER_USERNAME/liqnic-backend:latest
+                # docker pull $DOCKER_USERNAME/liqnic-backend:latest
                 docker compose up -d backend
               fi
 
               if [ -f dashboard.changed ] && [ "$(cat dashboard.changed)" = "yes" ]; then
                 echo "Deploying dashboard..."
-                docker pull $DOCKER_USERNAME/liqnic-dashboard:latest
+                # docker pull $DOCKER_USERNAME/liqnic-dashboard:latest
                 docker compose up -d dashboard
-              fi
-
-              if [ -f storefront.changed ] && [ "$(cat storefront.changed)" = "yes" ]; then
-                echo "Deploying storefront..."
-                docker pull $DOCKER_USERNAME/liqnic-storefront:latest
-                docker compose up -d storefront
               fi
             EOF
 
