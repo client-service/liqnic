@@ -40,9 +40,9 @@ jobs:
           working_directory: backend
           command: |
             if [ "$CIRCLE_BRANCH" = "development" ]; then
-              TAG="dev"
+              STATIC_TAG="dev"
             elif [ "$CIRCLE_BRANCH" = "production" ]; then
-              TAG="prod"
+              STATIC_TAG="prod"
             fi
 
             # Create a unique, traceable tag with the build number.
