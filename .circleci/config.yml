@@ -21,7 +21,7 @@ workflows:
           filters:
             branches:
               only:
-                - develop
+                - development
                 - production
 
       # This job checks for changes in the 'dashboard' directory.
@@ -34,5 +34,5 @@ workflows:
           filters:
             branches:
               only:
-                - develop
+                - development
                 - production
