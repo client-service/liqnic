@@ -1,0 +1,113 @@
+version: 2.1
+
+jobs:
+  build-and-test:
+    docker:
+      - image: cimg/node:22.4
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-deps-npm-{{ checksum "package-lock.json" }}
+            - v1-deps-npm-
+      - run: { name: "Install Dependencies", command: "npm install" }
+      - run:
+          {
+            name: "NPM audit -- check for vulnerabilities inside dependencies",
+            command: "npm audit",
+          }
+      - run: { name: "Fix found vulnerabilities", command: "npm audit fix" }
+      - save_cache:
+          key: v1-deps-npm-{{ checksum "package-lock.json" }}
+          paths: [ "node_modules" ]
+      - run: { name: "Build Dashboard", command: "npm run build" }
+  
+  docker-build-and-publish:
+    docker:
+      - image: cimg/node:22.4
+        auth:
+          username: $DOCKER_USERNAME
+          password: $DOCKER_PASSWORD
+    steps:
+      - checkout
+      - setup_remote_docker: { version: 20.10.18 }
+      - run:
+          name: Build and Push application Docker image
+          command: |
+            if [ "$CIRCLE_BRANCH" = "develop" ]; then
+              TAG="dev"
+            elif [ "$CIRCLE_BRANCH" = "production" ]; then
+              TAG="prod"
+            fi
+
+            # Create a unique, traceable tag with the build number.
+            UNIQUE_TAG="$STATIC_TAG-$CIRCLE_BUILD_NUM"
+            
+            # Create the .env file for the Docker build context
+            echo "Creating .env file for dashboard build..."
+            echo "VITE_MEDUSA_BACKEND_URL=${DASHBOARD_VITE_MEDUSA_BACKEND_URL}" > .env
+            echo "VITE_MEDUSA_BASE=${DASHBOARD_VITE_MEDUSA_BASE}" >> .env
+            echo "VITE_MEDUSA_STOREFRONT_URL=${DASHBOARD_VITE_MEDUSA_STOREFRONT_URL}" >> .env
+            
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+            
+            # 1. Build the image with the unique tag.
+            docker build -t "$DOCKER_USERNAME/liqnic-dashboard:$UNIQUE_TAG" .
+            
+            # 2. Tag the unique build with the static tag for docker-compose.
+            docker tag "$DOCKER_USERNAME/liqnic-dashboard:$UNIQUE_TAG" "$DOCKER_USERNAME/liqnic-dashboard:$STATIC_TAG"
+            
+            # 3. Push both tags to Docker Hub.
+            docker push "$DOCKER_USERNAME/liqnic-dashboard:$UNIQUE_TAG"
+            docker push "$DOCKER_USERNAME/liqnic-dashboard:$STATIC_TAG"
+
+  deploy:
+    machine: { image: ubuntu-2204:2023.07.2 }
+    resource_class: medium
+
+    steps:
+      - run:
+          name: Install sshpass
+          command: sudo apt-get update && sudo apt-get install -y sshpass
+      
+      - run:
+          name: Deploy to Environment
+          command: |
+            if [ "$CIRCLE_BRANCH" = "develop" ]; then
+              DEPLOY_PATH="/home/docker/liqnic/dev"
+            elif [ "$CIRCLE_BRANCH" = "production" ]; then
+              DEPLOY_PATH="/home/docker/liqnic/prod"
+            fi
+
+            SSH_COMMAND="sshpass -p '$SSH_PASSWORD' ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST"
+            $SSH_COMMAND "
+              docker logout
+              docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+              set -e
+              cd $DEPLOY_PATH
+              docker-compose pull dashboard
+              docker-compose up -d --remove-orphans dashboard
+              docker image prune -af
+              echo '==> Dashboard deployment complete!'
+            "
+
+workflows:
+  build-and-deploy:
+    jobs:
+      - build-and-test:
+          filters:
+            branches:
+              only: [ develop, production ]
+      - docker-build-and-publish:
+          context: [ liqnic-dev, liqnic-prod ]
+          requires: [ build-and-test ]
+          filters:
+            branches:
+              only: [ develop, production ]
+      - deploy:
+          context: [ liqnic-dev, liqnic-prod ]
+          requires: [ docker-build-and-publish ]
+          filters:
+            branches:
+              only: [ develop, production ]
+
