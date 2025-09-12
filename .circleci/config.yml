@@ -12,8 +12,8 @@ orbs:
   path-filtering: circleci/path-filtering@2.0.4
 
 workflows:
-  # This is the only workflow in the root config.
-  trigger-service-pipelines:
+  # This workflow triggers the backend pipeline if changes are detected.
+  trigger-backend-pipeline:
     jobs:
       # This job checks for changes in the 'backend' directory.
       - path-filtering/filter:
@@ -27,7 +27,10 @@ workflows:
               only:
                 - development
                 - production
-
+  
+  # This workflow triggers the dashboard pipeline if changes are detected.
+  trigger-dashboard-pipeline:
+    jobs:
       # This job checks for changes in the 'dashboard' directory.
       - path-filtering/filter:
           name: filter-dashboard-changes
