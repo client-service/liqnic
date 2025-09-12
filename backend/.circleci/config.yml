@@ -74,8 +74,8 @@ jobs:
       - run:
           name: Debug SSH Connection
           command: |
-            echo "Attempting verbose SSH connection to diagnose issues..."
-            ssh -v -o StrictHostKeyChecking=no -o PasswordAuthentication=yes $SSH_USER@$SSH_HOST "echo 'SSH connection successful'" || echo "SSH connection failed. Check verbose logs above."
+            echo "Attempting verbose SSH connection, preferring password auth..."
+            ssh -v -o StrictHostKeyChecking=no -o PreferredAuthentications=password $SSH_USER@$SSH_HOST "echo 'SSH connection successful'" || echo "SSH connection failed. Check verbose logs above."
 
       - run:
           name: Deploy to Environment
@@ -86,7 +86,7 @@ jobs:
               DEPLOY_PATH="/home/docker/liqnic/prod"
             fi
 
-            SSH_COMMAND="sshpass -p '$SSH_PASSWORD' ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST"
+            SSH_COMMAND="sshpass -p '$SSH_PASSWORD' ssh -o PreferredAuthentications=password -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST"
             $SSH_COMMAND "
               docker logout
               docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
