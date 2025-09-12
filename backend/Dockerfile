@@ -8,7 +8,7 @@ WORKDIR /server
 COPY package.json yarn.lock .yarnrc.yml ./
 
 # Install all dependencies using yarn
-RUN yarn install --production
+RUN yarn install
 
 # Copy source code
 COPY . .
