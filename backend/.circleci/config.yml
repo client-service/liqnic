@@ -19,7 +19,10 @@ jobs:
       - save_cache:
           key: v1-deps-yarn-{{ checksum "backend/yarn.lock" }}
           paths: ["node_modules"]
-      - run: { name: "Build Backend", command: "npm run build" }
+      - run:
+          name: "Build Backend"
+          working_directory: backend
+          command: "npm run build"
 
   docker-build-and-publish:
     docker:
