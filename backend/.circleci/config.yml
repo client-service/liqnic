@@ -7,18 +7,27 @@ jobs:
       - checkout
       - restore_cache:
           keys:
+            # The checksum path must be relative to the project root.
             - v1-deps-yarn-{{ checksum "backend/yarn.lock" }}
             - v1-deps-yarn-
-      - run: { name: "Install Dependencies", command: "yarn install" }
       - run:
-          {
-            name: "YARN audit -- check for vulnerabilities inside dependencies",
-            command: "yarn audit",
-          }
-      - run: { name: "Fix found vulnerabilities", command: "yarn audit fix" }
+          name: "Install Dependencies"
+          # All commands that interact with the backend's files must be run
+          # from within the backend directory.
+          working_directory: backend
+          command: "yarn install"
+      - run:
+          name: "YARN audit -- check for vulnerabilities inside dependencies"
+          working_directory: backend
+          command: "yarn audit"
+      - run:
+          name: "Fix found vulnerabilities"
+          working_directory: backend
+          command: "yarn audit fix"
       - save_cache:
           key: v1-deps-yarn-{{ checksum "backend/yarn.lock" }}
-          paths: ["node_modules"]
+          # The cache path must also be relative to the project root.
+          paths: ["backend/node_modules"]
       - run:
           name: "Build Backend"
           working_directory: backend
