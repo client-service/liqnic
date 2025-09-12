@@ -67,7 +67,9 @@ jobs:
             docker push "$DOCKER_USERNAME/liqnic-dashboard:$STATIC_TAG"
 
   deploy:
-    machine: { image: ubuntu-2204:2023.07.2 }
+    machine:
+      image: ubuntu-2204:2023.07.2
+    resource_class: medium
 
     steps:
       - run:
