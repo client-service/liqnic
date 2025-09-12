@@ -8,14 +8,31 @@ orbs:
   path-filtering: circleci/path-filtering@2.0.4
 
 workflows:
-  # This is the only workflow that runs initially. Its sole purpose is to
-  # check for changes and trigger the appropriate downstream pipeline.
-  check-for-changes:
+  # This is the only workflow in the root config.
+  trigger-service-pipelines:
     jobs:
+      # This job checks for changes in the 'backend' directory.
       - path-filtering/filter:
+          name: filter-backend-changes
           base-revision: main
-          # The mapping determines which config file to use for the pipeline continuation.
+          config-path: backend/.circleci/config.yml
           mapping: |
-            backend/.* backend/.circleci/config.yml
-            dashboard/.* dashboard/.circleci/config.yml
+            backend/.* true
+          filters:
+            branches:
+              only:
+                - develop
+                - production
 
+      # This job checks for changes in the 'dashboard' directory.
+      - path-filtering/filter:
+          name: filter-dashboard-changes
+          base-revision: main
+          config-path: dashboard/.circleci/config.yml
+          mapping: |
+            dashboard/.* true
+          filters:
+            branches:
+              only:
+                - develop
+                - production
