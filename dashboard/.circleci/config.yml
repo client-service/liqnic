@@ -78,7 +78,7 @@ jobs:
       - run:
           name: Deploy to Environment
           command: |
-            if [ "$CIRCLE_BRANCH" = "develop" ]; then
+            if [ "$CIRCLE_BRANCH" = "development" ]; then
               DEPLOY_PATH="/home/docker/liqnic/dev"
             elif [ "$CIRCLE_BRANCH" = "production" ]; then
               DEPLOY_PATH="/home/docker/liqnic/prod"
