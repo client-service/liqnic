@@ -4,6 +4,10 @@
 # within that service's directory.
 version: 2.1
 
+# This key explicitly enables Dynamic Configuration, allowing this
+# config to trigger other pipeline configurations.
+setup: true
+
 orbs:
   path-filtering: circleci/path-filtering@2.0.4
 
