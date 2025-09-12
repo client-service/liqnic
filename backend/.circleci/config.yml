@@ -61,12 +61,21 @@ jobs:
             docker push "$DOCKER_USERNAME/liqnic-backend:$STATIC_TAG"
 
   deploy:
-    machine: true
+    machine:
+      image: ubuntu-2204:2024.11.1
+    # If running ARM, the resource class needs to be added. Omitting this defaults to amd64
+    resource_class: arm.medium
 
     steps:
       - run:
           name: Install sshpass
           command: sudo apt-get update && sudo apt-get install -y sshpass
+      
+      - run:
+          name: Debug SSH Connection
+          command: |
+            echo "Attempting verbose SSH connection to diagnose issues..."
+            ssh -v -o StrictHostKeyChecking=no -o PasswordAuthentication=yes $SSH_USER@$SSH_HOST "echo 'SSH connection successful'" || echo "SSH connection failed. Check verbose logs above."
 
       - run:
           name: Deploy to Environment
