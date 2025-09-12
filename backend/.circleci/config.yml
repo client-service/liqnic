@@ -61,10 +61,7 @@ jobs:
             docker push "$DOCKER_USERNAME/liqnic-backend:$STATIC_TAG"
 
   deploy:
-    machine:
-      image: ubuntu-2204:2024.11.1
-    # If running ARM, the resource class needs to be added. Omitting this defaults to amd64
-    resource_class: arm.medium
+    machine: true
 
     steps:
       - run:
