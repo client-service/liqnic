@@ -22,7 +22,7 @@ jobs:
       - run:
           name: "Build Backend"
           working_directory: backend
-          command: "npm run build"
+          command: "yarn build"
 
   docker-build-and-publish:
     docker:
