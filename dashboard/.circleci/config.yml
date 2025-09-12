@@ -8,7 +8,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-deps-npm-{{ checksum "package-lock.json" }}
+            - v1-deps-npm-{{ checksum "dashboard/package-lock.json" }}
             - v1-deps-npm-
       - run: { name: "Install Dependencies", command: "npm install" }
       - run:
@@ -18,9 +18,12 @@ jobs:
           }
       - run: { name: "Fix found vulnerabilities", command: "npm audit fix" }
       - save_cache:
-          key: v1-deps-npm-{{ checksum "package-lock.json" }}
-          paths: [ "node_modules" ]
-      - run: { name: "Build Dashboard", command: "npm run build" }
+          key: v1-deps-npm-{{ checksum "dashboard/package-lock.json" }}
+          paths: [ "dashboard/node_modules" ]
+      - run:
+          name: "Build Dashboard"
+          working_directory: dashboard
+          command: "npm run build"
   
   docker-build-and-publish:
     docker:
@@ -30,7 +33,7 @@ jobs:
           password: $DOCKER_PASSWORD
     steps:
       - checkout
-      - setup_remote_docker: { version: 20.10.18 }
+      - setup_remote_docker
       - run:
           name: Build and Push application Docker image
           command: |
