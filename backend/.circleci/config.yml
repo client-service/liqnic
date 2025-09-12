@@ -7,7 +7,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-deps-yarn-{{ checksum "yarn.lock" }}
+            - v1-deps-yarn-{{ checksum "backend/yarn.lock" }}
             - v1-deps-yarn-
       - run: { name: "Install Dependencies", command: "yarn install" }
       - run:
@@ -17,7 +17,7 @@ jobs:
           }
       - run: { name: "Fix found vulnerabilities", command: "yarn audit fix" }
       - save_cache:
-          key: v1-deps-yarn-{{ checksum "yarn.lock" }}
+          key: v1-deps-yarn-{{ checksum "backend/yarn.lock" }}
           paths: ["node_modules"]
       - run: { name: "Build Backend", command: "npm run build" }
 
