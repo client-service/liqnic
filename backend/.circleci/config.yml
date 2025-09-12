@@ -12,10 +12,10 @@ jobs:
       - run: { name: "Install Dependencies", command: "yarn install" }
       - run:
           {
-            name: "NPM audit -- check for vulnerabilities inside dependencies",
-            command: "npm audit",
+            name: "YARN audit -- check for vulnerabilities inside dependencies",
+            command: "yarn audit",
           }
-      - run: { name: "Fix found vulnerabilities", command: "npm audit fix" }
+      - run: { name: "Fix found vulnerabilities", command: "yarn audit fix" }
       - save_cache:
           key: v1-deps-yarn-{{ checksum "yarn.lock" }}
           paths: ["node_modules"]
