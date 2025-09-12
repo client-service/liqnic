@@ -36,8 +36,10 @@ jobs:
       - setup_remote_docker
       - run:
           name: Build and Push application Docker image
+          # Run this entire script from the backend directory to find the Dockerfile.
+          working_directory: backend
           command: |
-            if [ "$CIRCLE_BRANCH" = "develop" ]; then
+            if [ "$CIRCLE_BRANCH" = "development" ]; then
               TAG="dev"
             elif [ "$CIRCLE_BRANCH" = "production" ]; then
               TAG="prod"
@@ -70,9 +72,9 @@ jobs:
       - run:
           name: Deploy to Environment
           command: |
-            if [ "$CIRCLE_BRANCH" = "develop" ]; then
+            if [ "$CIRCLE_BRANCH" = "development" ]; then
               DEPLOY_PATH="/home/docker/liqnic/dev"
-            elif [ "$CIRCLE_BRANCH" = "main" ]; then
+            elif [ "$CIRCLE_BRANCH" = "production" ]; then
               DEPLOY_PATH="/home/docker/liqnic/prod"
             fi
 
