@@ -70,12 +70,6 @@ jobs:
       - run:
           name: Install sshpass
           command: sudo apt-get update && sudo apt-get install -y sshpass
-      
-      - run:
-          name: Debug SSH Connection
-          command: |
-            echo "Attempting verbose SSH connection, preferring password auth..."
-            ssh -v -o StrictHostKeyChecking=no -o PreferredAuthentications=password $SSH_USER@$SSH_HOST "echo 'SSH connection successful'" || echo "SSH connection failed. Check verbose logs above."
 
       - run:
           name: Deploy to Environment
