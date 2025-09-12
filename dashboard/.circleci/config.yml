@@ -68,8 +68,9 @@ jobs:
 
   deploy:
     machine:
-      image: ubuntu-2204:2023.07.2
-    resource_class: medium
+      image: ubuntu-2204:2024.11.1
+    # If running ARM, the resource class needs to be added. Omitting this defaults to amd64
+    resource_class: arm.medium
 
     steps:
       - run:
