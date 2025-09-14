@@ -82,8 +82,8 @@ jobs:
               docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
               set -e
               cd $DEPLOY_PATH
-              docker-compose pull backend
-              docker-compose up -d --remove-orphans backend
+              docker compose pull backend
+              docker compose up -d --remove-orphans backend
               docker image prune -af
               echo '==> Backend deployment complete!'
             "

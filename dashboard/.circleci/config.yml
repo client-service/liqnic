@@ -88,8 +88,8 @@ jobs:
               docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
               set -e
               cd $DEPLOY_PATH
-              docker-compose pull dashboard
-              docker-compose up -d --remove-orphans dashboard
+              docker compose pull dashboard
+              docker compose up -d --remove-orphans dashboard
               docker image prune -af
               echo '==> Dashboard deployment complete!'
             "
