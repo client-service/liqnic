@@ -1,4 +1,4 @@
-# CircleCI Root Configuration (v21 - Final Fix)
+# CircleCI Root Configuration (v22 - Final Fix)
 # This configuration uses the official continuation orb for a cleaner,
 # more reliable way to trigger dynamic pipelines.
 version: 2.1
@@ -47,11 +47,6 @@ workflows:
           when: << pipeline.parameters.build-backend >>
           # Correct parameter name is 'configuration_path'.
           configuration_path: backend/.circleci/config.yml
-          filters:
-            branches:
-              only:
-                - development
-                - production
 
       # This job will only run if the 'build-dashboard' parameter is true.
       - continuation/continue:
@@ -61,9 +56,4 @@ workflows:
           when: << pipeline.parameters.build-dashboard >>
           # Correct parameter name is 'configuration_path'.
           configuration_path: dashboard/.circleci/config.yml
-          filters:
-            branches:
-              only:
-                - development
-                - production
 
