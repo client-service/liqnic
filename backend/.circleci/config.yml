@@ -68,10 +68,6 @@ jobs:
 
     steps:
       - run:
-          name: Install sshpass
-          command: sudo apt-get update && sudo apt-get install -y sshpass
-
-      - run:
           name: Deploy to Environment
           command: |
             if [ "$CIRCLE_BRANCH" = "development" ]; then
@@ -80,7 +76,7 @@ jobs:
               DEPLOY_PATH="/home/docker/liqnic/prod"
             fi
 
-            SSH_COMMAND="sshpass -p '$SSH_PASSWORD' ssh -o PreferredAuthentications=password -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST"
+            SSH_COMMAND="ssh $SSH_USER@$SSH_HOST"
             $SSH_COMMAND "
               docker logout
               docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
