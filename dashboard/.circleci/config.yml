@@ -94,3 +94,16 @@ jobs:
               echo '==> Dashboard deployment complete!'
             "
 
+workflows:
+  build-and-deploy:
+    jobs:
+      - build-and-test
+
+      - docker-build-and-publish:
+          context: [ liqnic-dev, liqnic-prod ]
+          requires: [ build-and-test ]
+      
+      - deploy:
+          context: [ liqnic-dev, liqnic-prod ]
+          requires: [ docker-build-and-publish ]
+

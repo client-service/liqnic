@@ -1,44 +1,78 @@
-# CircleCI Root Configuration (v17 - Multi-Config Dispatcher)
-# This file acts as a simple dispatcher. It detects which service's path has
-# changed and triggers the respective CircleCI configuration file located
-# within that service's directory.
+# CircleCI Root Configuration (v25 - Final Linter Fix)
+# This configuration wraps the orb command in a conditional 'when' step,
+# which is the correct syntax for conditionally executing a step.
 version: 2.1
 
-# This key explicitly enables Dynamic Configuration, allowing this
-# config to trigger other pipeline configurations.
+# This key explicitly enables Dynamic Configuration.
 setup: true
 
 orbs:
   path-filtering: circleci/path-filtering@2.0.4
+  continuation: circleci/continuation@2.0.1
+
+# Define pipeline parameters that the path-filtering orb will populate.
+parameters:
+  build-backend:
+    type: boolean
+    default: false
+  build-dashboard:
+    type: boolean
+    default: false
+
+# A reusable job that now contains the conditional logic.
+jobs:
+  trigger-pipeline:
+    docker:
+      # A minimal image is all that's needed to run the orb.
+      - image: cimg/base:current
+    parameters:
+      config_path:
+        type: string
+      # This new parameter will receive the pipeline parameter and control execution.
+      run_condition:
+        type: boolean
+        default: false
+    steps:
+      # The 'when' key is now applied to the step itself.
+      - when:
+          # The step's execution is controlled by the 'run_condition' parameter.
+          condition: << parameters.run_condition >>
+          # The steps inside will only run if the condition is true.
+          steps:
+            - continuation/continue:
+                configuration_path: << parameters.config_path >>
 
 workflows:
-  # This is the only workflow in the root config.
-  trigger-service-pipelines:
+  # This workflow checks for changes and triggers the appropriate service pipeline.
+  check-and-trigger:
     jobs:
-      # This job checks for changes in the 'backend' directory.
+      # This job runs first and sets the pipeline parameters defined above.
       - path-filtering/filter:
-          name: filter-backend-changes
-          base-revision: main
-          config-path: backend/.circleci/config.yml
+          name: check-changes
           mapping: |
-            backend/.* true
+            backend/.* build-backend true
+            dashboard/.* build-dashboard true
+          base-revision: main
           filters:
             branches:
               only:
                 - development
                 - production
 
-      # This job checks for changes in the 'dashboard' directory.
-      - path-filtering/filter:
-          name: filter-dashboard-changes
-          base-revision: main
-          config-path: dashboard/.circleci/config.yml
-          mapping: |
-            dashboard/.* true
+      # This job now runs unconditionally...
+      - trigger-pipeline:
+          name: trigger-backend-pipeline
           requires:
-            - filter-backend-changes
-          filters:
-            branches:
-              only:
-                - development
-                - production
+            - check-changes
+          # ...but the pipeline parameter is passed to the job.
+          run_condition: << pipeline.parameters.build-backend >>
+          config_path: backend/.circleci/config.yml
+
+      # Same pattern for the dashboard.
+      - trigger-pipeline:
+          name: trigger-dashboard-pipeline
+          requires:
+            - check-changes
+          run_condition: << pipeline.parameters.build-dashboard >>
+          config_path: dashboard/.circleci/config.yml
+

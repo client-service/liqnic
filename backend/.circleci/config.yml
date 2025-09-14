@@ -88,3 +88,15 @@ jobs:
               echo '==> Backend deployment complete!'
             "
 
+workflows:
+  build-and-deploy:
+    jobs:
+      - build-and-test
+
+      - docker-build-and-publish:
+          requires:
+            - build-and-test
+      
+      - deploy:
+          requires:
+            - docker-build-and-publish
