@@ -1,44 +1,58 @@
-# CircleCI Root Configuration (v17 - Multi-Config Dispatcher)
-# This file acts as a simple dispatcher. It detects which service's path has
-# changed and triggers the respective CircleCI configuration file located
-# within that service's directory.
+# CircleCI Root Configuration (v20 - Continuation Orb)
+# This configuration uses the official continuation orb for a cleaner,
+# more reliable way to trigger dynamic pipelines.
 version: 2.1
 
-# This key explicitly enables Dynamic Configuration, allowing this
-# config to trigger other pipeline configurations.
+# This key explicitly enables Dynamic Configuration.
 setup: true
 
+# Add the official continuation orb.
 orbs:
   path-filtering: circleci/path-filtering@2.0.4
+  continuation: circleci/continuation@2.0.1
+
+# Define pipeline parameters that the path-filtering orb will populate.
+parameters:
+  build-backend:
+    type: boolean
+    default: false
+  build-dashboard:
+    type: boolean
+    default: false
 
 workflows:
-  # This is the only workflow in the root config.
-  trigger-service-pipelines:
+  # This workflow checks for changes and triggers the appropriate service pipeline.
+  check-and-trigger:
     jobs:
-      # This job checks for changes in the 'backend' directory.
+      # This job runs first and sets the pipeline parameters defined above.
       - path-filtering/filter:
-          name: filter-backend-changes
-          base-revision: main
-          config-path: backend/.circleci/config.yml
+          name: check-changes
           mapping: |
-            backend/.* true
+            backend/.* build-backend true
+            dashboard/.* build-dashboard true
+          base-revision: main
           filters:
             branches:
               only:
                 - development
                 - production
 
-      # This job checks for changes in the 'dashboard' directory.
-      - path-filtering/filter:
-          name: filter-dashboard-changes
-          base-revision: main
-          config-path: dashboard/.circleci/config.yml
-          mapping: |
-            dashboard/.* true
+      # This job will only run if the 'build-backend' parameter is true.
+      # It uses the continuation orb to trigger the backend pipeline.
+      - continuation/continue:
+          name: trigger-backend-pipeline
           requires:
-            - filter-backend-changes
-          filters:
-            branches:
-              only:
-                - development
-                - production
+            - check-changes
+          # The 'when' condition directly uses the pipeline parameter.
+          when: << pipeline.parameters.build-backend >>
+          # Pass the path to the configuration file for the new pipeline.
+          configuration: backend/.circleci/config.yml
+
+      # This job will only run if the 'build-dashboard' parameter is true.
+      - continuation/continue:
+          name: trigger-dashboard-pipeline
+          requires:
+            - check-changes
+          when: << pipeline.parameters.build-dashboard >>
+          configuration: dashboard/.circleci/config.yml
+
