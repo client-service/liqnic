@@ -1,53 +1,26 @@
-# CircleCI Root Configuration (v27 - Fixed when misuse)
+# CircleCI Root Configuration (v31 - Two-File Setup)
+# This file is a simple dispatcher. Its only job is to run the
+# path-filtering orb, which will then trigger the pipeline defined in
+# the 'continue_config.yml' file with the correct parameters.
 version: 2.1
-
 setup: true
 
 orbs:
   path-filtering: circleci/path-filtering@2.0.4
-  continuation: circleci/continuation@2.0.1
-
-parameters:
-  build-backend:
-    type: boolean
-    default: false
-  build-dashboard:
-    type: boolean
-    default: false
 
 workflows:
-  # This workflow checks for changes and triggers the appropriate service pipeline.
-  check-and-trigger:
-    # This 'when' clause ensures the entire workflow only runs on the specified branches.
-    when:
-      or:
-        - equal: [ "development", << pipeline.git.branch >> ]
-        - equal: [ "production", << pipeline.git.branch >> ]
+  check-for-changes:
     jobs:
-      # This job runs first and sets the pipeline parameters defined above.
       - path-filtering/filter:
-          name: check-changes
+          # This parameter points the orb to the file that contains the rest of our pipeline logic.
+          config-path: .circleci/continue_config.yml
+          base-revision: main
           mapping: |
             backend/.* build-backend true
             dashboard/.* build-dashboard true
-          base-revision: main
+          filters:
+            branches:
+              only:
+                - development
+                - production
 
-      # This job will only run if the 'build-backend' parameter is true.
-      - continuation/continue:
-          name: trigger-backend-pipeline
-          requires:
-            - check-changes
-          # The 'when' clause now uses an explicit 'equal' check, which is more robust.
-          when:
-            equal: [ true, << pipeline.parameters.build-backend >> ]
-          configuration_path: backend/.circleci/config.yml
-
-      # This job will only run if the 'build-dashboard' parameter is true.
-      - continuation/continue:
-          name: trigger-dashboard-pipeline
-          requires:
-            - check-changes
-          # The 'when' clause now uses an explicit 'equal' check.
-          when:
-            equal: [ true, << pipeline.parameters.build-dashboard >> ]
-          configuration_path: dashboard/.circleci/config.yml
