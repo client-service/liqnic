@@ -1,16 +1,12 @@
-# CircleCI Root Configuration (v26 - Final Schema Fix)
-# This configuration uses two dedicated trigger jobs instead of one
-# reusable job to resolve the final linter schema violations.
+# CircleCI Root Configuration (v27 - Fixed when misuse)
 version: 2.1
 
-# This key explicitly enables Dynamic Configuration.
 setup: true
 
 orbs:
   path-filtering: circleci/path-filtering@2.0.4
   continuation: circleci/continuation@2.0.1
 
-# Define pipeline parameters that the path-filtering orb will populate.
 parameters:
   build-backend:
     type: boolean
@@ -18,30 +14,6 @@ parameters:
   build-dashboard:
     type: boolean
     default: false
-
-# Define separate, dedicated jobs for each pipeline trigger.
-jobs:
-  # This job's only purpose is to trigger the backend pipeline if its parameter is true.
-  trigger-backend-pipeline:
-    docker:
-      - image: cimg/base:current
-    steps:
-      - when:
-          condition: << pipeline.parameters.build-backend >>
-          steps:
-            - continuation/continue:
-                configuration_path: backend/.circleci/config.yml
-
-  # This job's only purpose is to trigger the dashboard pipeline if its parameter is true.
-  trigger-dashboard-pipeline:
-    docker:
-      - image: cimg/base:current
-    steps:
-      - when:
-          condition: << pipeline.parameters.build-dashboard >>
-          steps:
-            - continuation/continue:
-                configuration_path: dashboard/.circleci/config.yml
 
 workflows:
   # This workflow checks for changes and triggers the appropriate service pipeline.
@@ -60,13 +32,18 @@ workflows:
                 - development
                 - production
 
-      # Call the dedicated backend trigger job. It will internally decide whether to run.
-      - trigger-backend-pipeline:
+      # This job will only run if the 'build-backend' parameter is true.
+      - continuation/continue:
+          name: trigger-backend-pipeline
+          when: << pipeline.parameters.build-backend >>
+          configuration_path: backend/.circleci/config.yml
           requires:
             - check-changes
 
-      # Call the dedicated dashboard trigger job.
-      - trigger-dashboard-pipeline:
+      # This job will only run if the 'build-dashboard' parameter is true.
+      - continuation/continue:
+          name: trigger-dashboard-pipeline
+          when: << pipeline.parameters.build-dashboard >>
+          configuration_path: dashboard/.circleci/config.yml
           requires:
             - check-changes
-
