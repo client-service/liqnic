@@ -1,73 +1,26 @@
-# CircleCI Root Configuration (v27 - Fixed when misuse)
+# CircleCI Root Configuration (v31 - Two-File Setup)
+# This file is a simple dispatcher. Its only job is to run the
+# path-filtering orb, which will then trigger the pipeline defined in
+# the 'continue_config.yml' file with the correct parameters.
 version: 2.1
-
 setup: true
 
 orbs:
   path-filtering: circleci/path-filtering@2.0.4
-  continuation: circleci/continuation@2.0.1
-
-parameters:
-  build-backend:
-    type: boolean
-    default: false
-  build-dashboard:
-    type: boolean
-    default: false
-
-# Define separate, dedicated jobs for each pipeline trigger.
-jobs:
-  # This job's only purpose is to trigger the backend pipeline if its parameter is true.
-  trigger-backend-pipeline:
-    docker:
-      - image: cimg/base:current
-    steps:
-      # This unconditional step ensures the job is always valid for the linter.
-      - run: echo "Checking whether to trigger the backend pipeline..."
-      # This conditional step contains the actual trigger logic.
-      - when:
-          condition: << pipeline.parameters.build-backend >>
-          steps:
-            - continuation/continue:
-                configuration_path: backend/.circleci/config.yml
-
-  # This job's only purpose is to trigger the dashboard pipeline if its parameter is true.
-  trigger-dashboard-pipeline:
-    docker:
-      - image: cimg/base:current
-    steps:
-      # This unconditional step ensures the job is always valid for the linter.
-      - run: echo "Checking whether to trigger the dashboard pipeline..."
-      # This conditional step contains the actual trigger logic.
-      - when:
-          condition: << pipeline.parameters.build-dashboard >>
-          steps:
-            - continuation/continue:
-                configuration_path: dashboard/.circleci/config.yml
 
 workflows:
-  # This workflow checks for changes and triggers the appropriate service pipeline.
-  check-and-trigger:
+  check-for-changes:
     jobs:
-      # This job runs first and sets the pipeline parameters defined above.
       - path-filtering/filter:
-          name: check-changes
+          # This parameter points the orb to the file that contains the rest of our pipeline logic.
+          config-path: .circleci/continue_config.yml
+          base-revision: main
           mapping: |
             backend/.* build-backend true
             dashboard/.* build-dashboard true
-          base-revision: main
           filters:
             branches:
               only:
                 - development
                 - production
 
-      # Call the dedicated backend trigger job. It will internally decide whether to run.
-      - trigger-backend-pipeline:
-          requires:
-            - check-changes
-
-      # Call the dedicated dashboard trigger job.
-      - trigger-dashboard-pipeline:
-          requires:
-            - trigger-backend-pipeline # Run sequentially to avoid state conflicts
