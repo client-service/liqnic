@@ -67,17 +67,9 @@ jobs:
             fi
 
 workflows:
-  check-for-changes:
+  trigger-on-change:
     jobs:
-      - path-filtering/filter:
-          # This parameter points the orb to the file that contains the rest of our pipeline logic.
-          config-path: .circleci/continue_config.yml
-          # Use HEAD~1 to compare against the parent commit. This correctly
-          # detects changes on long-lived branches after a merge.
-          base-revision: HEAD~1
-          mapping: |
-            backend/.* build-backend true
-            dashboard/.* build-dashboard true
+      - check-and-trigger:
           filters:
             branches:
               only:
