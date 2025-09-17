@@ -119,6 +119,9 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/events",
     },
+    {
+      resolve: "./src/modules/loyalty"
+    }
   ],
   plugins: [
     /**
