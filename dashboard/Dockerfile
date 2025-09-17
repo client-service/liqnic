@@ -9,7 +9,7 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build
+RUN npm run build:preview
 
 # Reduce installed packages to production-only.
 RUN npm prune --production
@@ -21,7 +21,6 @@ FROM nginx:alpine
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Copy the Vite build output to Nginx's root directory
-COPY --from=build /app/index.html /user/share/nginx/html
 COPY --from=build /app/dist /usr/share/nginx/html
 
 EXPOSE 80
