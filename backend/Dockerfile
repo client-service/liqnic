@@ -8,7 +8,7 @@ WORKDIR /server
 COPY package.json yarn.lock .yarnrc.yml ./
 
 # Install all dependencies using yarn
-RUN yarn install --production
+RUN yarn install
 
 # Copy source code
 COPY . .
@@ -17,7 +17,4 @@ COPY . .
 EXPOSE 9000
 
 # Build the medusajs application
-RUN npm run build
-
-# Run migrations at container startup instead of build
-CMD ["sh", "-c", "npx medusa db:migrate && npm start"]
+RUN yarn build

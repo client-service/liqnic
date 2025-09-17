@@ -1,0 +1,121 @@
+version: 2.1
+jobs:
+  build-and-test:
+    docker:
+      - image: cimg/node:22.4
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            # The checksum path must be relative to the project root.
+            - v1-deps-yarn-{{ checksum "backend/yarn.lock" }}
+            # Fallback key.
+            - v1-deps-yarn-
+      - run:
+          name: "Install Dependencies"
+          # All commands that interact with the backend's files must be run
+          # from within the backend directory.
+          working_directory: backend
+          command: "yarn install"
+      - save_cache:
+          key: v1-deps-yarn-{{ checksum "backend/yarn.lock" }}
+          # The cache path must also be relative to the project root.
+          # Include both node_modules and the yarn cache directory.
+          paths:
+            - backend/node_modules
+            - backend/.yarn/cache
+      - run:
+          name: "Build Backend"
+          working_directory: backend
+          command: "yarn build"
+
+  docker-build-and-publish:
+    docker:
+      - image: cimg/node:22.4
+        auth:
+          username: $DOCKER_USERNAME
+          password: $DOCKER_PASSWORD
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build and Push application Docker image
+          # Run this entire script from the backend directory to find the Dockerfile.
+          working_directory: backend
+          command: |
+            if [ "$CIRCLE_BRANCH" = "development" ]; then
+              STATIC_TAG="dev"
+            elif [ "$CIRCLE_BRANCH" = "production" ]; then
+              STATIC_TAG="prod"
+            fi
+
+            # Create a unique, traceable tag with the build number.
+            UNIQUE_TAG="$STATIC_TAG-$CIRCLE_BUILD_NUM"
+
+            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+
+            # 1. Build the image with the unique tag.
+            docker build -t "$DOCKER_USERNAME/liqnic-backend:$UNIQUE_TAG" .
+
+            # 2. Tag the unique build with the static tag for docker-compose.
+            docker tag "$DOCKER_USERNAME/liqnic-backend:$UNIQUE_TAG" "$DOCKER_USERNAME/liqnic-backend:$STATIC_TAG"
+
+            # 3. Push both tags to Docker Hub.
+            docker push "$DOCKER_USERNAME/liqnic-backend:$UNIQUE_TAG"
+            docker push "$DOCKER_USERNAME/liqnic-backend:$STATIC_TAG"
+
+  deploy:
+    machine:
+      image: ubuntu-2204:2024.11.1
+    # If running ARM, the resource class needs to be added. Omitting this defaults to amd64
+    resource_class: arm.medium
+
+    steps:
+      - run:
+          name: Deploy to Environment
+          command: |
+            if [ "$CIRCLE_BRANCH" = "development" ]; then
+              DEPLOY_PATH="/home/docker/liqnic/dev"
+            elif [ "$CIRCLE_BRANCH" = "production" ]; then
+              DEPLOY_PATH="/home/docker/liqnic/prod"
+            fi
+
+            SSH_COMMAND="ssh $SSH_USER@$SSH_HOST"
+            $SSH_COMMAND "
+              docker logout
+              docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+              set -e
+              cd $DEPLOY_PATH
+              docker compose pull backend
+              docker compose up -d --remove-orphans backend
+              docker image prune -af
+              echo '==> Backend deployment complete!'
+            "
+
+workflows:
+  build-and-deploy:
+    jobs:
+      - build-and-test:
+          filters:
+            branches:
+              only:
+                - development
+                - production
+
+      - docker-build-and-publish:
+          requires:
+            - build-and-test
+          filters:
+            branches:
+              only:
+                - development
+                - production
+      
+      - deploy:
+          requires:
+            - docker-build-and-publish
+          filters:
+            branches:
+              only:
+                - development
+                - production

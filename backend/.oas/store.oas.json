@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "version": "2.0.0",
-    "title": "Liqnic Storefront API",
+    "title": "Medusa Storefront API",
     "license": {
       "name": "MIT",
       "url": "https://github.com/medusajs/medusa/blob/master/LICENSE"
@@ -786,7 +786,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -909,7 +909,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -997,7 +997,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1139,7 +1139,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1288,14 +1288,14 @@
     "/store/carts/{id}/customer": {
       "post": {
         "operationId": "PostCartsIdCustomer",
-        "summary": "Set Cart's Customer",
-        "x-sidebar-summary": "Set Customer",
-        "description": "Set the customer of the cart. This is useful when you create the cart for a guest customer, then they log in with their account.",
+        "summary": "Change Cart's Customer to Logged-in Customer",
+        "x-sidebar-summary": "Change Customer",
+        "description": "Change the cart's customer to the currently logged-in customer. This is useful when you create the cart for a guest customer, then they log in with their account.",
         "externalDocs": {
           "url": "https://docs.medusajs.com/resources/storefront-development/cart/update#set-carts-customer",
           "description": "Storefront guide: How to set the cart's customer."
         },
-        "x-authenticated": false,
+        "x-authenticated": true,
         "parameters": [
           {
             "name": "id",
@@ -1309,7 +1309,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1337,12 +1337,12 @@
           {
             "lang": "JavaScript",
             "label": "JS SDK",
-            "source": "import Medusa from \"@medusajs/js-sdk\"\n\nlet MEDUSA_BACKEND_URL = \"http://localhost:9000\"\n\nif (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {\n  MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL\n}\n\nexport const sdk = new Medusa({\n  baseUrl: MEDUSA_BACKEND_URL,\n  debug: process.env.NODE_ENV === \"development\",\n  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,\n})\n\nsdk.store.cart.transferCart(\"cart_123\")\n.then(({ cart }) => {\n  console.log(cart)\n})"
+            "source": "import Medusa from \"@medusajs/js-sdk\"\n\nlet MEDUSA_BACKEND_URL = \"http://localhost:9000\"\n\nif (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {\n  MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL\n}\n\nexport const sdk = new Medusa({\n  baseUrl: MEDUSA_BACKEND_URL,\n  debug: process.env.NODE_ENV === \"development\",\n  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,\n})\n\n// TODO must be authenticated as the customer to set the cart's customer\nsdk.store.cart.transferCart(\"cart_123\")\n.then(({ cart }) => {\n  console.log(cart)\n})"
           },
           {
             "lang": "Shell",
             "label": "cURL",
-            "source": "curl -X POST '{backend_url}/store/carts/{id}/customer' \\\n-H 'x-publishable-api-key: {your_publishable_api_key}'"
+            "source": "curl -X POST '{backend_url}/store/carts/{id}/customer' \\\n-H 'Authorization: Bearer {access_token}' \\\n-H 'x-publishable-api-key: {your_publishable_api_key}'"
           }
         ],
         "tags": [
@@ -1387,6 +1387,14 @@
             "deprecated": false,
             "since": "2.8.0"
           }
+        ],
+        "security": [
+          {
+            "cookie_auth": []
+          },
+          {
+            "jwt_token": []
+          }
         ]
       }
     },
@@ -1411,7 +1419,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1511,7 +1519,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1616,7 +1624,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1738,7 +1746,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1858,7 +1866,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1977,6 +1985,10 @@
         "x-sidebar-summary": "Add Promotions",
         "description": "Add a list of promotions to a cart.",
         "x-authenticated": false,
+        "externalDocs": {
+          "url": "https://docs.medusajs.com/v2/resources/storefront-development/cart/manage-promotions#add-promotion-to-cart",
+          "description": "Storefront guide: How to add a promotion to cart."
+        },
         "parameters": [
           {
             "name": "id",
@@ -1990,7 +2002,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -2071,6 +2083,10 @@
         "summary": "Remove Promotions from Cart",
         "description": "Remove a list of promotions from a cart.",
         "x-authenticated": false,
+        "externalDocs": {
+          "url": "https://docs.medusajs.com/v2/resources/storefront-development/cart/manage-promotions#remove-promotion-from-cart",
+          "description": "Storefront guide: How to remove a promotion from cart."
+        },
         "parameters": [
           {
             "name": "id",
@@ -2084,7 +2100,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -2112,7 +2128,7 @@
           {
             "lang": "Shell",
             "label": "cURL",
-            "source": "curl -X DELETE '{backend_url}/store/carts/{id}/promotions' \\\n-H 'x-publishable-api-key: {your_publishable_api_key}'"
+            "source": "curl -X DELETE '{backend_url}/store/carts/{id}/promotions' \\\n-H 'x-publishable-api-key: {your_publishable_api_key}' \\\n-H 'Content-Type: application/json' \\\n--data-raw '{\n  \"promo_codes\": [\"{value}\"]\n}'"
           }
         ],
         "tags": [
@@ -2194,7 +2210,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -2304,7 +2320,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -2405,7 +2421,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -2487,7 +2503,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -3391,7 +3407,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -3472,7 +3488,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -3669,7 +3685,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -3749,7 +3765,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -3861,7 +3877,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -3897,7 +3913,7 @@
           {
             "lang": "JavaScript",
             "label": "JS SDK",
-            "source": "import Medusa from \"@medusajs/js-sdk\"\n\nlet MEDUSA_BACKEND_URL = \"http://localhost:9000\"\n\nif (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {\n  MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL\n}\n\nexport const sdk = new Medusa({\n  baseUrl: MEDUSA_BACKEND_URL,\n  debug: process.env.NODE_ENV === \"development\",\n  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,\n})\n\nsdk.store.customer.retrieve()\n.then(({ customer }) => {\n  console.log(customer)\n})"
+            "source": "import Medusa from \"@medusajs/js-sdk\"\n\nlet MEDUSA_BACKEND_URL = \"http://localhost:9000\"\n\nif (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {\n  MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL\n}\n\nexport const sdk = new Medusa({\n  baseUrl: MEDUSA_BACKEND_URL,\n  debug: process.env.NODE_ENV === \"development\",\n  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,\n})\n\n// TODO must be authenticated as the customer to retrieve their details\nsdk.store.customer.retrieve()\n.then(({ customer }) => {\n  console.log(customer)\n})"
           },
           {
             "lang": "Shell",
@@ -3952,7 +3968,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -3997,7 +4013,7 @@
           {
             "lang": "JavaScript",
             "label": "JS SDK",
-            "source": "import Medusa from \"@medusajs/js-sdk\"\n\nlet MEDUSA_BACKEND_URL = \"http://localhost:9000\"\n\nif (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {\n  MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL\n}\n\nexport const sdk = new Medusa({\n  baseUrl: MEDUSA_BACKEND_URL,\n  debug: process.env.NODE_ENV === \"development\",\n  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,\n})\n\nsdk.store.customer.update({\n  first_name: \"John\"\n})\n.then(({ customer }) => {\n  console.log(customer)\n})"
+            "source": "import Medusa from \"@medusajs/js-sdk\"\n\nlet MEDUSA_BACKEND_URL = \"http://localhost:9000\"\n\nif (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {\n  MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL\n}\n\nexport const sdk = new Medusa({\n  baseUrl: MEDUSA_BACKEND_URL,\n  debug: process.env.NODE_ENV === \"development\",\n  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,\n})\n\n// TODO must be authenticated as the customer to update their details\nsdk.store.customer.update({\n  first_name: \"John\"\n})\n.then(({ customer }) => {\n  console.log(customer)\n})"
           },
           {
             "lang": "Shell",
@@ -4064,7 +4080,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -4233,7 +4249,7 @@
           {
             "lang": "JavaScript",
             "label": "JS SDK",
-            "source": "import Medusa from \"@medusajs/js-sdk\"\n\nlet MEDUSA_BACKEND_URL = \"http://localhost:9000\"\n\nif (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {\n  MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL\n}\n\nexport const sdk = new Medusa({\n  baseUrl: MEDUSA_BACKEND_URL,\n  debug: process.env.NODE_ENV === \"development\",\n  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,\n})\n\nsdk.store.customer.listAddress()\n.then(({ addresses, count, offset, limit }) => {\n  console.log(addresses)\n})"
+            "source": "import Medusa from \"@medusajs/js-sdk\"\n\nlet MEDUSA_BACKEND_URL = \"http://localhost:9000\"\n\nif (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {\n  MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL\n}\n\nexport const sdk = new Medusa({\n  baseUrl: MEDUSA_BACKEND_URL,\n  debug: process.env.NODE_ENV === \"development\",\n  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,\n})\n\n// TODO must be authenticated as the customer to list their addresses\nsdk.store.customer.listAddress()\n.then(({ addresses, count, offset, limit }) => {\n  console.log(addresses)\n})"
           },
           {
             "lang": "Shell",
@@ -4289,7 +4305,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -4334,7 +4350,7 @@
           {
             "lang": "JavaScript",
             "label": "JS SDK",
-            "source": "import Medusa from \"@medusajs/js-sdk\"\n\nlet MEDUSA_BACKEND_URL = \"http://localhost:9000\"\n\nif (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {\n  MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL\n}\n\nexport const sdk = new Medusa({\n  baseUrl: MEDUSA_BACKEND_URL,\n  debug: process.env.NODE_ENV === \"development\",\n  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,\n})\n\nsdk.store.customer.createAddress({\n  country_code: \"us\"\n})\n.then(({ customer }) => {\n  console.log(customer)\n})"
+            "source": "import Medusa from \"@medusajs/js-sdk\"\n\nlet MEDUSA_BACKEND_URL = \"http://localhost:9000\"\n\nif (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {\n  MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL\n}\n\nexport const sdk = new Medusa({\n  baseUrl: MEDUSA_BACKEND_URL,\n  debug: process.env.NODE_ENV === \"development\",\n  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,\n})\n\n// TODO must be authenticated as the customer to create an address\nsdk.store.customer.createAddress({\n  country_code: \"us\"\n})\n.then(({ customer }) => {\n  console.log(customer)\n})"
           },
           {
             "lang": "Shell",
@@ -4399,7 +4415,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -4435,7 +4451,7 @@
           {
             "lang": "JavaScript",
             "label": "JS SDK",
-            "source": "import Medusa from \"@medusajs/js-sdk\"\n\nlet MEDUSA_BACKEND_URL = \"http://localhost:9000\"\n\nif (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {\n  MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL\n}\n\nexport const sdk = new Medusa({\n  baseUrl: MEDUSA_BACKEND_URL,\n  debug: process.env.NODE_ENV === \"development\",\n  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,\n})\n\nsdk.store.customer.retrieveAddress(\n  \"caddr_123\"\n)\n.then(({ address }) => {\n  console.log(address)\n})"
+            "source": "import Medusa from \"@medusajs/js-sdk\"\n\nlet MEDUSA_BACKEND_URL = \"http://localhost:9000\"\n\nif (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {\n  MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL\n}\n\nexport const sdk = new Medusa({\n  baseUrl: MEDUSA_BACKEND_URL,\n  debug: process.env.NODE_ENV === \"development\",\n  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,\n})\n\n// TODO must be authenticated as the customer to retrieve their address\nsdk.store.customer.retrieveAddress(\n  \"caddr_123\"\n)\n.then(({ address }) => {\n  console.log(address)\n})"
           },
           {
             "lang": "Shell",
@@ -4500,7 +4516,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -4545,7 +4561,7 @@
           {
             "lang": "JavaScript",
             "label": "JS SDK",
-            "source": "import Medusa from \"@medusajs/js-sdk\"\n\nlet MEDUSA_BACKEND_URL = \"http://localhost:9000\"\n\nif (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {\n  MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL\n}\n\nexport const sdk = new Medusa({\n  baseUrl: MEDUSA_BACKEND_URL,\n  debug: process.env.NODE_ENV === \"development\",\n  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,\n})\n\nsdk.store.customer.updateAddress(\n  \"caddr_123\",\n  {\n    country_code: \"us\"\n  }\n)\n.then(({ customer }) => {\n  console.log(customer)\n})"
+            "source": "import Medusa from \"@medusajs/js-sdk\"\n\nlet MEDUSA_BACKEND_URL = \"http://localhost:9000\"\n\nif (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {\n  MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL\n}\n\nexport const sdk = new Medusa({\n  baseUrl: MEDUSA_BACKEND_URL,\n  debug: process.env.NODE_ENV === \"development\",\n  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,\n})\n\n// TODO must be authenticated as the customer to update their address\nsdk.store.customer.updateAddress(\n  \"caddr_123\",\n  {\n    country_code: \"us\"\n  }\n)\n.then(({ customer }) => {\n  console.log(customer)\n})"
           },
           {
             "lang": "Shell",
@@ -4612,7 +4628,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -4648,12 +4664,12 @@
           {
             "lang": "JavaScript",
             "label": "JS SDK",
-            "source": "import Medusa from \"@medusajs/js-sdk\"\n\nlet MEDUSA_BACKEND_URL = \"http://localhost:9000\"\n\nif (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {\n  MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL\n}\n\nexport const sdk = new Medusa({\n  baseUrl: MEDUSA_BACKEND_URL,\n  debug: process.env.NODE_ENV === \"development\",\n  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,\n})\n\nsdk.store.customer.deleteAddress(\"caddr_123\")\n.then(({ deleted, parent: customer }) => {\n  console.log(customer)\n})"
+            "source": "import Medusa from \"@medusajs/js-sdk\"\n\nlet MEDUSA_BACKEND_URL = \"http://localhost:9000\"\n\nif (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {\n  MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL\n}\n\nexport const sdk = new Medusa({\n  baseUrl: MEDUSA_BACKEND_URL,\n  debug: process.env.NODE_ENV === \"development\",\n  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,\n})\n\n// TODO must be authenticated as the customer to delete their address\nsdk.store.customer.deleteAddress(\"caddr_123\")\n.then(({ deleted, parent: customer }) => {\n  console.log(customer)\n})"
           },
           {
             "lang": "Shell",
             "label": "cURL",
-            "source": "curl -X DELETE '{backend_url}/store/customers/me/addresses/{address_id}' \\\n-H 'x-publishable-api-key: {your_publishable_api_key}' \\\n-H 'Authorization: Bearer {access_token}'"
+            "source": "curl -X DELETE '{backend_url}/store/customers/me/addresses/{address_id}' \\\n-H 'Authorization: Bearer {access_token}' \\\n-H 'x-publishable-api-key: {your_publishable_api_key}'"
           }
         ],
         "tags": [
@@ -4753,7 +4769,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -4839,7 +4855,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -4930,7 +4946,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -5112,12 +5128,12 @@
           {
             "lang": "JavaScript",
             "label": "JS SDK",
-            "source": "import Medusa from \"@medusajs/js-sdk\"\n\nlet MEDUSA_BACKEND_URL = \"http://localhost:9000\"\n\nif (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {\n  MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL\n}\n\nexport const sdk = new Medusa({\n  baseUrl: MEDUSA_BACKEND_URL,\n  debug: process.env.NODE_ENV === \"development\",\n  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,\n})\n\nsdk.store.order.list()\n.then(({ orders, count, offset, limit }) => {\n  console.log(orders)\n})"
+            "source": "import Medusa from \"@medusajs/js-sdk\"\n\nlet MEDUSA_BACKEND_URL = \"http://localhost:9000\"\n\nif (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {\n  MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL\n}\n\nexport const sdk = new Medusa({\n  baseUrl: MEDUSA_BACKEND_URL,\n  debug: process.env.NODE_ENV === \"development\",\n  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,\n})\n\n// TODO must be authenticated as the customer to list their orders\nsdk.store.order.list()\n.then(({ orders, count, offset, limit }) => {\n  console.log(orders)\n})"
           },
           {
             "lang": "Shell",
             "label": "cURL",
-            "source": "curl '{backend_url}/store/orders' \\\n-H 'x-publishable-api-key: {your_publishable_api_key}'"
+            "source": "curl '{backend_url}/store/orders' \\\n-H 'Authorization: Bearer {access_token}' \\\n-H 'x-publishable-api-key: {your_publishable_api_key}'"
           }
         ],
         "tags": [
@@ -5227,7 +5243,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -5320,7 +5336,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -5422,7 +5438,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -5450,12 +5466,12 @@
           {
             "lang": "JavaScript",
             "label": "JS SDK",
-            "source": "import Medusa from \"@medusajs/js-sdk\"\n\nlet MEDUSA_BACKEND_URL = \"http://localhost:9000\"\n\nif (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {\n  MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL\n}\n\nexport const sdk = new Medusa({\n  baseUrl: MEDUSA_BACKEND_URL,\n  debug: process.env.NODE_ENV === \"development\",\n  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,\n})\n\nsdk.store.order.cancelTransfer(\n  \"order_123\",\n  {},\n  {\n    Authorization: `Bearer ${token}`\n  }\n)\n.then(({ order }) => {\n  console.log(order)\n})"
+            "source": "import Medusa from \"@medusajs/js-sdk\"\n\nlet MEDUSA_BACKEND_URL = \"http://localhost:9000\"\n\nif (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {\n  MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL\n}\n\nexport const sdk = new Medusa({\n  baseUrl: MEDUSA_BACKEND_URL,\n  debug: process.env.NODE_ENV === \"development\",\n  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,\n})\n\n// TODO must be authenticated as the customer to cancel the order transfer\nsdk.store.order.cancelTransfer(\n  \"order_123\",\n  {},\n  {\n    Authorization: `Bearer ${token}`\n  }\n)\n.then(({ order }) => {\n  console.log(order)\n})"
           },
           {
             "lang": "Shell",
             "label": "cURL",
-            "source": "curl -X POST '{backend_url}/store/orders/{id}/transfer/cancel' \\\n-H 'x-publishable-api-key: {your_publishable_api_key}'"
+            "source": "curl -X POST '{backend_url}/store/orders/{id}/transfer/cancel' \\\n-H 'Authorization: Bearer {access_token}' \\\n-H 'x-publishable-api-key: {your_publishable_api_key}'"
           }
         ],
         "tags": [
@@ -5523,7 +5539,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -5625,7 +5641,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -5662,12 +5678,12 @@
           {
             "lang": "JavaScript",
             "label": "JS SDK",
-            "source": "import Medusa from \"@medusajs/js-sdk\"\n\nlet MEDUSA_BACKEND_URL = \"http://localhost:9000\"\n\nif (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {\n  MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL\n}\n\nexport const sdk = new Medusa({\n  baseUrl: MEDUSA_BACKEND_URL,\n  debug: process.env.NODE_ENV === \"development\",\n  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,\n})\n\nsdk.store.order.requestTransfer(\n  \"order_123\",\n  {\n    description: \"I want to transfer this order to my friend.\"\n  },\n  {},\n  {\n    Authorization: `Bearer ${token}`\n  }\n)\n.then(({ order }) => {\n  console.log(order)\n})"
+            "source": "import Medusa from \"@medusajs/js-sdk\"\n\nlet MEDUSA_BACKEND_URL = \"http://localhost:9000\"\n\nif (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {\n  MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL\n}\n\nexport const sdk = new Medusa({\n  baseUrl: MEDUSA_BACKEND_URL,\n  debug: process.env.NODE_ENV === \"development\",\n  publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,\n})\n\n// TODO must be authenticated as the customer to request the order transfer\nsdk.store.order.requestTransfer(\n  \"order_123\",\n  {\n    description: \"I want to transfer this order to my friend.\"\n  },\n  {},\n  {\n    Authorization: `Bearer ${token}`\n  }\n)\n.then(({ order }) => {\n  console.log(order)\n})"
           },
           {
             "lang": "Shell",
             "label": "cURL",
-            "source": "curl -X POST '{backend_url}/store/orders/{id}/transfer/request' \\\n-H 'x-publishable-api-key: {your_publishable_api_key}'"
+            "source": "curl -X POST '{backend_url}/store/orders/{id}/transfer/request' \\\n-H 'Authorization: Bearer {access_token}' \\\n-H 'x-publishable-api-key: {your_publishable_api_key}'"
           }
         ],
         "tags": [
@@ -5729,7 +5745,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -5835,7 +5851,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -5926,7 +5942,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -6115,7 +6131,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -7065,7 +7081,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -7168,7 +7184,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -8023,7 +8039,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -8099,7 +8115,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -8954,7 +8970,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -9034,7 +9050,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -10161,7 +10177,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -10341,7 +10357,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -10632,7 +10648,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -10722,7 +10738,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -10900,7 +10916,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -10976,7 +10992,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -11067,7 +11083,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -11248,7 +11264,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -11360,7 +11376,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -11869,7 +11885,7 @@
           {
             "name": "x-publishable-api-key",
             "in": "header",
-            "description": "Publishable API Key created in theLiqnic Admin.",
+            "description": "Publishable API Key created in the Medusa Admin.",
             "required": true,
             "schema": {
               "type": "string",
@@ -15232,7 +15248,6 @@
           "shipping_profile_id",
           "price_type",
           "provider_id",
-          "type",
           "prices"
         ],
         "properties": {
@@ -15331,6 +15346,11 @@
             "items": {
               "$ref": "#/components/schemas/AdminCreateShippingOptionRule"
             }
+          },
+          "type_id": {
+            "type": "string",
+            "title": "type_id",
+            "description": "The ID of the shipping option type that this shipping option belongs to."
           }
         }
       },
@@ -15392,7 +15412,6 @@
         "x-schemaName": "AdminCreateShippingOptionType",
         "required": [
           "label",
-          "description",
           "code"
         ],
         "properties": {
@@ -17053,6 +17072,7 @@
           "item_total",
           "item_subtotal",
           "item_tax_total",
+          "item_discount_total",
           "original_total",
           "original_subtotal",
           "original_tax_total",
@@ -17066,6 +17086,7 @@
           "shipping_total",
           "shipping_subtotal",
           "shipping_tax_total",
+          "shipping_discount_total",
           "original_shipping_total",
           "original_shipping_subtotal",
           "original_shipping_tax_total",
@@ -17343,6 +17364,16 @@
             "type": "number",
             "title": "credit_line_total",
             "description": "The draft order's credit line total."
+          },
+          "item_discount_total": {
+            "type": "number",
+            "title": "item_discount_total",
+            "description": "The total discount amount applied on the draft order's items."
+          },
+          "shipping_discount_total": {
+            "type": "number",
+            "title": "shipping_discount_total",
+            "description": "The total discount amount applied on the draft order's shipping."
           }
         }
       },
@@ -17414,6 +17445,7 @@
           "item_total",
           "item_subtotal",
           "item_tax_total",
+          "item_discount_total",
           "original_total",
           "original_subtotal",
           "original_tax_total",
@@ -17427,6 +17459,7 @@
           "shipping_total",
           "shipping_subtotal",
           "shipping_tax_total",
+          "shipping_discount_total",
           "original_shipping_total",
           "original_shipping_subtotal",
           "original_shipping_tax_total",
@@ -18222,6 +18255,16 @@
             "type": "number",
             "title": "credit_line_total",
             "description": "The draft order preview's credit line total."
+          },
+          "item_discount_total": {
+            "type": "number",
+            "title": "item_discount_total",
+            "description": "The total discount amount applied on the draft order's items."
+          },
+          "shipping_discount_total": {
+            "type": "number",
+            "title": "shipping_discount_total",
+            "description": "The total discount amount applied on the draft order's shipping."
           }
         }
       },
@@ -19975,6 +20018,7 @@
           "item_total",
           "item_subtotal",
           "item_tax_total",
+          "item_discount_total",
           "original_total",
           "original_subtotal",
           "original_tax_total",
@@ -19988,6 +20032,7 @@
           "shipping_total",
           "shipping_subtotal",
           "shipping_tax_total",
+          "shipping_discount_total",
           "original_shipping_total",
           "original_shipping_subtotal",
           "original_shipping_tax_total",
@@ -20264,6 +20309,16 @@
             "type": "number",
             "title": "credit_line_total",
             "description": "The order's credit line total."
+          },
+          "item_discount_total": {
+            "type": "number",
+            "title": "item_discount_total",
+            "description": "The total discount amount applied on the order's items."
+          },
+          "shipping_discount_total": {
+            "type": "number",
+            "title": "shipping_discount_total",
+            "description": "The total discount amount applied on the order's shipping."
           }
         }
       },
@@ -20556,6 +20611,7 @@
           "return_id",
           "exchange_id",
           "claim_id",
+          "ordering",
           "order_change_id",
           "reference",
           "reference_id",
@@ -20660,6 +20716,11 @@
             "format": "date-time",
             "title": "updated_at",
             "description": "The date the action was updated."
+          },
+          "ordering": {
+            "type": "number",
+            "title": "ordering",
+            "description": "The action's order in the sequence of actions."
           }
         }
       },
@@ -21165,6 +21226,7 @@
           "item_total",
           "item_subtotal",
           "item_tax_total",
+          "item_discount_total",
           "original_total",
           "original_subtotal",
           "original_tax_total",
@@ -21178,6 +21240,7 @@
           "shipping_total",
           "shipping_subtotal",
           "shipping_tax_total",
+          "shipping_discount_total",
           "original_shipping_total",
           "original_shipping_subtotal",
           "original_shipping_tax_total",
@@ -21973,6 +22036,16 @@
             "type": "number",
             "title": "credit_line_total",
             "description": "The order preview's credit line total."
+          },
+          "item_discount_total": {
+            "type": "number",
+            "title": "item_discount_total",
+            "description": "The total discount amount applied on the order's items."
+          },
+          "shipping_discount_total": {
+            "type": "number",
+            "title": "shipping_discount_total",
+            "description": "The total discount amount applied on the order's shipping."
           }
         }
       },
@@ -25437,6 +25510,11 @@
           },
           "inventory": {
             "$ref": "#/components/schemas/AdminInventoryItem"
+          },
+          "required_quantity": {
+            "type": "number",
+            "title": "required_quantity",
+            "description": "The inventory item's required quantity."
           }
         }
       },
@@ -27124,6 +27202,88 @@
             "type": "string",
             "title": "shipping_option_id",
             "description": "The type's shipping option id."
+          }
+        }
+      },
+      "AdminShippingOptionTypeDeleteResponse": {
+        "type": "object",
+        "description": "The response returned after deleting a shipping option type.",
+        "x-schemaName": "AdminShippingOptionTypeDeleteResponse",
+        "required": [
+          "id",
+          "object",
+          "deleted"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "id",
+            "description": "The shipping option type's ID."
+          },
+          "object": {
+            "type": "string",
+            "title": "object",
+            "description": "The name of the deleted object.",
+            "default": "shipping_option_type"
+          },
+          "deleted": {
+            "type": "boolean",
+            "title": "deleted",
+            "description": "Whether the Shipping Option Type was deleted."
+          }
+        }
+      },
+      "AdminShippingOptionTypeListResponse": {
+        "type": "object",
+        "description": "The paginated list of shipping option types.",
+        "x-schemaName": "AdminShippingOptionTypeListResponse",
+        "required": [
+          "limit",
+          "offset",
+          "count",
+          "shipping_option_types"
+        ],
+        "properties": {
+          "limit": {
+            "type": "number",
+            "title": "limit",
+            "description": "The maximum number of items returned."
+          },
+          "offset": {
+            "type": "number",
+            "title": "offset",
+            "description": "The number of items skipped before returning the results."
+          },
+          "count": {
+            "type": "number",
+            "title": "count",
+            "description": "The total number of items."
+          },
+          "estimate_count": {
+            "type": "number",
+            "title": "estimate_count",
+            "description": "The estimated count retrieved from the PostgreSQL query planner, which may be inaccurate.",
+            "x-featureFlag": "index_engine"
+          },
+          "shipping_option_types": {
+            "type": "array",
+            "description": "The list of shipping option types.",
+            "items": {
+              "$ref": "#/components/schemas/AdminShippingOptionType"
+            }
+          }
+        }
+      },
+      "AdminShippingOptionTypeResponse": {
+        "type": "object",
+        "description": "The shipping option type's details.",
+        "x-schemaName": "AdminShippingOptionTypeResponse",
+        "required": [
+          "shipping_option_type"
+        ],
+        "properties": {
+          "shipping_option_type": {
+            "$ref": "#/components/schemas/AdminShippingOptionType"
           }
         }
       },
@@ -29851,235 +30011,6 @@
           }
         }
       },
-      "AdminUpdateShippingOption": {
-        "type": "object",
-        "description": "The properties to update in the shipping option.",
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "name",
-            "description": "The shipping option's name."
-          },
-          "data": {
-            "type": "object",
-            "description": "The shipping option's data that is useful for third-party providers.",
-            "externalDocs": {
-              "url": "https://docs.medusajs.com/v2/resources/commerce-modules/fulfillment/shipping-option#data-property"
-            }
-          },
-          "price_type": {
-            "type": "string",
-            "description": "The type of the shipping option's price. If `calculated`, its price is retrieved by the  associated fulfillment provider during checkout. If `flat`, its price is set in the `prices` property.\n",
-            "enum": [
-              "calculated",
-              "flat"
-            ]
-          },
-          "provider_id": {
-            "type": "string",
-            "title": "provider_id",
-            "description": "The ID of the associated fulfillment provider that is used to process the option."
-          },
-          "shipping_profile_id": {
-            "type": "string",
-            "title": "shipping_profile_id",
-            "description": "The ID of the shipping profile this shipping option belongs to."
-          },
-          "type": {
-            "type": "object",
-            "description": "The shipping option's type.",
-            "required": [
-              "code",
-              "description",
-              "label"
-            ],
-            "properties": {
-              "label": {
-                "type": "string",
-                "title": "label",
-                "description": "The type's label."
-              },
-              "description": {
-                "type": "string",
-                "title": "description",
-                "description": "The type's description."
-              },
-              "code": {
-                "type": "string",
-                "title": "code",
-                "description": "The type's code."
-              }
-            }
-          },
-          "prices": {
-            "type": "array",
-            "description": "The shipping option's prices. If the `price_type` is `calculated`, pass an empty array.",
-            "items": {
-              "oneOf": [
-                {
-                  "type": "object",
-                  "description": "The shipping option's price for a currency code.",
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "title": "id",
-                      "description": "The ID of an existing price."
-                    },
-                    "currency_code": {
-                      "type": "string",
-                      "title": "currency_code",
-                      "description": "The price's currency code."
-                    },
-                    "amount": {
-                      "type": "number",
-                      "title": "amount",
-                      "description": "The price's amount."
-                    }
-                  }
-                },
-                {
-                  "type": "object",
-                  "description": "The shipping option's price for a region.",
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "title": "id",
-                      "description": "The ID of an existing price."
-                    },
-                    "region_id": {
-                      "type": "string",
-                      "title": "region_id",
-                      "description": "The ID of the associated region."
-                    },
-                    "amount": {
-                      "type": "number",
-                      "title": "amount",
-                      "description": "The price's amount."
-                    }
-                  }
-                }
-              ]
-            }
-          },
-          "rules": {
-            "type": "array",
-            "description": "The shipping option's rules.",
-            "items": {
-              "oneOf": [
-                {
-                  "type": "object",
-                  "description": "The details of a new shipping option rule.",
-                  "required": [
-                    "operator",
-                    "attribute",
-                    "value"
-                  ],
-                  "properties": {
-                    "operator": {
-                      "type": "string",
-                      "description": "The operator used to check whether a rule applies.",
-                      "enum": [
-                        "in",
-                        "eq",
-                        "ne",
-                        "gt",
-                        "gte",
-                        "lt",
-                        "lte",
-                        "nin"
-                      ]
-                    },
-                    "attribute": {
-                      "type": "string",
-                      "title": "attribute",
-                      "description": "The name of a property or table that the rule applies to.",
-                      "example": "customer_group"
-                    },
-                    "value": {
-                      "oneOf": [
-                        {
-                          "type": "string",
-                          "title": "value",
-                          "description": "A value of the attribute that enables this rule.",
-                          "example": "cusgroup_123"
-                        },
-                        {
-                          "type": "array",
-                          "description": "Values of the attribute that enable this rule.",
-                          "items": {
-                            "type": "string",
-                            "title": "value",
-                            "description": "A value of the attribute that enables this rule.",
-                            "example": "cusgroup_123"
-                          }
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "type": "object",
-                  "description": "Update the properties of an existing rule.",
-                  "required": [
-                    "id",
-                    "operator",
-                    "attribute",
-                    "value"
-                  ],
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "title": "id",
-                      "description": "The rule's ID."
-                    },
-                    "operator": {
-                      "type": "string",
-                      "description": "The operator used to check whether a rule applies.",
-                      "enum": [
-                        "in",
-                        "eq",
-                        "ne",
-                        "gt",
-                        "gte",
-                        "lt",
-                        "lte",
-                        "nin"
-                      ]
-                    },
-                    "attribute": {
-                      "type": "string",
-                      "title": "attribute",
-                      "description": "The name of a property or table that the rule applies to.",
-                      "example": "customer_group"
-                    },
-                    "value": {
-                      "oneOf": [
-                        {
-                          "type": "string",
-                          "title": "value",
-                          "description": "A value of the attribute that enables this rule.",
-                          "example": "cusgroup_123"
-                        },
-                        {
-                          "type": "array",
-                          "description": "Values of the attribute that enable this rule.",
-                          "items": {
-                            "type": "string",
-                            "title": "value",
-                            "description": "A value of the attribute that enables this rule.",
-                            "example": "cusgroup_123"
-                          }
-                        }
-                      ]
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        },
-        "x-schemaName": "AdminUpdateShippingOption"
-      },
       "AdminUpdateShippingOptionRule": {
         "type": "object",
         "description": "The properties to update in the shipping option rule.",
@@ -30137,6 +30068,28 @@
           }
         },
         "x-schemaName": "AdminUpdateShippingOptionRule"
+      },
+      "AdminUpdateShippingOptionType": {
+        "type": "object",
+        "description": "The properties to update in the shipping option type.",
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "code",
+            "description": "The shipping option type's code."
+          },
+          "description": {
+            "type": "string",
+            "title": "description",
+            "description": "The shipping option type's description."
+          },
+          "label": {
+            "type": "string",
+            "title": "label",
+            "description": "The shipping option type's label."
+          }
+        },
+        "x-schemaName": "AdminUpdateShippingOptionType"
       },
       "AdminUpdateShippingProfile": {
         "type": "object",
@@ -30947,6 +30900,16 @@
                       "type": "number",
                       "title": "timeout",
                       "description": "The maximum time in seconds to wait for this step to complete. If the step exceeds this time, the step's state is changed to `timeout`, but the step continues executing."
+                    },
+                    "autoRetry": {
+                      "type": "boolean",
+                      "title": "autoRetry",
+                      "description": "Whether the step should be automatically retried if it fails."
+                    },
+                    "maxAwaitingRetries": {
+                      "type": "number",
+                      "title": "maxAwaitingRetries",
+                      "description": "The maximum number of times to retry the step while it's in the `waiting_response` state."
                     }
                   }
                 },
@@ -32299,6 +32262,7 @@
           "item_total",
           "item_subtotal",
           "item_tax_total",
+          "item_discount_total",
           "original_total",
           "original_subtotal",
           "original_tax_total",
@@ -32312,6 +32276,7 @@
           "shipping_total",
           "shipping_subtotal",
           "shipping_tax_total",
+          "shipping_discount_total",
           "original_shipping_total",
           "original_shipping_subtotal",
           "original_shipping_tax_total",
@@ -32572,6 +32537,16 @@
             "type": "number",
             "title": "credit_line_total",
             "description": "The order's credit line total."
+          },
+          "item_discount_total": {
+            "type": "number",
+            "title": "item_discount_total",
+            "description": "The total discount amount applied on the order's items."
+          },
+          "shipping_discount_total": {
+            "type": "number",
+            "title": "shipping_discount_total",
+            "description": "The total discount amount applied on the order's shipping."
           }
         }
       },
@@ -35962,6 +35937,7 @@
           "item_total",
           "item_subtotal",
           "item_tax_total",
+          "item_discount_total",
           "original_total",
           "original_subtotal",
           "original_tax_total",
@@ -35977,6 +35953,7 @@
           "shipping_total",
           "shipping_subtotal",
           "shipping_tax_total",
+          "shipping_discount_total",
           "original_shipping_total",
           "original_shipping_subtotal",
           "original_shipping_tax_total"
@@ -36325,6 +36302,16 @@
             "type": "number",
             "title": "credit_line_total",
             "description": "The order's credit line total."
+          },
+          "item_discount_total": {
+            "type": "number",
+            "title": "item_discount_total",
+            "description": "The total discount amount applied on the order's items."
+          },
+          "shipping_discount_total": {
+            "type": "number",
+            "title": "shipping_discount_total",
+            "description": "The total discount amount applied on the order's shipping."
           }
         }
       },
@@ -38877,17 +38864,6 @@
           "cart",
           "title",
           "id",
-          "item_total",
-          "item_subtotal",
-          "item_tax_total",
-          "original_total",
-          "original_subtotal",
-          "original_tax_total",
-          "total",
-          "subtotal",
-          "tax_total",
-          "discount_total",
-          "discount_tax_total",
           "requires_shipping",
           "is_discountable",
           "is_tax_inclusive",
@@ -39250,57 +39226,57 @@
           "original_total": {
             "type": "number",
             "title": "original_total",
-            "description": "The item's total including taxes, excluding promotions."
+            "description": "The item's total including taxes, excluding promotions. This field is only available if you expand the `items.*` relation. Learn more in the [Cart Totals](https://docs.medusajs.com/resources/storefront-development/cart/totals#retrieve-and-show-cart-item-totals) guide."
           },
           "original_subtotal": {
             "type": "number",
             "title": "original_subtotal",
-            "description": "The item's total excluding taxes, including promotions."
+            "description": "The item's total excluding taxes, including promotions. This field is only available if you expand the `items.*` relation. Learn more in the [Cart Totals](https://docs.medusajs.com/resources/storefront-development/cart/totals#retrieve-and-show-cart-item-totals) guide."
           },
           "original_tax_total": {
             "type": "number",
             "title": "original_tax_total",
-            "description": "The total taxes of the item excluding promotions."
+            "description": "The total taxes of the item excluding promotions. This field is only available if you expand the `items.*` relation. Learn more in the [Cart Totals](https://docs.medusajs.com/resources/storefront-development/cart/totals#retrieve-and-show-cart-item-totals) guide."
           },
           "item_total": {
             "type": "number",
             "title": "original_tax_total",
-            "description": "The item's total including taxes and promotions."
+            "description": "The item's total including taxes and promotions. This field is only available if you expand the `items.*` relation. Learn more in the [Cart Totals](https://docs.medusajs.com/resources/storefront-development/cart/totals#retrieve-and-show-cart-item-totals) guide."
           },
           "item_subtotal": {
             "type": "number",
             "title": "item_subtotal",
-            "description": "The item's total excluding taxes, including promotions."
+            "description": "The item's total excluding taxes, including promotions. This field is only available if you expand the `items.*` relation. Learn more in the [Cart Totals](https://docs.medusajs.com/resources/storefront-development/cart/totals#retrieve-and-show-cart-item-totals) guide."
           },
           "item_tax_total": {
             "type": "number",
             "title": "item_tax_total",
-            "description": "The total taxes of the item including promotions."
+            "description": "The total taxes of the item including promotions. This field is only available if you expand the `items.*` relation. Learn more in the [Cart Totals](https://docs.medusajs.com/resources/storefront-development/cart/totals#retrieve-and-show-cart-item-totals) guide."
           },
           "total": {
             "type": "number",
             "title": "total",
-            "description": "The item's total including taxes and promotions."
+            "description": "The item's total including taxes and promotions. This field is only available if you expand the `items.*` relation. Learn more in the [Cart Totals](https://docs.medusajs.com/resources/storefront-development/cart/totals#retrieve-and-show-cart-item-totals) guide."
           },
           "subtotal": {
             "type": "number",
             "title": "subtotal",
-            "description": "The item's total excluding taxes, including promotions."
+            "description": "The item's total excluding taxes, including promotions. This field is only available if you expand the `items.*` relation. Learn more in the [Cart Totals](https://docs.medusajs.com/resources/storefront-development/cart/totals#retrieve-and-show-cart-item-totals) guide."
           },
           "tax_total": {
             "type": "number",
             "title": "tax_total",
-            "description": "The total taxes of the item including promotions."
+            "description": "The total taxes of the item including promotions. This field is only available if you expand the `items.*` relation. Learn more in the [Cart Totals](https://docs.medusajs.com/resources/storefront-development/cart/totals#retrieve-and-show-cart-item-totals) guide."
           },
           "discount_total": {
             "type": "number",
             "title": "discount_total",
-            "description": "The total discount of the item."
+            "description": "The total discount of the item. This field is only available if you expand the `items.*` relation. Learn more in the [Cart Totals](https://docs.medusajs.com/resources/storefront-development/cart/totals#retrieve-and-show-cart-item-totals) guide."
           },
           "discount_tax_total": {
             "type": "number",
             "title": "discount_tax_total",
-            "description": "The total taxes applied on the discounted amount."
+            "description": "The total taxes applied on the discounted amount. This field is only available if you expand the `items.*` relation. Learn more in the [Cart Totals](https://docs.medusajs.com/resources/storefront-development/cart/totals#retrieve-and-show-cart-item-totals) guide."
           }
         }
       },
@@ -39401,15 +39377,7 @@
           "amount",
           "is_tax_inclusive",
           "created_at",
-          "updated_at",
-          "original_total",
-          "original_subtotal",
-          "original_tax_total",
-          "total",
-          "subtotal",
-          "tax_total",
-          "discount_total",
-          "discount_tax_total"
+          "updated_at"
         ],
         "properties": {
           "id": {
@@ -39671,42 +39639,42 @@
           "original_total": {
             "type": "number",
             "title": "original_total",
-            "description": "The shipping method's total including taxes, excluding promotions."
+            "description": "The shipping method's total including taxes, excluding promotions. This field is only available if you expand the `shipping_methods.*` relation. Learn more in the [Cart Totals](https://docs.medusajs.com/resources/storefront-development/cart/totals#retrieve-and-show-shipping-method-totals) guide."
           },
           "original_subtotal": {
             "type": "number",
             "title": "original_subtotal",
-            "description": "The shipping method's total excluding taxes, including promotions."
+            "description": "The shipping method's total excluding taxes, including promotions. This field is only available if you expand the `shipping_methods.*` relation. Learn more in the [Cart Totals](https://docs.medusajs.com/resources/storefront-development/cart/totals#retrieve-and-show-shipping-method-totals) guide."
           },
           "original_tax_total": {
             "type": "number",
             "title": "original_tax_total",
-            "description": "The total taxes applied on the shipping method's amount including promotions."
+            "description": "The total taxes applied on the shipping method's amount including promotions. This field is only available if you expand the `shipping_methods.*` relation. Learn more in the [Cart Totals](https://docs.medusajs.com/resources/storefront-development/cart/totals#retrieve-and-show-shipping-method-totals) guide."
           },
           "total": {
             "type": "number",
             "title": "total",
-            "description": "The shipping method's total amount including taxes and promotions."
+            "description": "The shipping method's total amount including taxes and promotions. This field is only available if you expand the `shipping_methods.*` relation. Learn more in the [Cart Totals](https://docs.medusajs.com/resources/storefront-development/cart/totals#retrieve-and-show-shipping-method-totals) guide."
           },
           "subtotal": {
             "type": "number",
             "title": "subtotal",
-            "description": "The shipping method's total amount excluding taxes, including promotions."
+            "description": "The shipping method's total amount excluding taxes, including promotions. This field is only available if you expand the `shipping_methods.*` relation. Learn more in the [Cart Totals](https://docs.medusajs.com/resources/storefront-development/cart/totals#retrieve-and-show-shipping-method-totals) guide."
           },
           "tax_total": {
             "type": "number",
             "title": "tax_total",
-            "description": "The total taxes applied on the shipping method's amount including promotions."
+            "description": "The total taxes applied on the shipping method's amount including promotions. This field is only available if you expand the `shipping_methods.*` relation. Learn more in the [Cart Totals](https://docs.medusajs.com/resources/storefront-development/cart/totals#retrieve-and-show-shipping-method-totals) guide."
           },
           "discount_total": {
             "type": "number",
             "title": "discount_total",
-            "description": "The total amount discounted."
+            "description": "The total amount discounted. This field is only available if you expand the `shipping_methods.*` relation. Learn more in the [Cart Totals](https://docs.medusajs.com/resources/storefront-development/cart/totals#retrieve-and-show-shipping-method-totals) guide."
           },
           "discount_tax_total": {
             "type": "number",
             "title": "discount_tax_total",
-            "description": "The taxes applied on the discounted amount."
+            "description": "The taxes applied on the discounted amount. This field is only available if you expand the `shipping_methods.*` relation. Learn more in the [Cart Totals](https://docs.medusajs.com/resources/storefront-development/cart/totals#retrieve-and-show-shipping-method-totals) guide."
           }
         }
       },
@@ -40784,6 +40752,7 @@
           "item_total",
           "item_subtotal",
           "item_tax_total",
+          "item_discount_total",
           "original_total",
           "original_subtotal",
           "original_tax_total",
@@ -40797,6 +40766,7 @@
           "shipping_total",
           "shipping_subtotal",
           "shipping_tax_total",
+          "shipping_discount_total",
           "original_shipping_total",
           "original_shipping_subtotal",
           "original_shipping_tax_total",
@@ -41056,6 +41026,16 @@
             "type": "number",
             "title": "credit_line_total",
             "description": "The order's credit line total."
+          },
+          "item_discount_total": {
+            "type": "number",
+            "title": "item_discount_total",
+            "description": "The total discount amount applied on the order's items."
+          },
+          "shipping_discount_total": {
+            "type": "number",
+            "title": "shipping_discount_total",
+            "description": "The total discount amount applied on the order's shipping."
           }
         }
       },
