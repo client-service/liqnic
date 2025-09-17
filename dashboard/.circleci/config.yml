@@ -97,13 +97,28 @@ jobs:
 workflows:
   build-and-deploy:
     jobs:
-      - build-and-test
+      - build-and-test:
+          filters:
+            branches:
+              only:
+                - development
+                - production
 
       - docker-build-and-publish:
           context: [ liqnic-dev, liqnic-prod ]
           requires: [ build-and-test ]
+          filters:
+            branches:
+              only:
+                - development
+                - production
       
       - deploy:
           context: [ liqnic-dev, liqnic-prod ]
           requires: [ docker-build-and-publish ]
+          filters:
+            branches:
+              only:
+                - development
+                - production
 
