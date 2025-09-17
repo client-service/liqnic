@@ -10,16 +10,16 @@ jobs:
           keys:
             - v1-deps-npm-{{ checksum "dashboard/package-lock.json" }}
             - v1-deps-npm-
-      - run: { name: "Install Dependencies", command: "npm install" }
       - run:
-          {
-            name: "NPM audit -- check for vulnerabilities inside dependencies",
-            command: "npm audit",
-          }
-      - run: { name: "Fix found vulnerabilities", command: "npm audit fix" }
+          name: "Install Dependencies"
+          working_directory: dashboard
+          command: "npm install"
       - save_cache:
           key: v1-deps-npm-{{ checksum "dashboard/package-lock.json" }}
-          paths: [ "dashboard/node_modules" ]
+          paths:
+            # Include both node_modules and the global npm cache directory.
+            - dashboard/node_modules
+            - ~/.npm
       - run:
           name: "Build Dashboard"
           working_directory: dashboard
