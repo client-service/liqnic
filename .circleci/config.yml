@@ -5,24 +5,75 @@
 version: 2.1
 setup: true
 
-orbs:
-  path-filtering: circleci/path-filtering@2.0.4
+jobs:
+  # This single job detects changes and triggers the appropriate service pipeline.
+  check-and-trigger:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - run:
+          name: Detect changes and trigger pipelines
+          command: |
+            # This is the most reliable way to find the common ancestor commit.
+            MERGE_BASE=$(git merge-base main HEAD)
+
+            # This diff will correctly list all files changed since the branch diverged from main.
+            CHANGED_FILES=$(git diff --name-only $MERGE_BASE HEAD)
+
+            # Default parameters to false
+            BUILD_BACKEND=false
+            BUILD_DASHBOARD=false
+
+            echo "Changed files:"
+            echo "$CHANGED_FILES"
+
+            # Check if backend files were changed
+            if echo "$CHANGED_FILES" | grep -q "backend/"; then
+              echo "Changes detected in backend."
+              BUILD_BACKEND=true
+            fi
+
+            # Check if dashboard files were changed
+            if echo "$CHANGED_FILES" | grep -q "dashboard/"; then
+              echo "Changes detected in dashboard."
+              BUILD_DASHBOARD=true
+            fi
+
+            # Function to trigger a pipeline
+            trigger_pipeline() {
+              CONFIG_PATH=$1
+              echo "Triggering pipeline for $CONFIG_PATH..."
+              curl -X POST \
+                --url "https://circleci.com/api/v2/project/gh/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/pipeline" \
+                -H "Circle-Token: $CIRCLE_API_TOKEN" \
+                -H "content-type: application/json" \
+                -d "{
+                      \"branch\": \"$CIRCLE_BRANCH\",
+                      \"parameters\": {
+                        \"GHA_Meta_Trigger\": false,
+                        \"cci_config_path\": \"$CONFIG_PATH\"
+                      }
+                    }"
+            }
+
+            # Trigger the pipelines based on the parameters
+            if [ "$BUILD_BACKEND" = true ]; then
+              trigger_pipeline "backend/.circleci/config.yml"
+            fi
+
+            if [ "$BUILD_DASHBOARD" = true ]; then
+              trigger_pipeline "dashboard/.circleci/config.yml"
+            fi
 
 workflows:
-  check-for-changes:
+  trigger-on-change:
     jobs:
-      - path-filtering/filter:
-          # This parameter points the orb to the file that contains the rest of our pipeline logic.
-          config-path: .circleci/continue_config.yml
-          # Use HEAD~1 to compare against the parent commit. This correctly
-          # detects changes on long-lived branches after a merge.
-          base-revision: HEAD~1
-          mapping: |
-            backend/.* build-backend true
-            dashboard/.* build-dashboard true
+      - check-and-trigger:
           filters:
             branches:
               only:
                 - development
                 - production
+
 
