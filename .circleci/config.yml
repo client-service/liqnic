@@ -19,7 +19,8 @@ jobs:
       - run:
           name: "Install Backend Dependencies"
           working_directory: backend
-          command: "yarn install"
+          # Use --frozen-lockfile to prevent modifications to yarn.lock in CI
+          command: "yarn install --frozen-lockfile"
       - save_cache:
           key: v1-deps-yarn-{{ checksum "backend/yarn.lock" }}
           paths:
@@ -95,7 +96,8 @@ jobs:
       - run:
           name: "Install Dashboard Dependencies"
           working_directory: dashboard
-          command: "npm install"
+          # Use 'npm ci' for faster, more reliable installs in CI environments.
+          command: "npm ci"
       - save_cache:
           key: v1-deps-npm-{{ checksum "dashboard/package-lock.json" }}
           paths:
