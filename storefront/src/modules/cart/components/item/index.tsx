@@ -13,6 +13,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import Spinner from "@modules/common/icons/spinner"
 import Thumbnail from "@modules/products/components/thumbnail"
 import { useState } from "react"
+import { LuMinus, LuPlus } from "react-icons/lu"
 
 type ItemProps = {
   item: HttpTypes.StoreCartLineItem
@@ -45,8 +46,8 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
   const maxQuantity = item.variant?.manage_inventory ? 10 : maxQtyFromInventory
 
   return (
-    <Table.Row className="w-full" data-testid="product-row">
-      <Table.Cell className="!pl-0 p-4 w-24">
+    <Table.Row className="w-full relative" data-testid="product-row">
+      <Table.Cell className="!pl-0 p-8 md:p-12 w-24">
         <LocalizedClientLink
           href={`/products/${item.product_handle}`}
           className={clx("flex", {
@@ -54,10 +55,10 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
             "small:w-24 w-12": type === "full",
           })}
         >
-          <Thumbnail
-            thumbnail={item.thumbnail}
-            images={item.variant?.product?.images}
-            size="square"
+          <img
+            src={item?.thumbnail}
+            alt={item?.product_title}
+            className="w-full h-full object-cover rounded"
           />
         </LocalizedClientLink>
       </Table.Cell>
@@ -70,39 +71,47 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
           {item.product_title}
         </Text>
         <LineItemOptions variant={item.variant} data-testid="product-variant" />
-      </Table.Cell>
 
-      {type === "full" && (
-        <Table.Cell>
-          <div className="flex gap-2 items-center w-28">
-            <DeleteButton id={item.id} data-testid="product-delete-button" />
-            <CartItemSelect
-              value={item.quantity}
-              onChange={(value) => changeQuantity(parseInt(value.target.value))}
-              className="w-14 h-10 p-4"
-              data-testid="product-select-button"
-            >
-              {/* TODO: Update this with the v2 way of managing inventory */}
-              {Array.from(
-                {
-                  length: Math.min(maxQuantity, 10),
-                },
-                (_, i) => (
-                  <option value={i + 1} key={i}>
-                    {i + 1}
+        {/* Quantity Controls */}
+        <div className="flex items-center gap-4 mt-4 lg:mt-8">
+          <span className="text-gray-600 text-xs sm:text-sm font-medium">
+            Quantity
+          </span>
+
+          {type === "full" && (
+            <Table.Cell>
+              <div className="flex gap-2 items-center w-28">
+                <CartItemSelect
+                  value={item.quantity}
+                  onChange={(value) =>
+                    changeQuantity(parseInt(value.target.value))
+                  }
+                  className="w-14 h-10 p-4"
+                  data-testid="product-select-button"
+                >
+                  {/* TODO: Update this with the v2 way of managing inventory */}
+                  {Array.from(
+                    {
+                      length: Math.min(maxQuantity, 10),
+                    },
+                    (_, i) => (
+                      <option value={i + 1} key={i}>
+                        {i + 1}
+                      </option>
+                    )
+                  )}
+
+                  <option value={1} key={1}>
+                    1
                   </option>
-                )
-              )}
-
-              <option value={1} key={1}>
-                1
-              </option>
-            </CartItemSelect>
-            {updating && <Spinner />}
-          </div>
-          <ErrorMessage error={error} data-testid="product-error-message" />
-        </Table.Cell>
-      )}
+                </CartItemSelect>
+                {updating && <Spinner />}
+              </div>
+              <ErrorMessage error={error} data-testid="product-error-message" />
+            </Table.Cell>
+          )}
+        </div>
+      </Table.Cell>
 
       {type === "full" && (
         <Table.Cell className="hidden small:table-cell">
@@ -137,6 +146,14 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
           />
         </span>
       </Table.Cell>
+
+      <div className="absolute inset-0 w-full h-full pointer-events-none flex items-end justify-end pb-8">
+        <DeleteButton
+          id={item.id}
+          className="pointer-events-auto"
+          data-testid="product-delete-button"
+        />
+      </div>
     </Table.Row>
   )
 }

@@ -3,16 +3,27 @@
 import { Popover, PopoverPanel, Transition } from "@headlessui/react"
 import { ArrowRightMini, XMark } from "@medusajs/icons"
 import { Text, clx, useToggleState } from "@medusajs/ui"
-import { Fragment } from "react"
-
+import { Fragment, useState } from "react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CountrySelect from "../country-select"
 import { HttpTypes } from "@medusajs/types"
-import { MENU_ITEMS } from "components/navbar"
 import { LuMenu } from "react-icons/lu"
+import type { MenuItem } from "@lib/menu"
 
-const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
+export default function SideMenu({
+  regions,
+  menuItems,
+}: {
+  regions: HttpTypes.StoreRegion[] | null
+  menuItems: MenuItem[]
+}) {
   const toggleState = useToggleState()
+  // track open dropdowns
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null)
+
+  const handleToggle = (label: string) => {
+    setOpenDropdown((prev) => (prev === label ? null : label))
+  }
 
   return (
     <div className="h-full">
@@ -49,9 +60,9 @@ const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
                         <XMark />
                       </button>
                     </div>
-                    <ul className="flex flex-col gap-6 items-start justify-start">
-                      {MENU_ITEMS.map((item) => (
-                        <li key={item.label}>
+                    <ul className="flex flex-col gap-6 items-start justify-start w-full">
+                      {menuItems.map((item) => (
+                        <li key={item.label} className="w-full">
                           {item.href ? (
                             <LocalizedClientLink
                               href={item.href}
@@ -60,26 +71,44 @@ const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
                               {item.label}
                             </LocalizedClientLink>
                           ) : item.dropdown && item.children ? (
-                            <div className="flex flex-col gap-2">
-                              <span>{item.label}</span>
-                              <ul className="ml-4 flex flex-col gap-1">
-                                {item.children.map((child) => (
-                                  <li key={child.label}>
-                                    <LocalizedClientLink
-                                      href={child.href!}
-                                      onClick={close}
-                                    >
-                                      {child.label}
-                                    </LocalizedClientLink>
-                                  </li>
-                                ))}
-                              </ul>
+                            <div className="flex flex-col gap-2 w-full">
+                              <button
+                                type="button"
+                                onClick={() => handleToggle(item.label)}
+                                className="flex justify-between items-center w-full text-left"
+                              >
+                                <span>{item.label}</span>
+                                <ArrowRightMini
+                                  className={clx(
+                                    "transition-transform duration-150",
+                                    openDropdown === item.label
+                                      ? "-rotate-90"
+                                      : ""
+                                  )}
+                                />
+                              </button>
+
+                              {openDropdown === item.label && (
+                                <ul className="ml-4 flex flex-col gap-1">
+                                  {item.children.map((child) => (
+                                    <li key={child.label}>
+                                      <LocalizedClientLink
+                                        href={child.href!}
+                                        onClick={close}
+                                      >
+                                        {child.label}
+                                      </LocalizedClientLink>
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
                             </div>
                           ) : null}
                         </li>
                       ))}
                     </ul>
-                    <div className="flex flex-col gap-y-6">
+
+                    <div className="flex flex-col gap-y-6 mt-auto">
                       <div
                         className="flex justify-between"
                         onMouseEnter={toggleState.open}
@@ -113,5 +142,3 @@ const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
     </div>
   )
 }
-
-export default SideMenu

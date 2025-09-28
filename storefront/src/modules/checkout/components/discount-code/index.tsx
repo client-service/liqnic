@@ -1,7 +1,7 @@
 "use client"
 
 import { Badge, Heading, Input, Label, Text } from "@medusajs/ui"
-import React from "react";
+import React from "react"
 
 import { applyPromotions } from "@lib/data/cart"
 import { convertToLocale } from "@lib/util/money"
@@ -17,7 +17,7 @@ type DiscountCodeProps = {
 }
 
 const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
-  const [isOpen, setIsOpen] = React.useState(false)
+  const [isOpen, setIsOpen] = React.useState(true)
   const [errorMessage, setErrorMessage] = React.useState("")
 
   const { promotions = [] } = cart
@@ -58,8 +58,8 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
   return (
     <div className="w-full bg-white flex flex-col">
       <div className="txt-medium">
-        <form action={(a) => addPromotionCode(a)} className="w-full mb-5">
-          <Label className="flex gap-x-1 my-2 items-center">
+        <form action={(a) => addPromotionCode(a)} className="w-full mb-2">
+          {/* <Label className="flex gap-x-1 my-2 items-center">
             <button
               onClick={() => setIsOpen(!isOpen)}
               type="button"
@@ -67,27 +67,42 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
               data-testid="add-discount-button"
             >
               Add Promotion Code(s)
-            </button>
+            </button> */}
 
-            {/* <Tooltip content="You can add multiple promotion codes">
+          {/* <Tooltip content="You can add multiple promotion codes">
               <InformationCircleSolid color="var(--fg-muted)" />
             </Tooltip> */}
-          </Label>
+          {/* </Label> */}
 
           {isOpen && (
             <>
-              <div className="flex w-full gap-x-2">
-                <Input
+              <div className="flex items-center gap-4">
+                <div className="flex-1 relative">
+                  {/* <Input
                   className="size-full"
                   id="promotion-input"
                   name="code"
                   type="text"
                   autoFocus={false}
                   data-testid="discount-input"
+                /> */}
+                </div>
+              </div>
+
+              <div className="flex items-center border border-[#E4E4E4] rounded-md bg-white">
+                <input
+                  type="text"
+                  placeholder="Promo Code"
+                  id="promotion-input"
+                  name="code"
+                  autoFocus={false}
+                  data-testid="discount-input"
+                  className="flex-1 px-4 py-4 text-base text-gray-600 placeholder-[#C2C2C2] bg-transparent border-none outline-none font-manrope"
                 />
                 <SubmitButton
                   variant="secondary"
                   data-testid="discount-apply-button"
+                  className="px-4 py-2 bg-primary text-white text-sm font-bold rounded hover:bg-brand-primary transition-colors m-2"
                 >
                   Apply
                 </SubmitButton>

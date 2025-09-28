@@ -73,8 +73,9 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         onClick={handlePayment}
         size="large"
         data-testid={dataTestId}
+        className="bg-primary"
       >
-        Place order (COD)
+        Place order
       </Button>
 
       <ErrorMessage

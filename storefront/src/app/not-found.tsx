@@ -13,33 +13,35 @@ export default function NotFound() {
     <>
       <Navbar />
       <main>
-        <div className="flex flex-col gap-4 items-center justify-center min-h-screen bg-background">
-          <h1 className="text-4xl font-bold text-foreground">404</h1>
-          <h2 className="text-2xl font-semibold text-foreground">
-            Page not found
-          </h2>
-          <p className="text-muted-foreground text-center max-w-md">
-            The page you tried to access does not exist.
-          </p>
-          <Link
-            className="flex gap-x-2 items-center group mt-4 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-            href="/"
-          >
-            <span>Go to homepage</span>
-            <svg
-              className="w-4 h-4 group-hover:translate-x-1 transition-transform"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </Link>
+        <div className="min-h-[90vh] bg-gray-50 flex items-center justify-center">
+          <div className="text-center max-w-md mx-auto px-4">
+            <h1 className="text-6xl font-bold text-gray-600 mb-4 font-manrope">
+              404
+            </h1>
+            <h2 className="text-2xl font-bold text-gray-600 mb-4 font-manrope">
+              Page Not Found
+            </h2>
+            <p className="text-lg text-gray-500 mb-8 font-manrope">
+              Sorry, the page you're looking for doesn't exist or has been
+              moved.
+            </p>
+            <div className="flex gap-4 justify-center">
+              <Link href="/">
+                <button className="px-6 py-3 bg-[#C5A163] text-white font-medium rounded-lg hover:bg-brand-secondary transition-colors">
+                  Return Home
+                </button>
+              </Link>
+              <Link href="/shop">
+                <button className="px-6 py-3 border border-[#C5A163] text-[#C5A163] font-medium rounded-lg hover:bg-[#C5A163] hover:text-white transition-colors">
+                  Browse Shop
+                </button>
+              </Link>
+            </div>
+
+            <p className="mt-8 text-sm text-gray-400">
+              If you believe this is an error, please contact our support team.
+            </p>
+          </div>
         </div>
       </main>
       <Footer />
