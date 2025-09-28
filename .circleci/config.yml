@@ -62,6 +62,22 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - "YOUR_SSH_KEY_FINGERPRINT_HERE"
+            
+      - run:
+          name: Check if container exists
+          command: |
+            SSH_COMMAND="ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST"
+            $SSH_COMMAND "
+            if docker ps -a --format '{{.Names}}' | grep -q "liqnic-backend"; then
+              echo "Container liqnic-backend exists"
+              docker stop liqnic-backend
+              docker rm liqnic-backend
+              docker rmi $DOCKER_USERNAME/liqnic-backend:prod
+              echo "Container liqnic-backend:prod stopped and removed"
+            else
+              echo "Container liqnic-backend:prod does not exist"
+            fi"
+            
       - run:
           name: Deploy Backend to Environment
           command: |
@@ -75,9 +91,7 @@ jobs:
               set -e
               cd $DEPLOY_PATH
               docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-              docker compose pull backend
-              docker compose up -d --remove-orphans backend
-              docker image prune -af
+              docker compose up -d backend
               echo '==> Backend deployment complete!'
             "
 
@@ -142,6 +156,22 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - "YOUR_SSH_KEY_FINGERPRINT_HERE"
+            
+      - run:
+          name: Check if container exists
+          command: |
+            SSH_COMMAND="ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST"
+            $SSH_COMMAND "
+            if docker ps -a --format '{{.Names}}' | grep -q "liqnic-dashboard"; then
+              echo "Container liqnic-dashboard exists"
+              docker stop liqnic-dashboard
+              docker rm liqnic-dashboard
+              docker rmi $DOCKER_USERNAME/liqnic-dashboard:prod
+              echo "Container liqnic-dashboard:prod stopped and removed"
+            else
+              echo "Container liqnic-dashboard:prod does not exist"
+            fi"
+            
       - run:
           name: Deploy Dashboard to Environment
           command: |
@@ -155,9 +185,7 @@ jobs:
               set -e
               cd $DEPLOY_PATH
               docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-              docker compose pull dashboard
-              docker compose up -d --remove-orphans dashboard
-              docker image prune -af
+              docker compose up -d dashboard
               echo '==> Dashboard deployment complete!'
             "
 
@@ -219,4 +247,3 @@ workflows:
               only:
                 - development
                 - production
-
