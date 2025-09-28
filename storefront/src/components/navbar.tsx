@@ -70,9 +70,15 @@ export default async function Navbar() {
               Account
             </LocalizedClientLink>
           </div>
-          <div className="bg-gray-100 rounded-md p-2">
-            <LuSearch />
-          </div>
+          <LocalizedClientLink
+            className="hover:text-ui-fg-base"
+            href="/shop"
+            data-testid="nav-account-link"
+          >
+            <div className="bg-gray-100 rounded-md p-2">
+              <LuSearch />
+            </div>
+          </LocalizedClientLink>
           {/* Cart */}
           <Suspense
             fallback={
