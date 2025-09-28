@@ -1,5 +1,6 @@
 "use client"
 import Image from "next/image"
+import Link from "next/link"
 import { useState, useEffect } from "react"
 
 const Hero = () => {
@@ -12,7 +13,9 @@ const Hero = () => {
       description:
         "From IQOS ILUMA PRIME to ILUMA ONE, experience a new era of heated tobacco — crafted for sophistication, designed for modern living.",
       primaryButton: "Shop IQOS Devices",
+      primaryLink: "/categories/device",
       secondaryButton: "Shop Accessories",
+      secondaryLink: "/categories/device",
     },
     {
       image: "/images/hero-two.png",
@@ -20,7 +23,9 @@ const Hero = () => {
       description:
         "Experience the future of nicotine with IQOS ILUMA, PRIME, and ONE — designed for sophistication, cleaner taste, and convenience",
       primaryButton: "Shop IQOS Devices",
+      primaryLink: "/categories/iqos-devices",
       secondaryButton: "Shop Accessories",
+      secondaryLink: "/categories/accessories",
     },
     {
       image: "/images/hero-third.png",
@@ -28,7 +33,9 @@ const Hero = () => {
       description:
         "Explore ZYN in multiple flavors and strengths — a modern, smoke-free nicotine experience that fits your lifestyle.",
       primaryButton: "Shop ZYN Citrus",
+      primaryLink: "/categories/zyn-citrus",
       secondaryButton: "Shop ZYN Cool Mint",
+      secondaryLink: "/categories/zyn-coolmint",
     },
     {
       image: "/images/hero-four.png",
@@ -36,7 +43,9 @@ const Hero = () => {
       description:
         "From Moët Hennessy to Don Angel, discover rare whiskies, timeless cognacs, fine champagnes, and limited-edition collections — curated for every occasion.",
       primaryButton: "Shop Cognac",
+      primaryLink: "/categories/cognac",
       secondaryButton: "Shop Whiskies",
+      secondaryLink: "/categories/liquor",
     },
   ]
 
@@ -50,7 +59,7 @@ const Hero = () => {
 
   return (
     <section className="relative">
-      <div className="relative h-[60vh] lg:h-[85vh] w-full overflow-hidden">
+      <div className="relative h-[75vh] lg:h-[85vh] w-full overflow-hidden">
         {heroData.map((hero, index) => (
           <div
             key={index}
@@ -114,17 +123,21 @@ const Hero = () => {
                 key={`buttons-${currentHero}`}
                 className="flex flex-col sm:flex-row items-center gap-4 sm:gap-5 lg:gap-[20px] mt-8 animate-in slide-in-from-left-8 fade-in duration-700 delay-300"
               >
-                <button className="w-full sm:w-auto flex py-3 sm:py-[15px] px-6 sm:px-[10px] justify-center items-center gap-[10px] rounded-[5px] bg-[#C5A163] hover:bg-[#B8956B] transition-colors min-w-[201px]">
-                  <span className="text-white text-lg sm:text-[18px] leading-[150%] font-manrope">
-                    {heroData[currentHero].primaryButton}
-                  </span>
-                </button>
+                <Link href={heroData[currentHero].primaryLink} passHref>
+                  <button className="w-full sm:w-auto flex py-3 sm:py-[15px] px-6 sm:px-[10px] justify-center items-center gap-[10px] rounded-[5px] bg-[#C5A163] hover:bg-[#B8956B] transition-colors min-w-[201px]">
+                    <span className="text-white text-lg sm:text-[18px] leading-[150%] font-manrope">
+                      {heroData[currentHero].primaryButton}
+                    </span>
+                  </button>
+                </Link>
 
-                <button className="w-full sm:w-auto flex py-3 sm:py-[15px] px-6 sm:px-[10px] justify-center items-center gap-[10px] rounded-[5px] border border-[#838383] bg-transparent hover:bg-black/5 transition-colors min-w-[201px]">
-                  <span className="text-black text-lg sm:text-[18px] leading-[150%] font-manrope">
-                    {heroData[currentHero].secondaryButton}
-                  </span>
-                </button>
+                <Link href={heroData[currentHero].secondaryLink} passHref>
+                  <button className="w-full sm:w-auto flex py-3 sm:py-[15px] px-6 sm:px-[10px] justify-center items-center gap-[10px] rounded-[5px] border border-[#838383] bg-transparent hover:bg-black/5 transition-colors min-w-[201px]">
+                    <span className="text-black text-lg sm:text-[18px] leading-[150%] font-manrope">
+                      {heroData[currentHero].secondaryButton}
+                    </span>
+                  </button>
+                </Link>
               </div>
             </div>
           </div>
