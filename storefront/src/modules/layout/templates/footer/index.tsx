@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { LuFacebook, LuMail, LuMapPin } from "react-icons/lu"
 export default function Footer() {
   return (
@@ -147,30 +148,24 @@ export default function Footer() {
                 Legal
               </h3>
               <div className="flex flex-col items-start gap-[6px]">
-                <a
-                  href="#"
-                  className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
-                >
+                <Link href="/terms-and-conditions" className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope">
                   Terms and conditions
-                </a>
-                <a
-                  href="#"
-                  className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
-                >
+                </Link>
+                <Link href="/privacy-policy" className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope">
                   Privacy policy
-                </a>
-                <a
+                </Link>
+                <Link
                   href="#"
                   className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
                 >
                   Disclaimer
-                </a>
-                <a
+                </Link>
+                <Link
                   href="#"
                   className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
                 >
                   Shipping and returns
-                </a>
+                </Link>
               </div>
             </div>
 
