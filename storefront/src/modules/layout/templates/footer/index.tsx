@@ -1,4 +1,4 @@
-import { LuFacebook, LuMail, LuMapPin } from "react-icons/lu"
+import { LuFacebook, LuMail, LuMapPin, LuPhone } from "react-icons/lu"
 export default function Footer() {
   return (
     <footer className="w-full bg-[#F9F6EF] px-4 py-8 sm:py-12 lg:py-[50px]">
@@ -166,7 +166,7 @@ export default function Footer() {
                   Disclaimer
                 </a>
                 <a
-                  href="#"
+                  href="/shipping-return-policy"
                   className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
                 >
                   Shipping and returns
@@ -181,7 +181,7 @@ export default function Footer() {
               </h3>
               <div className="flex flex-col items-start gap-[6px]">
                 <div className="flex items-center gap-[10px]">
-                  <LuFacebook className="w-4 h-4 text-black" />
+                  <LuPhone className="w-4 h-4 text-black" />
                   <span className="text-[#606060] text-[13px] font-medium leading-[20px] font-manrope">
                     +977 9823123457
                   </span>
