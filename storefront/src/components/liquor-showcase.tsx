@@ -1,3 +1,4 @@
+import Image from "next/image"
 import React from "react"
 
 export default function LiquorShowcase() {
@@ -7,10 +8,11 @@ export default function LiquorShowcase() {
         <div className="flex flex-col lg:flex-row items-center justify-center gap-8 sm:gap-12 lg:gap-[74px]">
           {/* Left Image */}
           <div className="w-full max-w-[490px] aspect-square lg:w-[490px] lg:h-[509px] flex flex-col justify-center items-center bg-[#F3F3F3] relative overflow-hidden rounded-lg order-2 lg:order-1">
-            <img
-              src="https://api.builder.io/api/v1/image/assets/TEMP/ae0da64e59cdbf5925da4d162917c960efd862c6?width=409"
+            <Image
+              src="/images/premium-nicotine-three.png"
               alt="Premium Liquor Bottle"
-              className="w-[205px] h-[357px] object-contain absolute"
+              width={600}
+              height={600}
             />
           </div>
 
