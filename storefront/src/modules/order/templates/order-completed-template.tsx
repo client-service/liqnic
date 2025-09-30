@@ -29,7 +29,7 @@ export default async function OrderCompletedTemplate({
         <Image
           src="/images/order-confirm.png"
           alt=""
-          width={600} // set your desired size
+          width={600}
           height={600}
           className="object-contain"
           priority
