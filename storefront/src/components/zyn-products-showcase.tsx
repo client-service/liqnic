@@ -1,3 +1,4 @@
+import Image from "next/image"
 import React from "react"
 
 export default function ZYNProductsShowcase() {
@@ -27,10 +28,11 @@ export default function ZYNProductsShowcase() {
 
           {/* Right Image */}
           <div className="w-full max-w-[490px] aspect-square lg:w-[490px] lg:h-[509px] flex flex-col justify-center items-center bg-[#F3F3F3] relative overflow-hidden rounded-lg">
-            <img
-              src="https://api.builder.io/api/v1/image/assets/TEMP/e98520cb906032cbec0831e869301d25527ba6bf?width=1031"
+            <Image
+              src="/images/premium-nicotine-two.png"
               alt="ZYN Products Collection"
-              className="w-[515px] h-[515px] object-cover absolute -left-[13px] -top-[3px]"
+              width={600}
+              height={600}
             />
           </div>
         </div>
