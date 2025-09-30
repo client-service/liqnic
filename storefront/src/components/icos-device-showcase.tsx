@@ -1,3 +1,4 @@
+import Image from "next/image"
 import React from "react"
 
 export default function IcosDeviceShowcase() {
@@ -7,10 +8,11 @@ export default function IcosDeviceShowcase() {
         <div className="flex flex-col lg:flex-row items-center justify-center gap-8 sm:gap-12 lg:gap-[74px]">
           {/* Left Image */}
           <div className="w-full max-w-[490px] aspect-square lg:w-[490px] lg:h-[509px] flex flex-col justify-center items-center bg-[#F3F3F3] relative overflow-hidden rounded-lg order-2 lg:order-1">
-            <img
-              src="https://api.builder.io/api/v1/image/assets/TEMP/610bac007407feb8dcd670ee28dafd4e45bff275?width=980"
+            <Image
+              src="/images/PremiumNicotine.png"
               alt="IQOS Devices Collection"
-              className="w-full h-full object-cover"
+              width={600}
+              height={600}
             />
           </div>
 

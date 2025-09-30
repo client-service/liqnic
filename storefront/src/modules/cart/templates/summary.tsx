@@ -32,15 +32,28 @@ const Summary = ({ cart }: SummaryProps) => {
       <Heading level="h2" className="text-[2rem] leading-[2.75rem]">
         Summary
       </Heading>
-      <DiscountCode cart={cart} />
-      <Divider />
+
       <CartTotals totals={cart} />
-      <LocalizedClientLink
-        href={"/checkout?step=" + step}
-        data-testid="checkout-button"
-      >
-        <Button className="w-full h-10">Go to checkout</Button>
-      </LocalizedClientLink>
+
+      <DiscountCode cart={cart} />
+
+      {/* Action Buttons */}
+      <div className="grid grid-cols-2 gap-4">
+        <LocalizedClientLink
+          href={"/checkout?step=" + step}
+          data-testid="checkout-button"
+          className="w-full"
+        >
+          <button className="w-full py-3 px-4 bg-primary text-white text-sm font-medium rounded hover:bg-brand-primary transition-colors">
+            Go to Checkout
+          </button>
+        </LocalizedClientLink>
+        <LocalizedClientLink href="/" className="w-full">
+          <div className="w-full py-3 px-4 border border-gray-500 text-black text-sm font-medium rounded hover:bg-gray-50 text-center transition-colors">
+            Continue Shopping
+          </div>
+        </LocalizedClientLink>
+      </div>
     </div>
   )
 }

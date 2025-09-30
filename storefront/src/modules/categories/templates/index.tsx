@@ -8,6 +8,7 @@ import { SortOptions } from "@modules/store/components/refinement-list/sort-prod
 import PaginatedProducts from "@modules/store/templates/paginated-products"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { HttpTypes } from "@medusajs/types"
+import Link from "next/link"
 
 export default function CategoryTemplate({
   category,
@@ -25,15 +26,13 @@ export default function CategoryTemplate({
 
   if (!category || !countryCode) notFound()
 
-  const parents = [] as HttpTypes.StoreProductCategory[]
-
-  const getParents = (category: HttpTypes.StoreProductCategory) => {
-    if (category.parent_category) {
-      parents.push(category.parent_category)
-      getParents(category.parent_category)
+  const parents: HttpTypes.StoreProductCategory[] = []
+  const getParents = (cat: HttpTypes.StoreProductCategory) => {
+    if (cat.parent_category) {
+      parents.push(cat.parent_category)
+      getParents(cat.parent_category)
     }
   }
-
   getParents(category)
 
   return (
@@ -41,42 +40,58 @@ export default function CategoryTemplate({
       className="flex flex-col small:flex-row small:items-start py-6 content-container"
       data-testid="category-container"
     >
+      {/* Sidebar: Refinement / Sorting */}
       <RefinementList sortBy={sort} data-testid="sort-by-container" />
+
       <div className="w-full">
-        <div className="flex flex-row mb-8 text-2xl-semi gap-4">
-          {parents &&
-            parents.map((parent) => (
-              <span key={parent.id} className="text-ui-fg-subtle">
-                <LocalizedClientLink
-                  className="mr-4 hover:text-black"
-                  href={`/categories/${parent.handle}`}
-                  data-testid="sort-by-link"
-                >
-                  {parent.name}
-                </LocalizedClientLink>
-                /
-              </span>
-            ))}
-          <h1 data-testid="category-page-title">{category.name}</h1>
+        {/* Breadcrumb */}
+        <div className="flex flex-wrap items-center gap-1 mb-4 text-sm sm:text-base">
+          {parents.map((parent) => (
+            <span
+              key={parent.id}
+              className="text-gray-500 flex items-center gap-1"
+            >
+              <LocalizedClientLink
+                href={`/categories/${parent.handle}`}
+                className="hover:text-black transition-colors"
+                data-testid="category-breadcrumb-link"
+              >
+                {parent.name}
+              </LocalizedClientLink>
+              <span className="text-gray-400">{">"}</span>
+            </span>
+          ))}
+          <span className="font-semibold text-black">{category.name}</span>
         </div>
+
+        {/* Category Description */}
         {category.description && (
           <div className="mb-8 text-base-regular">
             <p>{category.description}</p>
           </div>
         )}
-        {category.category_children && (
-          <div className="mb-8 text-base-large">
-            <ul className="grid grid-cols-1 gap-2">
-              {category.category_children?.map((c) => (
-                <li key={c.id}>
-                  <InteractiveLink href={`/categories/${c.handle}`}>
-                    {c.name}
-                  </InteractiveLink>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+
+        {/* Child Categories */}
+        {category.category_children &&
+          category.category_children.length > 0 && (
+            <div className="mb-8">
+              <h3 className="font-semibold mb-2">Subcategories</h3>
+              <ul className="flex flex-wrap gap-2">
+                {category.category_children.map((c) => (
+                  <li key={c.id}>
+                    <Link
+                      href={`/categories/${c.handle}`}
+                      className="px-3 py-1 bg-gray-100 rounded-full hover:bg-gray-200 transition"
+                    >
+                      {c.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+        {/* Products */}
         <Suspense
           fallback={
             <SkeletonProductGrid
@@ -87,7 +102,7 @@ export default function CategoryTemplate({
           <PaginatedProducts
             sortBy={sort}
             page={pageNumber}
-            categoryId={category.id}
+            categoryId={category?.id}
             countryCode={countryCode}
           />
         </Suspense>

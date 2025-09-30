@@ -6,6 +6,25 @@ import { SortOptions } from "@modules/store/components/refinement-list/sort-prod
 
 const PRODUCT_LIMIT = 12
 
+async function fetchCategories() {
+  try {
+    const res = await fetch(
+      `${process.env.MEDUSA_BACKEND_URL}/store/product-categories?limit=1000`,
+      {
+        headers: {
+          "x-publishable-api-key":
+            process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY!,
+        },
+      }
+    )
+    const data = await res.json()
+    return data.product_categories
+  } catch (err) {
+    console.error("Error fetching categories:", err)
+    return []
+  }
+}
+
 type PaginatedProductsParams = {
   limit: number
   collection_id?: string[]
@@ -64,12 +83,17 @@ export default async function PaginatedProducts({
     countryCode,
   })
 
+  // Fetch categories
+  const categories = await fetchCategories() // <-- Here
+  // You can also inspect them in the console
+  console.log("Categories inside PaginatedProducts:", categories)
+
   const totalPages = Math.ceil(count / PRODUCT_LIMIT)
 
   return (
     <>
       <ul
-        className="grid grid-cols-2 w-full small:grid-cols-3 medium:grid-cols-4 gap-x-6 gap-y-8"
+        className="grid grid-cols-2 w-full small:grid-cols-3  gap-x-6 gap-y-8"
         data-testid="products-list"
       >
         {products.map((p) => {

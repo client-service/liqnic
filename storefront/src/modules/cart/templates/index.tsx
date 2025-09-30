@@ -4,6 +4,7 @@ import EmptyCartMessage from "../components/empty-cart-message"
 import SignInPrompt from "../components/sign-in-prompt"
 import Divider from "@modules/common/components/divider"
 import { HttpTypes } from "@medusajs/types"
+import { ContactSupportCTA } from "components/contact-support-cta"
 
 const CartTemplate = ({
   cart,
@@ -18,13 +19,13 @@ const CartTemplate = ({
         {cart?.items?.length ? (
           <div className="grid grid-cols-1 small:grid-cols-[1fr_360px] gap-x-40">
             <div className="flex flex-col bg-white py-6 gap-y-6">
+              <ItemsTemplate cart={cart} />
               {!customer && (
                 <>
                   <SignInPrompt />
                   <Divider />
                 </>
               )}
-              <ItemsTemplate cart={cart} />
             </div>
             <div className="relative">
               <div className="flex flex-col gap-y-8 sticky top-12">
@@ -44,6 +45,7 @@ const CartTemplate = ({
           </div>
         )}
       </div>
+      <ContactSupportCTA />
     </div>
   )
 }
