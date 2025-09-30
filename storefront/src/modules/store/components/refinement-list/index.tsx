@@ -22,6 +22,12 @@ const RefinementList = ({
     { value: string; label: string }[]
   >([])
 
+  const handleSortChange = (_name: string, value: SortOptions) => {
+    const searchParams = new URLSearchParams(window.location.search)
+    searchParams.set("sortBy", value)
+    router.push(`${pathname}?${searchParams.toString()}`)
+  }
+
   useEffect(() => {
     async function fetchData() {
       const result = await listCategories()
@@ -44,7 +50,7 @@ const RefinementList = ({
     <div className="flex small:flex-col gap-12 py-4 mb-8 small:px-0 pl-6 small:min-w-[250px] small:ml-[1.675rem]">
       <SortProducts
         sortBy={sortBy}
-        setQueryParams={() => {}}
+        setQueryParams={handleSortChange}
         data-testid={dataTestId}
       />
 
