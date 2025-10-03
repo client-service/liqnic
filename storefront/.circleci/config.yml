@@ -45,9 +45,7 @@ jobs:
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
             # Build Docker image with build-time ARG for NEXT_PUBLIC_STRAPI_URL
-            docker build \
-              --build-arg NEXT_PUBLIC_STRAPI_URL=$BUILD_ARG \
-              -t "$DOCKER_USERNAME/liqnic-storefront:$UNIQUE_TAG" .
+            docker build -t "$DOCKER_USERNAME/liqnic-storefront:$UNIQUE_TAG" .
 
             docker tag "$DOCKER_USERNAME/liqnic-storefront:$UNIQUE_TAG" "$DOCKER_USERNAME/liqnic-storefront:$STATIC_TAG"
             docker push --all-tags "$DOCKER_USERNAME/liqnic-storefront"
