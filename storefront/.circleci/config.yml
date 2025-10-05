@@ -5,13 +5,13 @@ jobs:
     docker:
       - image: cimg/node:22.4
     steps:
-      -checkout
+      - checkout
       
-      -run:
+      - run:
           name: Present Working Directory
           run: pwd
 
-      -run:
+      -  run:
           name: List directories
           run: ls -a
       
