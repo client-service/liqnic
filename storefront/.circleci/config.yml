@@ -7,22 +7,23 @@ jobs:
     steps:
       - checkout
 
-      - run:
-          name: Set Working Directory
-          working_directory: storefront
-          
       # Install dependencies
-      - run:
-          name: Install dependencies
-          command: npm install
+    - run:
+        name: Install dependencies
+        working_directory: storefront
+        command: npm install
 
-      # Fix audit issues safely
-      - run:
-          name: Fix npm vulnerabilities
-          command: npm audit fix || echo "Audit fix skipped"
+    # Fix audit issues safely
+    - run:
+        name: Fix npm vulnerabilities
+        working_directory: storefront
+        command: npm audit fix || echo "Audit fix skipped"
 
-      # Build app
-      - run: npm run build
+    # Build app
+    - run:
+        name: Build app
+        working_directory: storefront
+        command: npm run build
 
   docker-build-and-publish:
     docker:
