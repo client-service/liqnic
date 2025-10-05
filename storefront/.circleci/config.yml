@@ -8,22 +8,22 @@ jobs:
       - checkout
 
       # Install dependencies
-    - run:
-        name: Install dependencies
-        working_directory: storefront
-        command: npm install
-
-    # Fix audit issues safely
-    - run:
-        name: Fix npm vulnerabilities
-        working_directory: storefront
-        command: npm audit fix || echo "Audit fix skipped"
-
-    # Build app
-    - run:
-        name: Build app
-        working_directory: storefront
-        command: npm run build
+      - run:
+          name: Install dependencies
+          working_directory: storefront
+          command: npm install
+  
+      # Fix audit issues safely
+      - run:
+          name: Fix npm vulnerabilities
+          working_directory: storefront
+          command: npm audit fix || echo "Audit fix skipped"
+  
+      # Build app
+      - run:
+          name: Build app
+          working_directory: storefront
+          command: npm run build
 
   docker-build-and-publish:
     docker:
