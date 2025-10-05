@@ -58,24 +58,27 @@ jobs:
   deploy-backend:
     machine:
       image: ubuntu-2204:current
-    steps:
-      - add_ssh_keys:
-          fingerprints:
-            - "YOUR_SSH_KEY_FINGERPRINT_HERE"
-            
+    steps:  
       - run:
           name: Check if container exists
           command: |
+            if [ "$CIRCLE_BRANCH" = "development" ]; then
+              STATIC_TAG="dev"
+              CONTAINER_NAME="liqnic-backend-dev"
+            elif [ "$CIRCLE_BRANCH" = "production" ]; then
+              STATIC_TAG="prod"
+              CONTAINER_NAME="liqnic-backend-prod"
+            fi
             SSH_COMMAND="ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST"
             $SSH_COMMAND "
-            if docker ps -a --format '{{.Names}}' | grep -q "liqnic-backend"; then
+            if docker ps -a --format '{{.Names}}' | grep -q "${CONTAINER_NAME}"; then
               echo "Container liqnic-backend exists"
-              docker stop liqnic-backend
-              docker rm liqnic-backend
-              docker rmi $DOCKER_USERNAME/liqnic-backend:prod
-              echo "Container liqnic-backend:prod stopped and removed"
+              docker stop $CONTAINER_NAME
+              docker rm $CONTAINER_NAME
+              docker rmi $DOCKER_USERNAME/liqnic-backend:$STATIC_TAG
+              echo "Container liqnic-backend stopped and removed"
             else
-              echo "Container liqnic-backend:prod does not exist"
+              echo "Container liqnic-backend does not exist"
             fi"
             
       - run:
@@ -152,24 +155,27 @@ jobs:
   deploy-dashboard:
     machine:
       image: ubuntu-2204:current
-    steps:
-      - add_ssh_keys:
-          fingerprints:
-            - "YOUR_SSH_KEY_FINGERPRINT_HERE"
-            
+    steps:  
       - run:
           name: Check if container exists
           command: |
+            if [ "$CIRCLE_BRANCH" = "development" ]; then
+              STATIC_TAG="dev"
+              CONTAINER_NAME="liqnic-dashboard-dev"
+            elif [ "$CIRCLE_BRANCH" = "production" ]; then
+              STATIC_TAG="prod"
+              CONTAINER_NAME="liqnic-dashboard-prod"
+            fi
             SSH_COMMAND="ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST"
             $SSH_COMMAND "
-            if docker ps -a --format '{{.Names}}' | grep -q "liqnic-dashboard"; then
+            if docker ps -a --format '{{.Names}}' | grep -q "${CONTAINER_NAME}"; then
               echo "Container liqnic-dashboard exists"
-              docker stop liqnic-dashboard
-              docker rm liqnic-dashboard
-              docker rmi $DOCKER_USERNAME/liqnic-dashboard:prod
-              echo "Container liqnic-dashboard:prod stopped and removed"
+              docker stop $CONTAINER_NAME
+              docker rm $CONTAINER_NAME
+              docker rmi $DOCKER_USERNAME/liqnic-dashboard:$STATIC_TAG
+              echo "Container liqnic-dashboard stopped and removed"
             else
-              echo "Container liqnic-dashboard:prod does not exist"
+              echo "Container liqnic-dashboard does not exist"
             fi"
             
       - run:
