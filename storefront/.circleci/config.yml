@@ -7,8 +7,10 @@ jobs:
     steps:
       - checkout
 
-      - working_directory: storefront
-      
+      - run:
+          name: Set Working Directory
+          working_directory: storefront
+          
       # Install dependencies
       - run:
           name: Install dependencies
