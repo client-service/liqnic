@@ -46,15 +46,16 @@ const SortProducts = ({
   }
 
   return (
-    <div className="flex flex-col gap-2 mr-8" data-testid={dataTestId}>
+    <div className="flex flex-col gap-2 md:mr-8 lf:mr-8" data-testid={dataTestId}>
       <h3 className="text-lg font-semibold text-ui-fg mb-2">Sort by</h3>
-      {SORT_OPTIONS.map((option) => {
-        const selected = option.value === sortBy
-        return (
-          <button
-            key={option.value}
-            onClick={() => handleChange(option.value)}
-            className={`
+      <div className="grid grid-cols-3 md:grid-cols-1 lg:grid-cols-1 gap-2">
+        {SORT_OPTIONS.map((option) => {
+          const selected = option.value === sortBy
+          return (
+            <button
+              key={option.value}
+              onClick={() => handleChange(option.value)}
+              className={`
             flex items-start gap-3 p-3 rounded-lg border transition
             ${
               selected
@@ -63,20 +64,21 @@ const SortProducts = ({
             }
             focus:outline-none focus:ring-2 focus:ring-blue-400
           `}
-            aria-pressed={selected}
-          >
-            <div className="text-ui-fg-subtle mt-0.5">{option.icon}</div>
-            <div className="flex flex-col text-left">
-              <span className="text-sm font-medium text-ui-fg">
-                {option.title}
-              </span>
-              <span className="text-xs text-ui-fg-muted">
-                {option.subtitle}
-              </span>
-            </div>
-          </button>
-        )
-      })}
+              aria-pressed={selected}
+            >
+              <div className="text-ui-fg-subtle mt-0.5">{option.icon}</div>
+              <div className="flex flex-col text-left">
+                <span className="md:text-sm font-medium text-xs">
+                  {option.title}
+                </span>
+                <span className="text-xs text-ui-fg-muted hidden md:block">
+                  {option.subtitle}
+                </span>
+              </div>
+            </button>
+          )
+        })}
+      </div>
     </div>
   )
 }

@@ -99,7 +99,7 @@ const CartDropdown = ({
                 </div>
               </div>
               <span className="text-black text-[14.4px] font-medium leading-[150%] font-manrope hidden md:flex">
-               Rs. {subtotal}
+                Rs. {subtotal}
               </span>
             </div>
           </LocalizedClientLink>
@@ -133,7 +133,7 @@ const CartDropdown = ({
                     })
                     .map((item) => (
                       <div
-                        className="grid grid-cols-2 gap-x-4"
+                        className="grid grid-cols-2 gap-x-16"
                         key={item.id}
                         data-testid="cart-item"
                       >
@@ -142,16 +142,15 @@ const CartDropdown = ({
                             href={`/products/${item.product_handle}`}
                             className="w-24"
                           >
-                            <div className="w-[74.2px] h-[74.2px] lg:w-28 lg:h-28  rounded shrink-0 overflow-hidden">
+                            <div className="w-[74.2px] h-[74.2px] lg:w-28 lg:h-28 rounded shrink-0 overflow-hidden">
                               <Thumbnail
                                 thumbnail={item.thumbnail}
                                 images={item.variant?.product?.images}
                                 size="square"
-                                className=""
                               />
                             </div>
                           </LocalizedClientLink>
-                          <div className="flex flex-col overflow-ellipsis whitespace-nowrap space-y-2">
+                          <div className="flex flex-col overflow-ellipsis whitespace-nowrap space-y-2 w-full">
                             <h3 className="text-base-regular overflow-hidden text-ellipsis">
                               <LocalizedClientLink
                                 href={`/products/${item.product_handle}`}
@@ -166,13 +165,12 @@ const CartDropdown = ({
                               data-value={item.variant}
                             />
                             <span
-                              data-testid="cart-item-quantity "
+                              data-testid="cart-item-quantity"
                               data-value={item.quantity}
                               className="text-sm"
                             >
                               Qty: {item.quantity}
                             </span>
-
                             <DeleteButton
                               id={item.id}
                               className="mt-1"
@@ -181,24 +179,21 @@ const CartDropdown = ({
                           </div>
                         </div>
 
-                        <div className=" flex justify-end">
-                          <div>
-                            <div className="flex flex-col flex-1">
-                              <div className="flex items-start justify-between">
-                                <div className="flex justify-end">
-                                  <LineItemPrice
-                                    item={item}
-                                    style="tight"
-                                    currencyCode={cartState.currency_code}
-                                  />
-                                </div>
-                              </div>
+                        <div className="flex justify-end items-start">
+                          <div className="flex flex-col items-end">
+                            <div className="flex justify-end">
+                              <LineItemPrice
+                                item={item}
+                                style="tight"
+                                currencyCode={cartState.currency_code}
+                              />
                             </div>
                           </div>
                         </div>
                       </div>
                     ))}
                 </div>
+
                 <hr className="mt-8 lg:mt-16 h-2" />
                 <div className="p-4 flex flex-col gap-y-4 text-small-regular ">
                   <div className="flex items-center justify-between">
