@@ -25,28 +25,30 @@ export default function ProductGalleryClient({ images, title }: Props) {
           <button
             key={index}
             onClick={() => setActiveIndex(index)}
-            className={`shrink-0 rounded overflow-hidden border transition-colors ${
+            className={`shrink-0 rounded-lg border-2 transition-colors duration-200 overflow-hidden bg-white ${
               activeIndex === index
-                ? "border-black"
-                : "border-gray-200 hover:border-brand-primary"
+                ? "border-primary"
+                : "border-gray-200 hover:border-primary"
             }`}
             aria-label={`View product image ${index + 1}`}
           >
-            <img
-              src={img.url}
-              alt={title || `Product thumbnail ${index + 1}`}
-              className="w-20 h-20 object-cover"
-            />
+            <div className="w-20 h-20 p-1 flex items-center justify-center ">
+              <img
+                src={img.url}
+                alt={title || `Product thumbnail ${index + 1}`}
+                className="w-full h-full object-contain"
+              />
+            </div>
           </button>
         ))}
       </aside>
 
       {/* Main Image */}
-      <div className="order-1 md:order-2 md:col-span-7 relative w-full border rounded-lg">
+      <div className="order-1 md:order-2 md:col-span-7 relative w-full h-[70vh] border-2 rounded-lg overflow-hidden bg-white flex items-center justify-center">
         <img
           src={formatted[activeIndex].url}
           alt={title || "Product image"}
-          className="w-full h-auto object-contain"
+          className="w-full h-full object-contain"
         />
       </div>
     </div>

@@ -1,4 +1,5 @@
 import Image from "next/image"
+import Link from "next/link"
 import React from "react"
 
 export default function ZYNProductsShowcase() {
@@ -19,11 +20,13 @@ export default function ZYNProductsShowcase() {
               consectetur phasellus mi.
             </p>
 
-            <button className="flex w-full sm:w-auto min-w-[201px] py-3 sm:py-[15px] px-6 sm:px-[10px] justify-center items-center gap-[10px] rounded-[5px] bg-[#C5A163] hover:bg-[#B8956B] transition-colors">
-              <span className="text-white text-lg sm:text-[20px] font-medium leading-[150%] font-manrope">
-                Shop ZYN
-              </span>
-            </button>
+            <Link href={"/categories/nicotine-pouch"}>
+              <button className="flex w-full sm:w-auto min-w-[201px] py-3 sm:py-[15px] px-6 sm:px-[10px] justify-center items-center gap-[10px] rounded-[5px] bg-[#C5A163] hover:bg-[#B8956B] transition-colors">
+                <span className="text-white text-lg sm:text-[20px] font-medium leading-[150%] font-manrope">
+                  Shop ZYN
+                </span>
+              </button>
+            </Link>
           </div>
 
           {/* Right Image */}
