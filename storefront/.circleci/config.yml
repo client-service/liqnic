@@ -7,6 +7,14 @@ jobs:
     steps:
       - checkout
       
+      -run:
+        name: Present Working Directory
+        run: pwd
+
+      -run:
+        name: List directories
+        run: ls -a
+      
       # Install dependencies
       - run:
           name: Install dependencies
