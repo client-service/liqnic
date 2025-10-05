@@ -51,7 +51,7 @@ jobs:
               STATIC_TAG="prod"
               CONTAINER_NAME="liqnic-storefront-prod"
             fi
-            SSH_COMMAND="SSH_COMMAND="ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST""
+            SSH_COMMAND="SSH_COMMAND="ssh $SSH_USER@$SSH_HOST""
             $SSH_COMMAND "
               if docker ps -a --format '{{.Names}}' | grep -q "${CONTAINER_NAME}"; then
                 echo 'Container liqnic-storefront exists'
@@ -73,7 +73,7 @@ jobs:
               DEPLOY_PATH="/home/docker/liqnic/prod"
             fi
 
-            SSH_COMMAND="SSH_COMMAND="ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST""
+            SSH_COMMAND="SSH_COMMAND="ssh $SSH_USER@$SSH_HOST""
             $SSH_COMMAND "
               set -e
               cd $DEPLOY_PATH
