@@ -143,10 +143,11 @@ const CartDropdown = ({
                             className="w-24"
                           >
                             <div className="w-[74.2px] h-[74.2px] lg:w-28 lg:h-28 rounded shrink-0 overflow-hidden">
-                              <Thumbnail
-                                thumbnail={item.thumbnail}
-                                images={item.variant?.product?.images}
-                                size="square"
+                              <img
+                                src={item.thumbnail}
+                                // images={item.variant?.product?.images}
+                                // size="square"
+                                className="w-full h-full object-contain"
                               />
                             </div>
                           </LocalizedClientLink>

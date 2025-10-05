@@ -13,7 +13,6 @@ export async function fetchCategories(parentId?: string) {
       },
     })
     const data = await res.json()
-    console.log("categories test 2", data)
 
     return data.product_categories || []
   } catch (err) {
