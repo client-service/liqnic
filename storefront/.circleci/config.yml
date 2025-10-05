@@ -95,8 +95,6 @@ workflows:
 
       - docker-build-and-publish:
           context: [ liqnic-dev, liqnic-prod ]
-          requires:
-            - build-and-test
           filters:
             branches:
               only:
