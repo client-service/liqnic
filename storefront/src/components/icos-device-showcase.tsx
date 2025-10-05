@@ -18,16 +18,16 @@ export default function IcosDeviceShowcase() {
           </div>
 
           {/* Right Content */}
-          <div className="flex flex-col items-start gap-4 sm:gap-6 lg:gap-[25px] w-full lg:w-[676px] text-center lg:text-left order-1 lg:order-2">
+          <div className="flex flex-col items-center lg:items-start gap-4 sm:gap-6 lg:gap-[25px] w-full lg:w-[676px] text-center lg:text-left order-1 lg:order-2">
             <h2 className="w-full max-w-[598px] text-black text-2xl sm:text-3xl lg:text-4xl xl:text-[42px] font-bold leading-tight tracking-tight lg:tracking-[-0.84px] font-manrope">
               Premium Nicotine & Fine Spirits Delivered 24/7k
             </h2>
 
             <p className="w-full text-[#606060] text-base sm:text-lg lg:text-[18px] font-medium leading-relaxed lg:leading-[35px] font-manrope">
-              Lorem ipsum dolor sit amet consectetur. Velit convallis in sed
-              viverra sodales neque tellus. Diam viverra in consectetur
-              dignissim nam et. Ut tincidunt vitae fermentum nibh amet
-              consectetur phasellus mi.
+              Discover the latest IQOS devices for a smooth experience. Designed
+              for convenience and style, each device offers effortless use and
+              premium quality. Enjoy a modern, satisfying nicotine alternative
+              with ease.
             </p>
 
             <Link href={"/categories/device"}>

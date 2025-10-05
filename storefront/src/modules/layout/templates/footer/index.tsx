@@ -167,7 +167,7 @@ export default function Footer() {
                   Disclaimer
                 </Link>
                 <Link
-                  href="#"
+                  href="/shipping-return-policy"
                   className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
                 >
                   Shipping and returns

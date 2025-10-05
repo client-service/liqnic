@@ -1,4 +1,5 @@
 import Image from "next/image"
+import Link from "next/link"
 
 export default function IllumaProducts() {
   return (
@@ -17,11 +18,13 @@ export default function IllumaProducts() {
                     Nationwide, anytime you need.
                   </p>
                 </div>
-                <button className="inline-flex py-2 px-4 sm:px-5 justify-center items-center rounded-md bg-[#5BE419] hover:bg-green-600 active:bg-green-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
-                  <span className="text-white text-sm sm:text-base lg:text-lg  font-sans">
-                    Buy now
-                  </span>
-                </button>
+                <Link href="/products/iqos-prime-mid-moss-green">
+                  <button className="inline-flex py-2 px-4 sm:px-5 justify-center items-center rounded-md bg-[#5BE419] hover:bg-green-600 active:bg-green-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                    <span className="text-white text-sm sm:text-base lg:text-lg  font-sans">
+                      Buy now
+                    </span>
+                  </button>
+                </Link>
               </div>
             </div>
             <div className="absolute inset-0  flex justify-end">
@@ -48,11 +51,13 @@ export default function IllumaProducts() {
                     Nationwide, anytime you need.
                   </p>
                 </div>
-                <button className="inline-flex py-2 px-4 sm:px-5 justify-center items-center rounded-md bg-[#F27CA0] hover:bg-pink-500 active:bg-pink-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2">
-                  <span className="text-white text-sm sm:text-base lg:text-lg  font-sans">
-                    Buy now
-                  </span>
-                </button>
+                <Link href="/products/iqos-prime-mid-moss-green">
+                  <button className="inline-flex py-2 px-4 sm:px-5 justify-center items-center rounded-md bg-[#F27CA0] hover:bg-pink-500 active:bg-pink-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2">
+                    <span className="text-white text-sm sm:text-base lg:text-lg  font-sans">
+                      Buy now
+                    </span>
+                  </button>
+                </Link>
               </div>
             </div>
             <div className="absolute inset-0  flex justify-end">
@@ -79,11 +84,13 @@ export default function IllumaProducts() {
                     Nationwide, anytime you need.
                   </p>
                 </div>
-                <button className="inline-flex py-2 px-4 sm:px-5 justify-center items-center rounded-md bg-[#D2AD76] hover:bg-amber-700 active:bg-amber-800 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2">
-                  <span className="text-white text-sm sm:text-base lg:text-lg  font-sans">
-                    Buy now
-                  </span>
-                </button>
+                <Link href="/products/iqos-prime-mid-moss-green">
+                  <button className="inline-flex py-2 px-4 sm:px-5 justify-center items-center rounded-md bg-[#D2AD76] hover:bg-amber-700 active:bg-amber-800 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2">
+                    <span className="text-white text-sm sm:text-base lg:text-lg  font-sans">
+                      Buy now
+                    </span>
+                  </button>
+                </Link>
               </div>
             </div>
             <div className="absolute inset-0  flex justify-end">
