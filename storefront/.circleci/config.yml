@@ -6,13 +6,14 @@ jobs:
       - image: cimg/node:22.4
     steps:
       - checkout
+      
       -run:
-        name: Present Working Directory
-        run: pwd
+          name: Present Working Directory
+          run: pwd
 
       -run:
-        name: List directories
-        run: ls -a
+          name: List directories
+          run: ls -a
       
       # Install dependencies
       - run:
