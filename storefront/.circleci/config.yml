@@ -6,14 +6,8 @@ jobs:
       - image: cimg/node:22.4
     steps:
       - checkout
-      
-      - run:
-          name: Present Working Directory
-          command: pwd
 
-      -  run:
-          name: List directories
-          command: ls -a
+      - working_directory: storefront
       
       # Install dependencies
       - run:
@@ -40,6 +34,7 @@ jobs:
 
       - run:
           name: Build and Push Docker Image
+          working_directory: storefront
           command: |
             if [ "$CIRCLE_BRANCH" = "development" ]; then
               STATIC_TAG="dev"
