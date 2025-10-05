@@ -9,11 +9,11 @@ jobs:
       
       - run:
           name: Present Working Directory
-          run: pwd
+          command: pwd
 
       -  run:
           name: List directories
-          run: ls -a
+          command: ls -a
       
       # Install dependencies
       - run:
