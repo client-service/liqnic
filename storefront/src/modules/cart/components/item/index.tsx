@@ -1,9 +1,8 @@
 "use client"
 
-import { Table, Text, clx } from "@medusajs/ui"
+import { Table, Text, clx, Button } from "@medusajs/ui"
 import { updateLineItem } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
-import CartItemSelect from "@modules/cart/components/cart-item-select"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import DeleteButton from "@modules/common/components/delete-button"
 import LineItemOptions from "@modules/common/components/line-item-options"
@@ -21,31 +20,55 @@ type ItemProps = {
 }
 
 const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
+  const [quantity, setQuantity] = useState(item.quantity)
   const [updating, setUpdating] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const changeQuantity = async (quantity: number) => {
+  const changeQuantity = async (newQty: number) => {
+    if (newQty < 1) return
     setError(null)
     setUpdating(true)
-
-    await updateLineItem({
-      lineId: item.id,
-      quantity,
-    })
-      .catch((err) => {
-        setError(err.message)
-      })
-      .finally(() => {
-        setUpdating(false)
-      })
+    try {
+      await updateLineItem({ lineId: item.id, quantity: newQty })
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setUpdating(false)
+    }
   }
 
-  // TODO: Update this to grab the actual max inventory
-  const maxQtyFromInventory = 10
-  const maxQuantity = item.variant?.manage_inventory ? 10 : maxQtyFromInventory
+  const maxQtyFromInventory = item.variant?.inventory_quantity ?? 10
+  const maxQuantity = item.variant?.manage_inventory
+    ? Math.max(item.quantity, Math.min(maxQtyFromInventory, 10))
+    : Math.max(item.quantity, 10)
+
+  const increment = () => {
+    const next = Math.min(quantity + 1, maxQuantity)
+    setQuantity(next)
+    changeQuantity(next)
+  }
+
+  const decrement = () => {
+    const next = Math.max(quantity - 1, 1)
+    setQuantity(next)
+    changeQuantity(next)
+  }
 
   return (
-    <Table.Row className="w-full" data-testid="product-row">
+    <Table.Row
+      className={clx(
+        "relative w-full transition-all duration-200",
+        updating && "opacity-50 blur-[1px] pointer-events-none"
+      )}
+      data-testid="product-row"
+    >
+      {/* Overlay when updating */}
+      {updating && (
+        <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center z-10">
+          <Spinner />
+        </div>
+      )}
+
       <Table.Cell className="!pl-0 p-4 w-24">
         <LocalizedClientLink
           href={`/products/${item.product_handle}`}
@@ -63,10 +86,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
       </Table.Cell>
 
       <Table.Cell className="text-left">
-        <Text
-          className="txt-medium-plus text-ui-fg-base"
-          data-testid="product-title"
-        >
+        <Text className="txt-medium-plus text-ui-fg-base" data-testid="product-title">
           {item.product_title}
         </Text>
         <LineItemOptions variant={item.variant} data-testid="product-variant" />
@@ -74,31 +94,29 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
 
       {type === "full" && (
         <Table.Cell>
-          <div className="flex gap-2 items-center w-28">
+          <div className="flex items-center gap-3">
             <DeleteButton id={item.id} data-testid="product-delete-button" />
-            <CartItemSelect
-              value={item.quantity}
-              onChange={(value) => changeQuantity(parseInt(value.target.value))}
-              className="w-14 h-10 p-4"
-              data-testid="product-select-button"
-            >
-              {/* TODO: Update this with the v2 way of managing inventory */}
-              {Array.from(
-                {
-                  length: Math.min(maxQuantity, 10),
-                },
-                (_, i) => (
-                  <option value={i + 1} key={i}>
-                    {i + 1}
-                  </option>
-                )
-              )}
 
-              <option value={1} key={1}>
-                1
-              </option>
-            </CartItemSelect>
-            {updating && <Spinner />}
+            {/* Quantity Stepper */}
+            <div className="flex items-center rounded-md">
+              <Button
+                variant="secondary"
+                className="w-8 h-8"
+                onClick={decrement}
+                disabled={quantity <= 1 || updating}
+              >
+                −
+              </Button>
+              <span className="px-3 w-8 text-center">{quantity}</span>
+              <Button
+                variant="secondary"
+                className="w-8 h-8"
+                onClick={increment}
+                disabled={quantity >= maxQuantity || updating}
+              >
+                +
+              </Button>
+            </div>
           </div>
           <ErrorMessage error={error} data-testid="product-error-message" />
         </Table.Cell>
@@ -130,11 +148,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
               />
             </span>
           )}
-          <LineItemPrice
-            item={item}
-            style="tight"
-            currencyCode={currencyCode}
-          />
+          <LineItemPrice item={item} style="tight" currencyCode={currencyCode} />
         </span>
       </Table.Cell>
     </Table.Row>
