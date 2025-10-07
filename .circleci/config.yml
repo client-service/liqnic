@@ -218,7 +218,6 @@ workflows:
 
       # Run Docker publish jobs in parallel after tests pass
       - docker-build-and-publish-backend:
-          context: [liqnic-dev,liqnic-prod]
           requires:
             - build-and-test-backend
           filters:
@@ -228,6 +227,7 @@ workflows:
                 - production
 
       - docker-build-and-publish-dashboard:
+          context: [liqnic-dev,liqnic-prod]
           requires:
             - build-and-test-dashboard
           filters:
