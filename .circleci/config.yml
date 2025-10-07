@@ -144,9 +144,6 @@ jobs:
               STATIC_TAG="prod"
             fi
             UNIQUE_TAG="$STATIC_TAG-$CIRCLE_BUILD_NUM"
-            echo "VITE_MEDUSA_BACKEND_URL=${DASHBOARD_VITE_MEDUSA_BACKEND_URL}" > .env
-            echo "VITE_MEDUSA_BASE=${DASHBOARD_VITE_MEDUSA_BASE}" >> .env
-            echo "VITE_MEDUSA_STOREFRONT_URL=${DASHBOARD_VITE_MEDUSA_STOREFRONT_URL}" >> .env
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
             docker build -t "$DOCKER_USERNAME/liqnic-dashboard:$UNIQUE_TAG" .
             docker tag "$DOCKER_USERNAME/liqnic-dashboard:$UNIQUE_TAG" "$DOCKER_USERNAME/liqnic-dashboard:$STATIC_TAG"
