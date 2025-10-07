@@ -5,6 +5,7 @@ import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "../thumbnail"
 import PreviewPrice from "./price"
+import Image from "next/image"
 
 export default async function ProductPreview({
   product,
@@ -24,6 +25,8 @@ export default async function ProductPreview({
   //   return null
   // }
 
+  const imageUrl = product.thumbnail || product.images?.[0]?.url
+
   const { cheapestPrice } = getProductPrice({
     product,
   })
@@ -35,12 +38,30 @@ export default async function ProductPreview({
     >
       <div data-testid="product-wrapper">
         <div className="w-full p-4 sm:p-[22px] flex flex-col gap-3 sm:gap-[15px] rounded-lg border border-[#E6E6E6] bg-[#F9F9F9]">
-          <Thumbnail
+          {/* <Thumbnail
             thumbnail={product.thumbnail}
             images={product.images}
             size="full"
             isFeatured={isFeatured}
-          />
+          /> */}
+
+          {imageUrl ? (
+            <div className="relative w-full aspect-square overflow-hidden rounded-lg  h-60 flex items-center justify-center border">
+              <Image
+                src={imageUrl}
+                alt={product.title || "Product image"}
+                width={200}
+                height={200}
+                className={`object-contain ${isFeatured ? "rounded-xl" : ""}`}
+                priority={isFeatured} // preload featured products
+              />
+            </div>
+          ) : (
+            <div className="w-full aspect-square flex items-center justify-center bg-gray-100 text-gray-400">
+              No image
+            </div>
+          )}
+          {/* other product details go here */}
 
           <div className="flex flex-col gap-2 sm:gap-[9px]">
             {/* Brand and Variant */}

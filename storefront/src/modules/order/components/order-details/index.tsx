@@ -31,9 +31,12 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
           {new Date(order.created_at).toDateString()}
         </span>
       </Text>
-      <Text className="mt-2 text-ui-fg-interactive">
-        Order number: <span data-testid="order-id">{order.display_id}</span>
-      </Text>
+
+      <div className="mt-2 px-6 py-3 border border-[#E7E7E7] rounded-lg max-w-52">
+        <span className="text-gray-500 text-[13px] font-medium font-manrope leading-5 text-center">
+          Order Number: <span data-testid="order-id">#{order.display_id}</span>
+        </span>
+      </div>
 
       <div className="flex items-center text-compact-small gap-x-4 mt-4">
         {showStatus && (

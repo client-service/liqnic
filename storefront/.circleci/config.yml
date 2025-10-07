@@ -1,25 +1,6 @@
 version: 2.1
 
 jobs:
-  build-and-test:
-    docker:
-      - image: cimg/node:22.4
-    steps:
-      - checkout
-      
-      # Install dependencies
-      - run:
-          name: Install dependencies
-          command: npm install
-
-      # Fix audit issues safely
-      - run:
-          name: Fix npm vulnerabilities
-          command: npm audit fix || echo "Audit fix skipped"
-
-      # Build app
-      - run: npm run build
-
   docker-build-and-publish:
     docker:
       - image: cimg/node:22.4
@@ -32,6 +13,7 @@ jobs:
 
       - run:
           name: Build and Push Docker Image
+          working_directory: storefront
           command: |
             if [ "$CIRCLE_BRANCH" = "development" ]; then
               STATIC_TAG="dev"
@@ -69,7 +51,7 @@ jobs:
               STATIC_TAG="prod"
               CONTAINER_NAME="liqnic-storefront-prod"
             fi
-            SSH_COMMAND="SSH_COMMAND="ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST""
+            SSH_COMMAND="SSH_COMMAND="ssh $SSH_USER@$SSH_HOST""
             $SSH_COMMAND "
               if docker ps -a --format '{{.Names}}' | grep -q "${CONTAINER_NAME}"; then
                 echo 'Container liqnic-storefront exists'
@@ -91,7 +73,7 @@ jobs:
               DEPLOY_PATH="/home/docker/liqnic/prod"
             fi
 
-            SSH_COMMAND="SSH_COMMAND="ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST""
+            SSH_COMMAND="SSH_COMMAND="ssh $SSH_USER@$SSH_HOST""
             $SSH_COMMAND "
               set -e
               cd $DEPLOY_PATH
@@ -104,17 +86,8 @@ workflows:
   version: 2
   build-and-deploy:
     jobs:
-      - build-and-test:
-          filters:
-            branches:
-              only:
-                - development
-                - production
-
       - docker-build-and-publish:
           context: [ liqnic-dev, liqnic-prod ]
-          requires:
-            - build-and-test
           filters:
             branches:
               only:

@@ -40,7 +40,7 @@ export default async function Home({
             Our Products
           </h2>
           <ul className="flex flex-col gap-x-6">
-            <FeaturedProducts collections={collections} region={region} />
+            <FeaturedProducts region={region} />
           </ul>
         </div>
         <IcosDeviceShowcase />
