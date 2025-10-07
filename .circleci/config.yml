@@ -145,7 +145,11 @@ jobs:
             fi
             UNIQUE_TAG="$STATIC_TAG-$CIRCLE_BUILD_NUM"
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-            docker build -t "$DOCKER_USERNAME/liqnic-dashboard:$UNIQUE_TAG" .
+            docker build \
+            --build-arg VITE_MEDUSA_BACKEND_URL=$MEDUSA_BACKEND_URL \
+            --build-arg VITE_MEDUSA_BASE=$VITE_MEDUSA_BASE \
+            --build-arg VITE_MEDUSA_STOREFRONT_URL=$NEXT_PUBLIC_BASE_URL \
+            -t "$DOCKER_USERNAME/liqnic-dashboard:$UNIQUE_TAG" .
             docker tag "$DOCKER_USERNAME/liqnic-dashboard:$UNIQUE_TAG" "$DOCKER_USERNAME/liqnic-dashboard:$STATIC_TAG"
             docker push --all-tags "$DOCKER_USERNAME/liqnic-dashboard"
 
@@ -214,6 +218,7 @@ workflows:
 
       # Run Docker publish jobs in parallel after tests pass
       - docker-build-and-publish-backend:
+          context: [liqnic-dev,liqnic-prod]
           requires:
             - build-and-test-backend
           filters:
