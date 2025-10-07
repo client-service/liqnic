@@ -16,7 +16,7 @@ export default async function Navbar() {
   const MENU_ITEMS: MenuItem[] = await buildMenuItems()
 
   return (
-    <nav className="w-full h-[71px] bg-white border-b border-gray-200 top-0 sticky z-40">
+    <nav className="w-full h-[71px] bg-white border-b border-gray-200 top-0 sticky md:z-40">
       <div className="component-px h-full flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center">
@@ -70,9 +70,15 @@ export default async function Navbar() {
               Account
             </LocalizedClientLink>
           </div>
-          <div className="bg-gray-100 rounded-md p-2">
-            <LuSearch />
-          </div>
+          <LocalizedClientLink
+            className="hover:text-ui-fg-base"
+            href="/shop"
+            data-testid="nav-account-link"
+          >
+            <div className="bg-gray-100 rounded-md p-2">
+              <LuSearch />
+            </div>
+          </LocalizedClientLink>
           {/* Cart */}
           <Suspense
             fallback={

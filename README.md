@@ -1,6 +1,6 @@
 # 🛠️ MedusaJS Monorepo (Backend + Dashboard + Storefront)
 
-This repository contains three main components:
+This repository contains three main components: test
 
 * **Backend** → [MedusaJS v2](https://medusajs.com/) (TypeScript)
 * **Dashboard** → [Admin dashboard](https://github.com/medusajs/medusa/tree/develop/packages/admin/dashboard) (cloned from MedusaJS GitHub, Vite + React + TS)

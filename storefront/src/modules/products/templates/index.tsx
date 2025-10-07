@@ -30,11 +30,11 @@ const ProductTemplate = async ({
   return (
     <>
       <section
-        className="grid grid-cols-6 gap-8 lg:gap-16 component-px w-full py-8 lg:py-16 bg-gray-100"
+        className="grid grid-cols-1 md:grid-cols-6 gap-8 lg:gap-16 component-px w-full py-8 lg:py-16 bg-gray-100"
         data-testid="product-container"
       >
         {/* Left Section (Gallery + Info) */}
-        <div className="col-span-4">
+        <div className="md:col-span-4">
           <ProductGalleryClient
             images={product?.images || []}
             title={product?.title}

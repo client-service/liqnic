@@ -1,3 +1,4 @@
+import Image from "next/image"
 export default function About() {
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
@@ -25,14 +26,12 @@ export default function About() {
       </section>
 
       {/* Hero Image Section */}
-      <section
-        className="w-full h-[300px] sm:h-[400px] lg:h-[537px] relative bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: `url('https://api.builder.io/api/v1/image/assets/TEMP/b7ab11769810ef93f34483ca2d923384c6d55ceb?width=2880')`,
-        }}
-      >
-        <div className="absolute inset-0 bg-black/10"></div>
-      </section>
+      <Image
+        src="/images/about-page/About.png"
+        height={537}
+        width={2000}
+        alt="hero"
+      />
 
       {/* Mission & Vision Header */}
       <section className="w-full px-4 py-12 sm:py-16 lg:py-20">
@@ -50,13 +49,12 @@ export default function About() {
       {/* Mission & Vision Content */}
       <section className="w-full px-4 lg:px-[100px] py-8 sm:py-12 lg:py-16">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12 max-w-[1240px] mx-auto">
-          {/* Left Image */}
-          <div
-            className="w-full lg:w-[600px] h-[300px] sm:h-[400px] lg:h-[450px] bg-cover bg-center rounded-lg overflow-hidden order-2 lg:order-1"
-            style={{
-              backgroundImage: `url('https://api.builder.io/api/v1/image/assets/TEMP/209b2e42166c44da3442688607e7f3a246e25fb3?width=1200')`,
-            }}
-          ></div>
+          <Image
+            src="/images/about-page/Mission.png"
+            height={600}
+            width={600}
+            alt="hero"
+          />
 
           {/* Right Content */}
           <div className="flex flex-col items-start gap-8 sm:gap-10 lg:gap-[50px] w-full lg:w-[562px] order-1 lg:order-2">
@@ -121,12 +119,12 @@ export default function About() {
           </div>
 
           {/* Right Image */}
-          <div
-            className="w-full lg:w-[600px] h-[300px] sm:h-[400px] lg:h-[450px] bg-cover bg-center rounded-lg overflow-hidden"
-            style={{
-              backgroundImage: `url('https://api.builder.io/api/v1/image/assets/TEMP/6984e63c6ad72c4308154e9b104d2132cb61e530?width=1200')`,
-            }}
-          ></div>
+          <Image
+            src="/images/about-page/Message.png"
+            height={600}
+            width={600}
+            alt="hero"
+          />
         </div>
       </section>
 
@@ -149,10 +147,11 @@ export default function About() {
             {/* Team Member 1 */}
             <div className="flex flex-col items-center text-center">
               <div className="w-[280px] sm:w-[320px] lg:w-[380px] h-[280px] sm:h-[320px] lg:h-[380px] rounded-lg overflow-hidden mb-6 lg:mb-8">
-                <img
-                  src="https://api.builder.io/api/v1/image/assets/TEMP/87cf6095e22fd8656d0ceb7cf9194297443a9b52?width=760"
+                <Image
+                  src="/images/about-page/Bibek.png"
+                  height={900}
+                  width={500}
                   alt="Bibek Adhikari"
-                  className="w-full h-full object-cover"
                 />
               </div>
               <div className="flex flex-col items-start gap-3 lg:gap-[10px] w-[280px]">
@@ -168,10 +167,11 @@ export default function About() {
             {/* Team Member 2 */}
             <div className="flex flex-col items-center text-center">
               <div className="w-[280px] sm:w-[320px] lg:w-[380px] h-[280px] sm:h-[320px] lg:h-[380px] rounded-lg overflow-hidden mb-6 lg:mb-8">
-                <img
-                  src="https://api.builder.io/api/v1/image/assets/TEMP/46fb8fac2682354aaf9d2f9e49278c2cd9bf6aa6?width=760"
+                <Image
+                  src="/images/about-page/Subash.png"
+                  height={900}
+                  width={500}
                   alt="Subash Thapa"
-                  className="w-full h-full object-cover"
                 />
               </div>
               <div className="flex flex-col items-start gap-3 lg:gap-[10px] w-[280px]">
@@ -187,10 +187,11 @@ export default function About() {
             {/* Team Member 3 */}
             <div className="flex flex-col items-center text-center">
               <div className="w-[280px] sm:w-[320px] lg:w-[380px] h-[280px] sm:h-[320px] lg:h-[380px] rounded-lg overflow-hidden mb-6 lg:mb-8">
-                <img
-                  src="https://api.builder.io/api/v1/image/assets/TEMP/8cdb486ed0369fc9ec4267bc605c9be0cf35a6c8?width=760"
+                <Image
+                  src="/images/about-page/Alina.png"
+                  height={900}
+                  width={500}
                   alt="Alina Gurung"
-                  className="w-full h-full object-cover"
                 />
               </div>
               <div className="flex flex-col items-start gap-3 lg:gap-[10px] w-[280px]">

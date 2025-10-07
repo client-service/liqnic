@@ -121,7 +121,7 @@ const Hero = () => {
 
               <div
                 key={`buttons-${currentHero}`}
-                className="flex flex-col sm:flex-row items-center gap-4 sm:gap-5 lg:gap-[20px] mt-8 animate-in slide-in-from-left-8 fade-in duration-700 delay-300"
+                className="flex flex-col sm:flex-row md:items-center gap-4 sm:gap-5 lg:gap-[20px] mt-8 animate-in slide-in-from-left-8 fade-in duration-700 delay-300"
               >
                 <Link href={heroData[currentHero].primaryLink} passHref>
                   <button className="w-full sm:w-auto flex py-3 sm:py-[15px] px-6 sm:px-[10px] justify-center items-center gap-[10px] rounded-[5px] bg-[#C5A163] hover:bg-[#B8956B] transition-colors min-w-[201px]">

@@ -1,28 +1,28 @@
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Alert, Button, Heading, Hint, Input, Text } from "@medusajs/ui"
-import { useForm } from "react-hook-form"
-import { Trans, useTranslation } from "react-i18next"
-import { Link, useLocation, useNavigate } from "react-router-dom"
-import * as z from "zod"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Alert, Button, Heading, Hint, Input, Text } from "@medusajs/ui";
+import { useForm } from "react-hook-form";
+import { Trans, useTranslation } from "react-i18next";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import * as z from "zod";
 
-import { Form } from "../../components/common/form"
-import AvatarBox from "../../components/common/logo-box/avatar-box"
-import { useSignInWithEmailPass } from "../../hooks/api"
-import { isFetchError } from "../../lib/is-fetch-error"
-import { useExtension } from "../../providers/extension-provider"
+import { Form } from "../../components/common/form";
+import AvatarBox from "../../components/common/logo-box/avatar-box";
+import { useSignInWithEmailPass } from "../../hooks/api";
+import { isFetchError } from "../../lib/is-fetch-error";
+import { useExtension } from "../../providers/extension-provider";
 
 const LoginSchema = z.object({
   email: z.string().email(),
   password: z.string(),
-})
+});
 
 export const Login = () => {
-  const { t } = useTranslation()
-  const location = useLocation()
-  const navigate = useNavigate()
-  const { getWidgets } = useExtension()
+  const { t } = useTranslation();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { getWidgets } = useExtension();
 
-  const from = location.state?.from?.pathname || "/orders"
+  const from = location.state?.from?.pathname || "/orders";
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -30,9 +30,9 @@ export const Login = () => {
       email: "",
       password: "",
     },
-  })
+  });
 
-  const { mutateAsync, isPending } = useSignInWithEmailPass()
+  const { mutateAsync, isPending } = useSignInWithEmailPass();
 
   const handleSubmit = form.handleSubmit(async ({ email, password }) => {
     await mutateAsync(
@@ -47,42 +47,42 @@ export const Login = () => {
               form.setError("email", {
                 type: "manual",
                 message: error.message,
-              })
+              });
 
-              return
+              return;
             }
           }
 
           form.setError("root.serverError", {
             type: "manual",
             message: error.message,
-          })
+          });
         },
         onSuccess: () => {
-          navigate(from, { replace: true })
+          navigate(from, { replace: true });
         },
-      }
-    )
-  })
+      },
+    );
+  });
 
-  const serverError = form.formState.errors?.root?.serverError?.message
+  const serverError = form.formState.errors?.root?.serverError?.message;
   const validationError =
     form.formState.errors.email?.message ||
-    form.formState.errors.password?.message
+    form.formState.errors.password?.message;
 
   return (
     <div className="bg-ui-bg-subtle flex min-h-dvh w-dvw items-center justify-center">
       <div className="m-4 flex w-full max-w-[280px] flex-col items-center">
         <AvatarBox />
         <div className="mb-4 flex flex-col items-center">
-          <Heading>{t("login.title")}</Heading>
+          <Heading className="text-2xl font-bold">{t("login.title")}</Heading>
           <Text size="small" className="text-ui-fg-subtle text-center">
             {t("login.hint")}
           </Text>
         </div>
         <div className="flex w-full flex-col gap-y-3">
           {getWidgets("login.before").map((Component, i) => {
-            return <Component key={i} />
+            return <Component key={i} />;
           })}
           <Form {...form}>
             <form
@@ -105,7 +105,7 @@ export const Login = () => {
                           />
                         </Form.Control>
                       </Form.Item>
-                    )
+                    );
                   }}
                 />
                 <Form.Field
@@ -125,7 +125,7 @@ export const Login = () => {
                           />
                         </Form.Control>
                       </Form.Item>
-                    )
+                    );
                   }}
                 />
               </div>
@@ -145,13 +145,17 @@ export const Login = () => {
                   {serverError}
                 </Alert>
               )}
-              <Button className="w-full" type="submit" isLoading={isPending}>
+              <Button
+                className="w-full  !bg-[#C5A163] "
+                type="submit"
+                isLoading={isPending}
+              >
                 {t("actions.continueWithEmail")}
               </Button>
             </form>
           </Form>
           {getWidgets("login.after").map((Component, i) => {
-            return <Component key={i} />
+            return <Component key={i} />;
           })}
         </div>
         <span className="text-ui-fg-muted txt-small my-6">
@@ -168,5 +172,5 @@ export const Login = () => {
         </span>
       </div>
     </div>
-  )
-}
+  );
+};

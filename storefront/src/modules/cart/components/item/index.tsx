@@ -1,8 +1,8 @@
 "use client"
 
-import { Table, Text, clx } from "@medusajs/ui"
 import { updateLineItem } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
+import { Table, Text, clx } from "@medusajs/ui"
 import CartItemSelect from "@modules/cart/components/cart-item-select"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import DeleteButton from "@modules/common/components/delete-button"
@@ -11,9 +11,7 @@ import LineItemPrice from "@modules/common/components/line-item-price"
 import LineItemUnitPrice from "@modules/common/components/line-item-unit-price"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Spinner from "@modules/common/icons/spinner"
-import Thumbnail from "@modules/products/components/thumbnail"
 import { useState } from "react"
-import { LuMinus, LuPlus } from "react-icons/lu"
 
 type ItemProps = {
   item: HttpTypes.StoreCartLineItem
@@ -44,6 +42,8 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
   // TODO: Update this to grab the actual max inventory
   const maxQtyFromInventory = 10
   const maxQuantity = item.variant?.manage_inventory ? 10 : maxQtyFromInventory
+
+  console.log("this is image url", item?.thumbnail)
 
   return (
     <Table.Row className="w-full relative" data-testid="product-row">
