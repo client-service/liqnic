@@ -223,7 +223,6 @@ workflows:
                 - production
 
       - docker-build-and-publish-dashboard:
-          context: [ liqnic-dev, liqnic-prod ]
           requires:
             - build-and-test-dashboard
           filters:
