@@ -43,6 +43,8 @@ module.exports = defineConfig({
             id: "local",
             options: {
               // provider options...
+              upload_dir: "static",
+              backend_url: process.env.MEDUSA_SERVE_STATIC_URL || "http://localhost:9000"
             },
           },
         ],
