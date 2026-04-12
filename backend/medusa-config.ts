@@ -95,7 +95,7 @@ module.exports = defineConfig({
     },
 
     /**
-     * Distributed Locking
+     * Distributed Locking (For multiple instance in Production)
      */
     {
       resolve: "@medusajs/medusa/locking",
@@ -188,6 +188,16 @@ module.exports = defineConfig({
     databaseDriverOptions: {
       connection: {
         ssl: false
+      },
+      // Enforce connection pooling limits
+      pool: {
+        min: 2,
+        max: 20, // Adjust based on your Postgres server's max_connections
+        idleTimeoutMillis: 30000,
+      },
+      // Force Postgres to assassinate queries taking longer than 2.5 seconds
+      extra: {
+        statement_timeout: 2500 
       }
     },
     databaseUrl: process.env.DATABASE_URL,

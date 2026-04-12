@@ -1,9 +1,19 @@
 import { defineMiddlewares } from "@medusajs/framework";
 import upload, { imageFileFilter } from "../middlewares/multer.middleware";
 import { memoryStorage } from "multer";
+import { queryGuardrailMiddleware } from '../middlewares/query-guardrail.middleware';
 
 export default defineMiddlewares({
     routes: [
+        // --- STOREFRONT GUARDRAILS ---
+        {
+            // Apply guardrails to ALL public storefront routes
+            matcher: "/store/*",
+            method: "ALL", 
+            middlewares: [queryGuardrailMiddleware],
+        },
+        
+        // --- ADMIN MULTIPART UPLOADS ---
         {
             // Apply this middleware to both create and update event routes
             method: ["POST"],
