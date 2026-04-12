@@ -43,6 +43,8 @@ module.exports = defineConfig({
             id: "local",
             options: {
               // provider options...
+              upload_dir: "static",
+              backend_url: process.env.MEDUSA_SERVE_STATIC_URL || "http://localhost:9000"
             },
           },
         ],
@@ -69,20 +71,49 @@ module.exports = defineConfig({
     },
 
     /**
-     * Event Bus
+     * Caching
      */
     {
-      key: "eventBus",
-      resolve: "@medusajs/event-bus-local",
+      key: "cacheService",
+      resolve: "@medusajs/cache-redis",
+      options: { 
+        redisUrl: process.env.CACHE_REDIS_URL,
+      },
     },
+
+    /**
+     * Event Bus
+     */
     // Redis-based Event Bus (for production)
-    // {
-    //   key: "eventBus",
-    //   resolve: "@medusajs/event-bus-redis",
-    //   options: {
-    //     redisUrl: process.env.EVENTS_REDIS_URL,
-    //   },
-    // },
+    {
+      key: "eventBus",
+      resolve: "@medusajs/event-bus-redis",
+      options: {
+        redisUrl: process.env.EVENTS_REDIS_URL,
+        
+      },
+    },
+
+    /**
+     * Distributed Locking (For multiple instance in Production)
+     */
+    {
+      resolve: "@medusajs/medusa/locking",
+      options: {
+        providers: [
+          {
+            resolve: "@medusajs/locking-redis",
+            id: "locking-redis",
+            // set this if you want this provider to be used by default
+            // and you have other Locking Module Providers registered.
+            is_default: true,
+            options: {
+              redisUrl: process.env.LOCKING_REDIS_URL,
+            },
+          },
+        ],
+      },
+    },
 
     /**
      * Notifications
@@ -157,9 +188,20 @@ module.exports = defineConfig({
     databaseDriverOptions: {
       connection: {
         ssl: false
+      },
+      // Enforce connection pooling limits
+      pool: {
+        min: 2,
+        max: 20, // Adjust based on your Postgres server's max_connections
+        idleTimeoutMillis: 30000,
+      },
+      // Force Postgres to assassinate queries taking longer than 2.5 seconds
+      extra: {
+        statement_timeout: 2500 
       }
     },
     databaseUrl: process.env.DATABASE_URL,
+    redisUrl: process.env.REDIS_URL,
     http: {
       storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,

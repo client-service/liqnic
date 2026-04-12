@@ -15,12 +15,11 @@ completeCartWorkflow.hooks.validate(
       entity: "cart",
       fields: [
         "id", 
-        "promotions.*", 
-        "customer.*", 
-        "promotions.rules.*", 
-        "promotions.rules.values.*", 
-        "promotions.application_method.*", 
         "metadata",
+        "customer.id", // Only grab the customer ID, not the entire customer payload
+        "promotions.id",
+        "promotions.application_method.value", 
+        "promotions.application_method.type"
       ],
       filters: {
         id: cart.id,
