@@ -1,6 +1,9 @@
 # Development Dockerfile for Medusa
 FROM node:22-alpine
 
+# Allocates 4GB instead of the default 512MB/1GB
+ENV NODE_OPTIONS=--max-old-space-size=4096
+
 # Set working directory
 WORKDIR /server
 
@@ -8,7 +11,7 @@ WORKDIR /server
 COPY package.json yarn.lock .yarnrc.yml ./
 
 # Install all dependencies using yarn
-RUN yarn install --immutable
+RUN yarn install
 
 # Copy source code
 COPY . .

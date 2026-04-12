@@ -18,13 +18,15 @@ export const handleOrderPointsWorkflow = createWorkflow(
       entity: "order",
       fields: [
         "id", 
-        "customer.*", 
         "total", 
-        "cart.*",
-        "cart.promotions.*",
-        "cart.promotions.rules.*",
-        "cart.promotions.rules.values.*",
-        "cart.promotions.application_method.*",
+        "customer.id", 
+        "cart.id",
+        "cart.metadata",
+        "cart.promotions.id",
+        "cart.promotions.rules.attribute", // Needed for orderHasLoyaltyPromotion check
+        "cart.promotions.rules.values.value", // Needed to match customer ID
+        "cart.promotions.application_method.value",
+        "cart.promotions.application_method.type"
       ],
       filters: {
         id: order_id,
