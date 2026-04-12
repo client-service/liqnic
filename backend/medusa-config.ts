@@ -71,12 +71,40 @@ module.exports = defineConfig({
     },
 
     /**
+     * Distributed Locking
+     */
+    {
+      resolve: "@medusajs/medusa/locking",
+      options: {
+        providers: [
+          {
+            resolve: "@medusajs/locking-redis",
+            id: "locking-redis",
+            // set this if you want this provider to be used by default
+            // and you have other Locking Module Providers registered.
+            is_default: true,
+            options: {
+              redisUrl: process.env.REDIS_URL,
+            },
+          },
+        ],
+      },
+    },
+
+    /**
+     * Caching
+     */
+    {
+      key: "cacheService",
+      resolve: "@medusajs/cache-redis",
+      options: { 
+        redisUrl: process.env.CACHE_REDIS_URL,
+      },
+    },
+
+    /**
      * Event Bus
      */
-    // {
-    //   key: "eventBus",
-    //   resolve: "@medusajs/event-bus-local",
-    // },
     // Redis-based Event Bus (for production)
     {
       key: "eventBus",
