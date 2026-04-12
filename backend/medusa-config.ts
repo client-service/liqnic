@@ -71,27 +71,6 @@ module.exports = defineConfig({
     },
 
     /**
-     * Distributed Locking
-     */
-    {
-      resolve: "@medusajs/medusa/locking",
-      options: {
-        providers: [
-          {
-            resolve: "@medusajs/locking-redis",
-            id: "locking-redis",
-            // set this if you want this provider to be used by default
-            // and you have other Locking Module Providers registered.
-            is_default: true,
-            options: {
-              redisUrl: process.env.REDIS_URL,
-            },
-          },
-        ],
-      },
-    },
-
-    /**
      * Caching
      */
     {
@@ -112,6 +91,27 @@ module.exports = defineConfig({
       options: {
         redisUrl: process.env.EVENTS_REDIS_URL,
         
+      },
+    },
+
+    /**
+     * Distributed Locking
+     */
+    {
+      resolve: "@medusajs/medusa/locking",
+      options: {
+        providers: [
+          {
+            resolve: "@medusajs/locking-redis",
+            id: "locking-redis",
+            // set this if you want this provider to be used by default
+            // and you have other Locking Module Providers registered.
+            is_default: true,
+            options: {
+              redisUrl: process.env.LOCKING_REDIS_URL,
+            },
+          },
+        ],
       },
     },
 
@@ -191,6 +191,7 @@ module.exports = defineConfig({
       }
     },
     databaseUrl: process.env.DATABASE_URL,
+    redisUrl: process.env.REDIS_URL,
     http: {
       storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,
