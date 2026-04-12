@@ -19,14 +19,11 @@ type WorkflowInput = {
 
 const fields = [
   "id",
-  "customer.*",
-  "promotions.*",
-  "promotions.application_method.*",
-  "promotions.rules.*",
-  "promotions.rules.values.*",
   "currency_code",
   "total",
   "metadata",
+  "promotions.id",
+  "promotions.code" // Required to remove the promotion via updateCartPromotionsWorkflow
 ]
 
 export const removeLoyaltyFromCartWorkflow = createWorkflow(

@@ -73,18 +73,19 @@ module.exports = defineConfig({
     /**
      * Event Bus
      */
-    {
-      key: "eventBus",
-      resolve: "@medusajs/event-bus-local",
-    },
-    // Redis-based Event Bus (for production)
     // {
     //   key: "eventBus",
-    //   resolve: "@medusajs/event-bus-redis",
-    //   options: {
-    //     redisUrl: process.env.EVENTS_REDIS_URL,
-    //   },
+    //   resolve: "@medusajs/event-bus-local",
     // },
+    // Redis-based Event Bus (for production)
+    {
+      key: "eventBus",
+      resolve: "@medusajs/event-bus-redis",
+      options: {
+        redisUrl: process.env.EVENTS_REDIS_URL,
+        
+      },
+    },
 
     /**
      * Notifications

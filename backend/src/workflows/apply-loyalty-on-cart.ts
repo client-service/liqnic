@@ -28,14 +28,14 @@ type WorkflowInput = {
 
 const fields = [
     "id",
-    "customer.*",
-    "promotions.*",
-    "promotions.application_method.*",
-    "promotions.rules.*",
-    "promotions.rules.values.*",
     "currency_code",
     "total",
     "metadata",
+    "customer.id",
+    "customer.first_name", // Needed for generating promo code string
+    "customer.email",      // Needed for campaign description
+    "promotions.id",
+    "promotions.code"      // Needed to re-apply existing promos alongside the new one
 ]
 
 export const applyLoyaltyOnCartWorkflow = createWorkflow(
