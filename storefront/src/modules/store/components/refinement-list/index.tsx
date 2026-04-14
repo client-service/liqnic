@@ -144,14 +144,11 @@ const RefinementList = ({
 
       {/* Sidebar (only visible on small screens when open) */}
       {isSmallScreen && isSidebarOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-10">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
           <div ref={sidebarRef} className="w-[250px] h-full bg-white p-4">
             <div className="flex flex-row items-center justify-between">
               <h3 className="font-semibold mb-2">Categories</h3>
-              <button
-                onClick={toggleSidebar}
-                className="py-2 px-4 text-lg"
-              >
+              <button onClick={toggleSidebar} className="py-2 px-4 text-lg">
                 <IoMdClose />
               </button>
             </div>

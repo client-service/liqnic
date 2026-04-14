@@ -1,26 +1,42 @@
-import { Heading, Text } from "@medusajs/ui"
+"use client"
 
-import InteractiveLink from "@modules/common/components/interactive-link"
+import { Heading, Text } from "@medusajs/ui"
+import Link from "next/link"
+import { CiShoppingBasket } from "react-icons/ci"
+import { LuShoppingCart } from "react-icons/lu"
 
 const EmptyCartMessage = () => {
   return (
     <div
-      className="py-48 px-2 flex flex-col justify-center items-start"
+      className="flex flex-col items-center justify-center text-center py-32 px-4 bg-ui-bg-base/40 "
       data-testid="empty-cart-message"
     >
+      {/* Icon */}
+      <div className="p-6 rounded-full bg-primary/10 text-primary mb-6">
+        <LuShoppingCart className="w-10 h-10" />
+      </div>
+
+      {/* Title */}
       <Heading
         level="h1"
-        className="flex flex-row text-3xl-regular gap-x-2 items-baseline"
+        className="text-3xl font-semibold text-ui-fg-base mb-2"
       >
-        Cart
+        Your cart is empty !
       </Heading>
-      <Text className="text-base-regular mt-4 mb-6 max-w-[32rem]">
-        You don&apos;t have anything in your cart. Let&apos;s change that, use
-        the link below to start browsing our products.
+
+      {/* Description */}
+      <Text className="text-base text-ui-fg-subtle max-w-md mb-8">
+        Looks like you haven&apos;t added anything yet. Discover amazing
+        products and find something you love!
       </Text>
-      <div>
-        <InteractiveLink href="/shop">Explore products</InteractiveLink>
-      </div>
+
+      {/* Button */}
+      <Link
+        href="/shop"
+        className="bg-primary text-white px-6 py-3 rounded-full font-medium hover:bg-primary/90 transition-all shadow-md"
+      >
+        Explore Products
+      </Link>
     </div>
   )
 }

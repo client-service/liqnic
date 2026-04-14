@@ -1,0 +1,47 @@
+{
+  "name": "liqnic-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "dashboard",
+    "storefront"
+  ],
+  "packageManager": "yarn@3.8.7",
+  "scripts": {
+    "medusa": "yarn workspace backend medusa",
+    "dev:backend": "yarn workspace backend dev",
+    "dev:dashboard": "yarn workspace @medusajs/dashboard dev",
+    "dev:storefront": "yarn workspace medusa-next dev",
+    "dev": "concurrently \"yarn dev:backend\" \"yarn dev:storefront\" \"yarn dev:dashboard\"",
+    "build:backend": "yarn workspace backend build",
+    "build:dashboard": "yarn workspace @medusajs/dashboard build",
+    "build:storefront": "yarn workspace medusa-next build",
+    "build": "yarn workspaces foreach -pt run build",
+    "start:backend": "yarn workspace backend start",
+    "start:dashboard": "yarn workspace @medusajs/dashboard start",
+    "start:storefront": "yarn workspace medusa-next start",
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
+  },
+  "resolutions": {
+    "@medusajs/admin-sdk": "2.9.0",
+    "@medusajs/cli": "2.9.0",
+    "@medusajs/framework": "2.9.0",
+    "@medusajs/medusa": "2.9.0",
+    "@medusajs/medusa-oas-cli": "2.9.0",
+    "@medusajs/test-utils": "2.9.0",
+    "@medusajs/admin-shared": "2.9.0",
+    "@medusajs/icons": "2.9.0",
+    "@medusajs/js-sdk": "2.9.0",
+    "@medusajs/admin-vite-plugin": "2.9.0",
+    "@medusajs/types": "2.9.0",
+    "@medusajs/ui-preset": "2.9.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5",
+    "typescript": "^5.6.2"
+  }
+}

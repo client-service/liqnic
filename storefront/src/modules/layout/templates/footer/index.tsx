@@ -152,13 +152,13 @@ export default function Footer() {
                   href="/terms-and-conditions"
                   className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
                 >
-                  Terms and conditions
+                  Terms and Conditions
                 </Link>
                 <Link
                   href="/privacy-policy"
                   className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
                 >
-                  Privacy policy
+                  Privacy Policy
                 </Link>
                 <Link
                   href="#"
@@ -170,7 +170,7 @@ export default function Footer() {
                   href="/shipping-return-policy"
                   className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
                 >
-                  Shipping and returns
+                  Shipping and Returns
                 </Link>
               </div>
             </div>

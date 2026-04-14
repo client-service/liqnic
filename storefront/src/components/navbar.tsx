@@ -16,7 +16,7 @@ export default async function Navbar() {
   const MENU_ITEMS: MenuItem[] = await buildMenuItems()
 
   return (
-    <nav className="w-full h-[71px] bg-white border-b border-gray-200 top-0 sticky md:z-40">
+    <nav className="w-full h-[71px] bg-white border-b border-gray-200 top-0 sticky z-40">
       <div className="component-px h-full flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center">
