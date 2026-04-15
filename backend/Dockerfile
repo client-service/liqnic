@@ -18,8 +18,8 @@ COPY backend/package.json ./backend/
 COPY dashboard/package.json ./dashboard/
 COPY storefront/package.json ./storefront/
 
-# 3. Install ONLY backend dependencies (including devDependencies for the build)
-RUN yarn workspaces focus backend
+# 3. Install ALL dependencies in the builder stage to access root TypeScript
+RUN yarn install --immutable
 
 # 4. Copy the Backend source code
 COPY backend ./backend

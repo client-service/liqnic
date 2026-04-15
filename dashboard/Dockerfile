@@ -14,8 +14,8 @@ COPY backend/package.json ./backend/
 COPY dashboard/package.json ./dashboard/
 COPY storefront/package.json ./storefront/
 
-# 3. Install ONLY dashboard dependencies
-RUN yarn workspaces focus @medusajs/dashboard
+# 3. Install ALL dependencies to access root TypeScript
+RUN yarn install --immutable
 
 # 4. Copy Dashboard source code
 COPY dashboard ./dashboard
