@@ -89,7 +89,7 @@ jobs:
             ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
               set -e
               cd $DEPLOY_PATH
-              export APP_VERSION=$APP_VERSION
+              export BACKEND_VERSION=$APP_VERSION
               docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
               docker compose pull backend
               docker compose up -d --remove-orphans backend
@@ -150,7 +150,7 @@ jobs:
             ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
               set -e
               cd $DEPLOY_PATH
-              export APP_VERSION=$APP_VERSION
+              export DASHBOARD_VERSION=$APP_VERSION
               docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
               docker compose pull dashboard
               docker compose up -d --remove-orphans dashboard
@@ -216,7 +216,7 @@ jobs:
             ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
               set -e
               cd $DEPLOY_PATH
-              export APP_VERSION=$APP_VERSION
+              export STOREFRONT_VERSION=$APP_VERSION
               docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
               docker compose pull storefront
               docker compose up -d --remove-orphans storefront
