@@ -1,51 +1,44 @@
-# DEV
-FROM node:22-alpine AS dev-target
-ENV NODE_ENV=development
-
-# Create directory named app to hold the application code inside the image
+# ==========================================
+# STAGE 1: BUILDER
+# ==========================================
+FROM node:24-alpine AS builder
 WORKDIR /app
 
-# Add package.json and package-lock.json
-COPY package*.json /tmp/
+# 1. Enable Corepack and copy the ROOT lockfile and configs
+RUN corepack enable
+COPY package.json yarn.lock .yarnrc.yml ./
+COPY .yarn .yarn
 
-# CI and release builds should use npm ci to fully respect the lockfile.
-# Local development may use npm install for opportunistic package updates.
-ARG npm_install_command=ci
-RUN cd /tmp && npm $npm_install_command
+# 2. Copy ONLY the workspace package.json files (to preserve Docker cache)
+COPY storefront/package.json ./storefront/
+COPY backend/package.json ./backend/
+COPY dashboard/package.json ./dashboard/
 
-# Move installed node modules to app
-RUN cp -a /tmp/node_modules /app
+# 3. Magic Trick: Install ONLY the storefront dependencies!
+# This reads the root yarn.lock but ignores backend/dashboard bloat
+RUN yarn workspaces focus medusa-next
 
-# Bundle app source
-COPY . /app
+# 4. Copy the actual Storefront source code
+COPY storefront ./storefront
 
-# PORT ID inside docker container
-EXPOSE 3000
+# 5. Build the Storefront
+WORKDIR /app/storefront
+# Pass Next.js environment variables here if needed
+RUN yarn build
 
-# Build
-FROM dev-target AS build-target
-ENV NODE_ENV=production
-
-# Use build tools, installed as development packages, to produce a release build.
-RUN npm run build
-
-# Reduce installed packages to production-only.
-RUN npm prune --production
-
-# PROD
-FROM node:22-alpine AS prod-target
-ENV NODE_ENV=production
-
+# ==========================================
+# STAGE 2: RUNNER (Production Image)
+# ==========================================
+FROM node:24-alpine AS runner
 WORKDIR /app
 
-# Include only the release build and production packages.
-COPY --from=build-target /app/node_modules /app/node_modules
-COPY --from=build-target /app/.next /app/.next
-COPY --from=build-target /app/package.json /app/package.json
-COPY --from=build-target /app/public /app/public
-COPY --from=build-target /app/next.config.js /app/next.config.js
+# Copy the built output from the builder stage
+COPY --from=builder /app/storefront/public ./public
+COPY --from=builder /app/storefront/.next/standalone ./
+COPY --from=builder /app/storefront/.next/static ./.next/static
 
-# PORT ID inside docker container
 EXPOSE 3000
+ENV PORT=3000
 
-CMD ["npm", "start"]
+# Start the standalone Next.js server
+CMD ["node", "server.js"]

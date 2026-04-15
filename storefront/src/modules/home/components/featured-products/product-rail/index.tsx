@@ -66,7 +66,6 @@ export default async function ProductRail({
   } = await listProducts({
     regionId: region.id,
     queryParams: {
-      fields: "*variants.calculated_price",
       limit,
     },
   })
@@ -104,7 +103,7 @@ export default async function ProductRail({
       <ul className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-24 small:gap-y-36">
         {pricedProducts.map((product) => (
           <li key={product.id}>
-            <ProductPreview product={product} region={region} isFeatured />
+            <ProductPreview product={product} isFeatured />
           </li>
         ))}
       </ul>

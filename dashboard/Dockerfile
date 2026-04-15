@@ -1,37 +1,46 @@
-# Stage 1: Build the React application
-FROM node:22-alpine AS build
-
+# ==========================================
+# STAGE 1: BUILDER
+# ==========================================
+FROM node:22-alpine3.23 AS builder
 WORKDIR /app
 
-COPY package*.json ./
+# 1. Copy the ROOT lockfile and Yarn configs
+RUN corepack enable
+COPY package.json yarn.lock .yarnrc.yml ./
+COPY .yarn .yarn
 
-RUN npm install
+# 2. Copy workspace package.json files
+COPY backend/package.json ./backend/
+COPY dashboard/package.json ./dashboard/
+COPY storefront/package.json ./storefront/
 
-COPY . .
+# 3. Install ONLY dashboard dependencies
+RUN yarn workspaces focus @medusajs/dashboard
 
-# Accept and inject Vite-specific build arguments
+# 4. Copy Dashboard source code
+COPY dashboard ./dashboard
+
+# 5. Build the Vite Dashboard
+WORKDIR /app/dashboard
+# Pass build-time args for Medusa URLs
 ARG VITE_MEDUSA_BACKEND_URL
 ARG VITE_MEDUSA_BASE
 ARG VITE_MEDUSA_STOREFRONT_URL
-
 ENV VITE_MEDUSA_BACKEND_URL=$VITE_MEDUSA_BACKEND_URL
 ENV VITE_MEDUSA_BASE=$VITE_MEDUSA_BASE
 ENV VITE_MEDUSA_STOREFRONT_URL=$VITE_MEDUSA_STOREFRONT_URL
 
-RUN npm run build:preview
+RUN yarn build
 
-# Reduce installed packages to production-only.
-RUN npm prune --production
+# ==========================================
+# STAGE 2: RUNNER (Nginx)
+# ==========================================
+FROM nginx:alpine AS runner
 
-# Stage 2: Serve the built application with Nginx
-FROM nginx:alpine
+# Copy the built Vite static assets to Nginx
+COPY --from=builder /app/dashboard/dist /usr/share/nginx/html
 
-# Copy the Vite build output to Nginx's root directory
-COPY --from=build /app/dist /usr/share/nginx/html
-
-# Copy custom nginx config
-COPY nginx.conf /etc/nginx/nginx.conf
-
+# Expose port 80 (Traefik will route to this)
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]

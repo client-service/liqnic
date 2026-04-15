@@ -1,0 +1,84 @@
+# ==========================================
+# 📦 YARN V3 (BERRY) SPECIFIC
+# ==========================================
+
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# Swap the comments on the following lines if you wish to use zero-installs
+# In that case, don't forget to run `yarn config set enableGlobalCache false`!
+# Documentation here: https://yarnpkg.com/features/caching#zero-installs
+
+#!.yarn/cache
+.pnp.*
+
+# ==========================================
+# 🗄️ NODE & DEPENDENCIES
+# ==========================================
+# Ignore all node_modules at the root and nested inside any sub-folder
+node_modules/
+*/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+logs
+*.log
+
+# ==========================================
+# 🔐 SECRETS & ENVIRONMENT
+# ==========================================
+.env
+.env.*
+!.env.template
+!.env.example
+
+# ==========================================
+# 🏗️ BUILD ARTIFACTS (Medusa, Next.js, Vite)
+# ==========================================
+# Next.js (Storefront)
+.next/
+out/
+
+# Vite / Dashboard
+dist/
+dist-ssr/
+
+# Medusa Backend / TypeScript
+.medusa/
+.cache/
+build/
+dist/
+*.tsbuildinfo
+
+# ==========================================
+# 💽 DATABASE & UPLOADS (Backend)
+# ==========================================
+backend/uploads/
+backend/data/
+backend/static/
+*.sqlite
+*.sqlite3
+*.db
+
+# ==========================================
+# 💻 OS & EDITOR FILES
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+.AppleDouble
+.LSOverride
+Thumbs.db
+.vscode/
+.idea/
+coverage
+.vercel

@@ -1,0 +1,268 @@
+version: 2.1
+
+# ==========================================
+# 🎛️ PIPELINE PARAMETERS (From path-filtering)
+# ==========================================
+parameters:
+  run-backend-pipeline:
+    type: boolean
+    default: false
+  run-dashboard-pipeline:
+    type: boolean
+    default: false
+  run-storefront-pipeline:
+    type: boolean
+    default: false
+
+# ==========================================
+# 📦 SHARED CONFIGURATION
+# ==========================================
+executors:
+  node-docker:
+    docker:
+      - image: cimg/node:24.14.1
+  deploy-machine:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: arm.medium # Optional: remove if using amd64 on CircleCI
+
+commands:
+  install-monorepo-deps:
+    description: "Install dependencies strictly using Yarn v3 workspaces"
+    steps:
+      - restore_cache:
+          keys:
+            - v1-yarn-deps-{{ checksum "yarn.lock" }}
+      - run:
+          name: "Strict Yarn Install"
+          command: yarn install --immutable
+      - save_cache:
+          key: v1-yarn-deps-{{ checksum "yarn.lock" }}
+          paths:
+            - .yarn/cache
+            - node_modules
+
+jobs:
+  # ====================================================================
+  # ==                         BACKEND JOBS                           ==
+  # ====================================================================
+  build-test-backend:
+    executor: node-docker
+    steps:
+      - checkout
+      - install-monorepo-deps
+      - run:
+          name: Build Backend
+          command: yarn workspace backend build
+
+  docker-publish-backend:
+    executor: node-docker
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build and Push Backend Image (Root Context)
+          command: |
+            ENV_TAG=$([ "$CIRCLE_BRANCH" = "production" ] && echo "prod" || echo "dev")
+            UNIQUE_TAG="$ENV_TAG-$CIRCLE_BUILD_NUM"
+            
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+            
+            # Note the '.' at the end! It builds from the root to read yarn.lock
+            docker build -f backend/Dockerfile -t "$DOCKER_USERNAME/liqnic-backend:$UNIQUE_TAG" .
+            docker tag "$DOCKER_USERNAME/liqnic-backend:$UNIQUE_TAG" "$DOCKER_USERNAME/liqnic-backend:$ENV_TAG"
+            docker push --all-tags "$DOCKER_USERNAME/liqnic-backend"
+
+  deploy-backend:
+    executor: deploy-machine
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:bu4d5JVl8kARC8wsDVC72vhPvS2ZlRUFjb/PAhyvb+U"
+      - run:
+          name: Zero-Downtime Deploy Backend
+          command: |
+            ENV_TAG=$([ "$CIRCLE_BRANCH" = "production" ] && echo "prod" || echo "dev")
+            export APP_VERSION="$ENV_TAG-$CIRCLE_BUILD_NUM"
+            DEPLOY_PATH="/home/docker/liqnic/$ENV_TAG"
+            
+            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
+              set -e
+              cd $DEPLOY_PATH
+              export APP_VERSION=$APP_VERSION
+              docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+              docker compose pull backend
+              docker compose up -d --remove-orphans backend
+              docker image prune -af
+              echo '==> Backend deployment complete!'
+            "
+
+  # ====================================================================
+  # ==                        DASHBOARD JOBS                          ==
+  # ====================================================================
+  build-test-dashboard:
+    executor: node-docker
+    steps:
+      - checkout
+      - install-monorepo-deps
+      - run:
+          name: Build Dashboard
+          command: yarn workspace @medusajs/dashboard build
+
+  docker-publish-dashboard:
+    executor: node-docker
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build and Push Dashboard Image (Root Context)
+          command: |
+            ENV_TAG=$([ "$CIRCLE_BRANCH" = "production" ] && echo "prod" || echo "dev")
+            UNIQUE_TAG="$ENV_TAG-$CIRCLE_BUILD_NUM"
+            
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+            
+            # Pass build arguments explicitly
+            docker build \
+              -f dashboard/Dockerfile \
+              --build-arg VITE_MEDUSA_BACKEND_URL=$MEDUSA_BACKEND_URL \
+              --build-arg VITE_MEDUSA_BASE=$VITE_MEDUSA_BASE \
+              --build-arg VITE_MEDUSA_STOREFRONT_URL=$NEXT_PUBLIC_BASE_URL \
+              -t "$DOCKER_USERNAME/liqnic-dashboard:$UNIQUE_TAG" .
+              
+            docker tag "$DOCKER_USERNAME/liqnic-dashboard:$UNIQUE_TAG" "$DOCKER_USERNAME/liqnic-dashboard:$ENV_TAG"
+            docker push --all-tags "$DOCKER_USERNAME/liqnic-dashboard"
+
+  deploy-dashboard:
+    executor: deploy-machine
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:bu4d5JVl8kARC8wsDVC72vhPvS2ZlRUFjb/PAhyvb+U"
+
+      - run:
+          name: Zero-Downtime Deploy Dashboard
+          command: |
+            ENV_TAG=$([ "$CIRCLE_BRANCH" = "production" ] && echo "prod" || echo "dev")
+            export APP_VERSION="$ENV_TAG-$CIRCLE_BUILD_NUM"
+            DEPLOY_PATH="/home/docker/liqnic/$ENV_TAG"
+            
+            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
+              set -e
+              cd $DEPLOY_PATH
+              export APP_VERSION=$APP_VERSION
+              docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+              docker compose pull dashboard
+              docker compose up -d --remove-orphans dashboard
+              docker image prune -af
+              echo '==> Dashboard deployment complete!'
+            "
+
+  # ====================================================================
+  # ==                       STOREFRONT JOBS                          ==
+  # ====================================================================
+  build-test-storefront:
+    executor: node-docker
+    steps:
+      - checkout
+      - install-monorepo-deps
+      - run:
+          name: Build Storefront
+          command: |
+            # Inject build-time environment variables for Next.js
+            echo "MEDUSA_BACKEND_URL=${STOREFRONT_MEDUSA_BACKEND_URL}" > storefront/.env
+            echo "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=${NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY}" >> storefront/.env
+            echo "NEXT_PUBLIC_BASE_URL=${STOREFRONT_NEXT_PUBLIC_BASE_URL}" >> storefront/.env
+            
+            yarn workspace medusa-next build
+
+  docker-publish-storefront:
+    executor: node-docker
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build and Push Storefront Image (Root Context)
+          command: |
+            ENV_TAG=$([ "$CIRCLE_BRANCH" = "production" ] && echo "prod" || echo "dev")
+            UNIQUE_TAG="$ENV_TAG-$CIRCLE_BUILD_NUM"
+            
+            # Inject build-time environment variables for Docker Next.js build
+            echo "MEDUSA_BACKEND_URL=${STOREFRONT_MEDUSA_BACKEND_URL}" > storefront/.env
+            echo "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=${NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY}" >> storefront/.env
+            echo "NEXT_PUBLIC_BASE_URL=${STOREFRONT_NEXT_PUBLIC_BASE_URL}" >> storefront/.env
+            
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+            
+            # Build from Root
+            docker build -f storefront/Dockerfile -t "$DOCKER_USERNAME/liqnic-storefront:$UNIQUE_TAG" .
+            docker tag "$DOCKER_USERNAME/liqnic-storefront:$UNIQUE_TAG" "$DOCKER_USERNAME/liqnic-storefront:$ENV_TAG"
+            docker push --all-tags "$DOCKER_USERNAME/liqnic-storefront"
+
+  deploy-storefront:
+    executor: deploy-machine
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:bu4d5JVl8kARC8wsDVC72vhPvS2ZlRUFjb/PAhyvb+U"
+            
+      - run:
+          name: Zero-Downtime Deploy Storefront
+          command: |
+            ENV_TAG=$([ "$CIRCLE_BRANCH" = "production" ] && echo "prod" || echo "dev")
+            export APP_VERSION="$ENV_TAG-$CIRCLE_BUILD_NUM"
+            DEPLOY_PATH="/home/docker/liqnic/$ENV_TAG"
+            
+            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
+              set -e
+              cd $DEPLOY_PATH
+              export APP_VERSION=$APP_VERSION
+              docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+              docker compose pull storefront
+              docker compose up -d --remove-orphans storefront
+              docker image prune -af
+              echo '==> Storefront deployment complete!'
+            "
+
+# ====================================================================
+# ==                         WORKFLOWS                            ==
+# ====================================================================
+workflows:
+  backend-workflow:
+    when: << pipeline.parameters.run-backend-pipeline >>
+    jobs:
+      - build-test-backend:
+          filters: { branches: { only: [development, production] } }
+      - docker-publish-backend:
+          context: [liqnic-dev, liqnic-prod]
+          requires: [build-test-backend]
+          filters: { branches: { only: [development, production] } }
+      - deploy-backend:
+          requires: [docker-publish-backend]
+          filters: { branches: { only: [development, production] } }
+
+  dashboard-workflow:
+    when: << pipeline.parameters.run-dashboard-pipeline >>
+    jobs:
+      - build-test-dashboard:
+          filters: { branches: { only: [development, production] } }
+      - docker-publish-dashboard:
+          context: [liqnic-dev, liqnic-prod]
+          requires: [build-test-dashboard]
+          filters: { branches: { only: [development, production] } }
+      - deploy-dashboard:
+          requires: [docker-publish-dashboard]
+          filters: { branches: { only: [development, production] } }
+
+  storefront-workflow:
+    when: << pipeline.parameters.run-storefront-pipeline >>
+    jobs:
+      - build-test-storefront:
+          filters: { branches: { only: [development, production] } }
+      - docker-publish-storefront:
+          context: [liqnic-dev, liqnic-prod]
+          requires: [build-test-storefront]
+          filters: { branches: { only: [development, production] } }
+      - deploy-storefront:
+          requires: [docker-publish-storefront]
+          filters: { branches: { only: [development, production] } }
