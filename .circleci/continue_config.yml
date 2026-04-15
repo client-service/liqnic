@@ -64,7 +64,7 @@ jobs:
           name: Build and Push Backend Image (Root Context)
           command: |
             ENV_TAG=$([ "$CIRCLE_BRANCH" = "production" ] && echo "prod" || echo "dev")
-            UNIQUE_TAG="$ENV_TAG-$CIRCLE_BUILD_NUM"
+            UNIQUE_TAG="$ENV_TAG-${CIRCLE_SHA1:0:7}"
             
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
             
@@ -83,7 +83,7 @@ jobs:
           name: Zero-Downtime Deploy Backend
           command: |
             ENV_TAG=$([ "$CIRCLE_BRANCH" = "production" ] && echo "prod" || echo "dev")
-            export APP_VERSION="$ENV_TAG-$CIRCLE_BUILD_NUM"
+            export APP_VERSION="$ENV_TAG-${CIRCLE_SHA1:0:7}"
             DEPLOY_PATH="/home/docker/liqnic/$ENV_TAG"
             
             ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
@@ -118,7 +118,7 @@ jobs:
           name: Build and Push Dashboard Image (Root Context)
           command: |
             ENV_TAG=$([ "$CIRCLE_BRANCH" = "production" ] && echo "prod" || echo "dev")
-            UNIQUE_TAG="$ENV_TAG-$CIRCLE_BUILD_NUM"
+            UNIQUE_TAG="$ENV_TAG-${CIRCLE_SHA1:0:7}"
             
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
             
@@ -144,7 +144,7 @@ jobs:
           name: Zero-Downtime Deploy Dashboard
           command: |
             ENV_TAG=$([ "$CIRCLE_BRANCH" = "production" ] && echo "prod" || echo "dev")
-            export APP_VERSION="$ENV_TAG-$CIRCLE_BUILD_NUM"
+            export APP_VERSION="$ENV_TAG-${CIRCLE_SHA1:0:7}"
             DEPLOY_PATH="/home/docker/liqnic/$ENV_TAG"
             
             ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
@@ -185,7 +185,7 @@ jobs:
           name: Build and Push Storefront Image (Root Context)
           command: |
             ENV_TAG=$([ "$CIRCLE_BRANCH" = "production" ] && echo "prod" || echo "dev")
-            UNIQUE_TAG="$ENV_TAG-$CIRCLE_BUILD_NUM"
+            UNIQUE_TAG="$ENV_TAG-${CIRCLE_SHA1:0:7}"
             
             # Inject build-time environment variables for Docker Next.js build
             echo "MEDUSA_BACKEND_URL=${STOREFRONT_MEDUSA_BACKEND_URL}" > storefront/.env
@@ -210,7 +210,7 @@ jobs:
           name: Zero-Downtime Deploy Storefront
           command: |
             ENV_TAG=$([ "$CIRCLE_BRANCH" = "production" ] && echo "prod" || echo "dev")
-            export APP_VERSION="$ENV_TAG-$CIRCLE_BUILD_NUM"
+            export APP_VERSION="$ENV_TAG-${CIRCLE_SHA1:0:7}"
             DEPLOY_PATH="/home/docker/liqnic/$ENV_TAG"
             
             ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
