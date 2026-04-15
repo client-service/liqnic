@@ -36,7 +36,9 @@
     "@medusajs/js-sdk": "2.9.0",
     "@medusajs/admin-vite-plugin": "2.9.0",
     "@medusajs/types": "2.9.0",
-    "@medusajs/ui-preset": "2.9.0"
+    "@medusajs/ui-preset": "2.9.0",
+    "@types/express": "4.17.21",
+    "@types/express-serve-static-core": "4.17.41"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

@@ -1,4 +1,4 @@
-import { MedusaRequest } from "@medusajs/framework";
+import { Request } from "express";
 import multer from "multer";
 
 const allowedImageFormats = ['image/jpeg', 'image/jpg', 'image/png'];
@@ -8,7 +8,7 @@ const allowedImageFormats = ['image/jpeg', 'image/jpg', 'image/png'];
  * Rejects files with mimetypes that don't start with 'image/'.
  */
 export const imageFileFilter = (
-  req: MedusaRequest,
+  req: Request,
   file: Express.Multer.File,
   callback: multer.FileFilterCallback
 ) => {
