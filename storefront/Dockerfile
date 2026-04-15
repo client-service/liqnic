@@ -14,9 +14,8 @@ COPY storefront/package.json ./storefront/
 COPY backend/package.json ./backend/
 COPY dashboard/package.json ./dashboard/
 
-# 3. Magic Trick: Install ONLY the storefront dependencies!
-# This reads the root yarn.lock but ignores backend/dashboard bloat
-RUN yarn workspaces focus medusa-next
+# 3. Install ALL dependencies to access root TypeScript
+RUN yarn install --immutable
 
 # 4. Copy the actual Storefront source code
 COPY storefront ./storefront
