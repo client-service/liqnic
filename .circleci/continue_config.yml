@@ -144,17 +144,33 @@ jobs:
           name: Zero-Downtime Deploy Dashboard
           command: |
             ENV_TAG=$([ "$CIRCLE_BRANCH" = "production" ] && echo "prod" || echo "dev")
-            export APP_VERSION="$ENV_TAG-${CIRCLE_SHA1:0:7}"
+            export DASHBOARD_VERSION="$ENV_TAG-${CIRCLE_SHA1:0:7}"
             DEPLOY_PATH="/home/docker/liqnic/$ENV_TAG"
             
             ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
               set -e
               cd $DEPLOY_PATH
-              export DASHBOARD_VERSION=$APP_VERSION
+              export DASHBOARD_VERSION=$DASHBOARD_VERSION
               docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
               docker compose pull dashboard
+              
+              echo '==> Checking Backend Health Status...'
+              for i in {1..30}; do
+                # Get the health status, ignore errors if it doesn't exist yet
+                STATUS=\$(docker inspect -f '{{.State.Health.Status}}' liqnic-backend-\$ENV_TAG 2>/dev/null || echo \"missing\")
+                
+                if [ \"\$STATUS\" = \"healthy\" ] || [ \"\$STATUS\" = \"missing\" ]; then
+                  echo '==> Backend is healthy! Proceeding with frontend deployment...'
+                  break
+                fi
+                
+                echo \"==> Backend is currently \$STATUS. Waiting 10 seconds... (\$i/30)\"
+                sleep 10
+              done
+              
+              # Now it is safe to deploy the dashboard
               docker compose up -d --remove-orphans dashboard
-              docker image prune -af
+              nohup docker image prune -af > /dev/null 2>&1 &
               echo '==> Dashboard deployment complete!'
             "
 
@@ -207,21 +223,37 @@ jobs:
             - "SHA256:bu4d5JVl8kARC8wsDVC72vhPvS2ZlRUFjb/PAhyvb+U"
             
       - run:
-          name: Zero-Downtime Deploy Storefront
+          name: Zero-Downtime Deploy Dashboard
           command: |
             ENV_TAG=$([ "$CIRCLE_BRANCH" = "production" ] && echo "prod" || echo "dev")
-            export APP_VERSION="$ENV_TAG-${CIRCLE_SHA1:0:7}"
+            export DASHBOARD_VERSION="$ENV_TAG-${CIRCLE_SHA1:0:7}"
             DEPLOY_PATH="/home/docker/liqnic/$ENV_TAG"
             
             ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
               set -e
               cd $DEPLOY_PATH
-              export STOREFRONT_VERSION=$APP_VERSION
+              export DASHBOARD_VERSION=$DASHBOARD_VERSION
               docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-              docker compose pull storefront
-              docker compose up -d --remove-orphans storefront
-              docker image prune -af
-              echo '==> Storefront deployment complete!'
+              docker compose pull dashboard
+              
+              echo '==> Checking Backend Health Status...'
+              for i in {1..30}; do
+                # Get the health status, ignore errors if it doesn't exist yet
+                STATUS=\$(docker inspect -f '{{.State.Health.Status}}' liqnic-backend-\$ENV_TAG 2>/dev/null || echo \"missing\")
+                
+                if [ \"\$STATUS\" = \"healthy\" ] || [ \"\$STATUS\" = \"missing\" ]; then
+                  echo '==> Backend is healthy! Proceeding with frontend deployment...'
+                  break
+                fi
+                
+                echo \"==> Backend is currently \$STATUS. Waiting 10 seconds... (\$i/30)\"
+                sleep 10
+              done
+              
+              # Now it is safe to deploy the dashboard
+              docker compose up -d --remove-orphans dashboard
+              nohup docker image prune -af > /dev/null 2>&1 &
+              echo '==> Dashboard deployment complete!'
             "
 
 # ====================================================================
