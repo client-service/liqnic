@@ -46,4 +46,4 @@ COPY --from=builder /app/node_modules ../node_modules
 EXPOSE 9000
 
 # Start the Medusa server
-CMD ["yarn", "start"]
+CMD ["npx", "medusa", "start"]
