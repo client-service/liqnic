@@ -74,7 +74,6 @@ module.exports = defineConfig({
      * Caching
      */
     {
-      key: "cacheService",
       resolve: "@medusajs/cache-redis",
       options: { 
         redisUrl: process.env.CACHE_REDIS_URL,
@@ -86,7 +85,6 @@ module.exports = defineConfig({
      */
     // Redis-based Event Bus (for production)
     {
-      key: "eventBus",
       resolve: "@medusajs/event-bus-redis",
       options: {
         redisUrl: process.env.EVENTS_REDIS_URL,
