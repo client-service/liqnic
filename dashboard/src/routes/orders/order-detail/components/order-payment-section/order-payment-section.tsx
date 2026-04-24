@@ -213,11 +213,16 @@ const Payment = ({
             )}
           </Text>
         </div>
-        <div className="hidden items-center justify-end sm:flex">
-          <Text size="small" leading="compact" className="capitalize">
-            {payment.provider_id}
+        <Text size="small" leading="compact" className="capitalize">
+            {payment.provider_id === "qr-payment" ? "Bank Transfer (QR)" : payment.provider_id}
           </Text>
-        </div>
+          
+          {/* Unpack the custom transaction ID for the admin to verify */}
+          {payment.data?.transaction_id && (
+            <Badge size="small" color="blue" className="mt-1 font-mono">
+              Ref: {payment.data.transaction_id as string}
+            </Badge>
+          )}
         <div className="flex items-center justify-end">
           <StatusBadge color={color} className="text-nowrap">
             {status}
@@ -246,6 +251,7 @@ const Payment = ({
           ]}
         />
       </div>
+      
       {showCapture && (
         <div className="bg-ui-bg-subtle flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-x-2">
