@@ -58,6 +58,14 @@ module.exports = defineConfig({
       resolve: "@medusajs/medusa/payment",
       options: {
         providers: [
+          // new custom QR Payment Provider
+          {
+            resolve: "./src/modules/qr-payments",
+            id: "qr-payment",
+            options: {
+               // You can add options here if you ever need to pass API keys or webhook secrets
+            }
+          },
           // Uncomment this to enable Stripe later
           // {
           //   resolve: "@medusajs/medusa/payment-stripe",
