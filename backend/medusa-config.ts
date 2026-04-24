@@ -61,12 +61,10 @@ module.exports = defineConfig({
           // new COD Payment Provider
           {
             resolve: "./src/modules/cod-payment",
-            id: "cod-payment",
           },
           // new custom QR Payment Provider
           {
             resolve: "./src/modules/qr-payment",
-            id: "qr-payment",
           },
           // Uncomment this to enable Stripe later
           // {
