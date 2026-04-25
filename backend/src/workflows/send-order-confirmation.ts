@@ -1,5 +1,5 @@
-import { 
-  createWorkflow, 
+import {
+  createWorkflow,
   WorkflowResponse,
 } from "@medusajs/framework/workflows-sdk"
 import { useQueryGraphStep } from "@medusajs/medusa/core-flows"
@@ -40,7 +40,7 @@ export const sendOrderConfirmationWorkflow = createWorkflow(
         id,
       },
     })
-    
+
     const notification = sendNotificationStep([{
       to: orders[0].email!,
       channel: "email",
@@ -48,7 +48,17 @@ export const sendOrderConfirmationWorkflow = createWorkflow(
       data: {
         order: orders[0],
       },
-    }])
+    },
+    // 2. Email to the Admin
+    {
+      to: process.env.ADMIN_ALERT_EMAIL || "liqnichost@gmail.com",
+      channel: "email",
+      template: "order-placed", // Reusing the same beautiful React template!
+      data: {
+        order: orders[0],
+      },
+    }
+    ])
 
     return new WorkflowResponse(notification)
   }

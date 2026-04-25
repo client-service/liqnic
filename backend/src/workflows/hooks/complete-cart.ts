@@ -14,11 +14,11 @@ completeCartWorkflow.hooks.validate(
     const { data: carts } = await query.graph({
       entity: "cart",
       fields: [
-        "id", 
+        "id",
         "metadata",
         "customer.id", // Only grab the customer ID, not the entire customer payload
         "promotions.id",
-        "promotions.application_method.value", 
+        "promotions.application_method.value",
         "promotions.application_method.type"
       ],
       filters: {
@@ -35,7 +35,7 @@ completeCartWorkflow.hooks.validate(
     if (!loyaltyPromo) {
       return
     }
-    
+
     const customerLoyaltyPoints = await loyaltyModuleService.getPoints(
       carts[0].customer!.id
     )
@@ -46,8 +46,7 @@ completeCartWorkflow.hooks.validate(
     if (customerLoyaltyPoints < requiredPoints) {
       throw new MedusaError(
         MedusaError.Types.INVALID_DATA,
-        `Customer does not have enough loyalty points. Required: ${
-          requiredPoints
+        `Customer does not have enough loyalty points. Required: ${requiredPoints
         }, Available: ${customerLoyaltyPoints}`
       )
     }
