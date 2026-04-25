@@ -84,7 +84,7 @@ module.exports = defineConfig({
     {
       key: Modules.CACHE,
       resolve: "@medusajs/cache-redis",
-      options: { 
+      options: {
         redisUrl: process.env.CACHE_REDIS_URL,
       },
     },
@@ -98,7 +98,7 @@ module.exports = defineConfig({
       resolve: "@medusajs/event-bus-redis",
       options: {
         redisUrl: process.env.EVENTS_REDIS_URL,
-        
+
       },
     },
 
@@ -139,15 +139,15 @@ module.exports = defineConfig({
             },
           },
           // Example for custom Resend module
-          // {
-          //   resolve: "./src/modules/resend",
-          //   id: "resend",
-          //   options: {
-          //     channels: ["email"],
-          //     api_key: process.env.RESEND_API_KEY,
-          //     from: process.env.RESEND_FROM_EMAIL,
-          //   },
-          // },
+          {
+            resolve: "./src/modules/resend",
+            id: "notification-resend",
+            options: {
+              channels: ["email"],
+              api_key: process.env.RESEND_API_KEY,
+              from: process.env.RESEND_FROM_EMAIL,
+            },
+          },
         ],
       },
     },
@@ -205,7 +205,7 @@ module.exports = defineConfig({
       },
       // Force Postgres to assassinate queries taking longer than 2.5 seconds
       extra: {
-        statement_timeout: 2500 
+        statement_timeout: 2500
       }
     },
     databaseUrl: process.env.DATABASE_URL,
