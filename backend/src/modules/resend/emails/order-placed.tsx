@@ -141,7 +141,7 @@ function OrderPlacedEmailComponent({ order }: OrderPlacedEmailProps) {
                   </Text>
                   <Text className="text-sm text-gray-600 m-0 mt-1">
                     <strong>Status:</strong>{" "}
-                    {order.payment_status?.toUpperCase() || "PENDING"}
+                    {order.payment_status?.toUpperCase()}
                   </Text>
                 </Column>
               </Row>
@@ -203,8 +203,9 @@ function OrderPlacedEmailComponent({ order }: OrderPlacedEmailProps) {
                   <Text className="text-sm text-gray-500 m-0">Subtotal</Text>
                 </Column>
                 <Column align="right">
+                  {/* Safely check for item_total or subtotal */}
                   <Text className="text-sm text-gray-800 m-0">
-                    {formatPrice(order.item_total)}
+                    {formatPrice(order.item_total || order.subtotal || 0)}
                   </Text>
                 </Column>
               </Row>
@@ -223,8 +224,9 @@ function OrderPlacedEmailComponent({ order }: OrderPlacedEmailProps) {
                   <Text className="text-sm text-gray-500 m-0">Shipping</Text>
                 </Column>
                 <Column align="right">
+                  {/* Fixed: shipping_total lives at the root, not inside summary! */}
                   <Text className="text-sm text-gray-800 m-0">
-                    {formatPrice(order.summary?.shipping_total || 0)}
+                    {formatPrice(order.shipping_total || 0)}
                   </Text>
                 </Column>
               </Row>
