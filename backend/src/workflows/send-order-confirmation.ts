@@ -53,23 +53,15 @@ export const sendOrderConfirmationWorkflow = createWorkflow(
       },
     })
 
-    const notification = sendNotificationStep([{
-      to: orders[0].email!,
-      channel: "email",
-      template: "order-placed",
-      data: {
-        order: orders[0],
-      },
-    },
-    // 2. Email to the Admin
-    {
-      to: process.env.ADMIN_ALERT_EMAIL || "liqnichost@gmail.com",
-      channel: "email",
-      template: "admin-order-alert", // Reusing the same beautiful React template!
-      data: {
-        order: orders[0],
-      },
-    }
+    const notification = sendNotificationStep([
+      {
+        to: process.env.ADMIN_ALERT_EMAIL || "liqnichost@gmail.com",
+        channel: "email",
+        template: "admin-order-alert", // Reusing the same beautiful React template!
+        data: {
+          order: orders[0],
+        },
+      }
     ])
 
     return new WorkflowResponse(notification)
