@@ -2,16 +2,14 @@ import {
   Text,
   Column,
   Container,
-  Heading,
   Html,
-  Img,
   Row,
   Section,
   Tailwind,
   Head,
   Preview,
   Body,
-  Link,
+  Hr,
 } from "@react-email/components";
 import {
   BigNumberValue,
@@ -19,23 +17,19 @@ import {
   OrderDTO,
 } from "@medusajs/framework/types";
 
+// Extending the OrderDTO to ensure typescript doesn't complain about the summary and payment properties
+type ExtendedOrderDTO = OrderDTO & {
+  summary?: any;
+  payment_collections?: any[];
+};
+
 type OrderPlacedEmailProps = {
-  order: OrderDTO & {
+  order: ExtendedOrderDTO & {
     customer: CustomerDTO;
-  };
-  email_banner?: {
-    body: string;
-    title: string;
-    url: string;
   };
 };
 
-function OrderPlacedEmailComponent({
-  order,
-  email_banner,
-}: OrderPlacedEmailProps) {
-  const shouldDisplayBanner = email_banner && "title" in email_banner;
-
+function OrderPlacedEmailComponent({ order }: OrderPlacedEmailProps) {
   const formatter = new Intl.NumberFormat([], {
     style: "currency",
     currencyDisplay: "narrowSymbol",
@@ -43,108 +37,155 @@ function OrderPlacedEmailComponent({
   });
 
   const formatPrice = (price: BigNumberValue) => {
-    if (typeof price === "number") {
-      return formatter.format(price);
-    }
-
-    if (typeof price === "string") {
-      return formatter.format(parseFloat(price));
-    }
-
+    if (typeof price === "number") return formatter.format(price);
+    if (typeof price === "string") return formatter.format(parseFloat(price));
     return price?.toString() || "";
   };
 
+  // Extract the payment method safely
+  const getPaymentMethod = () => {
+    const providerId =
+      order.payment_collections?.[0]?.payments?.[0]?.provider_id;
+    if (!providerId) return "N/A";
+
+    if (providerId.includes("cod-payment")) return "CASH ON DELIVERY";
+    if (providerId.includes("qr-payment")) return "BANK TRANSFER (QR)";
+    if (providerId.includes("stripe")) return "CREDIT CARD";
+
+    return providerId.replace("pp_", "").toUpperCase();
+  };
+
+  const orderDate = new Date(order.created_at).toLocaleDateString();
+  // Use the computed summary total, fallback to raw total
+  const orderTotal = order.summary?.current_order_total || order.total || 0;
+
   return (
     <Tailwind>
-      <Html className="font-sans bg-gray-100">
+      <Html>
         <Head />
-        <Preview>Thank you for your order from Medusa</Preview>
-        <Body className="bg-white my-10 mx-auto w-full max-w-2xl">
-          {/* Header */}
-          <Section className="bg-[#27272a] text-white px-6 py-4">
-            <svg
-              width="15"
-              height="15"
-              viewBox="0 0 20 20"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M16.2447 3.92183L12.1688 1.57686C10.8352 0.807712 9.20112 0.807712 7.86753 1.57686L3.77285 3.92183C2.45804 4.69098 1.63159 6.11673 1.63159 7.63627V12.345C1.63159 13.8833 2.45804 15.2903 3.77285 16.0594L7.84875 18.4231C9.18234 19.1923 10.8165 19.1923 12.15 18.4231L16.2259 16.0594C17.5595 15.2903 18.3672 13.8833 18.3672 12.345V7.63627C18.4048 6.11673 17.5783 4.69098 16.2447 3.92183ZM10.0088 14.1834C7.69849 14.1834 5.82019 12.3075 5.82019 10C5.82019 7.69255 7.69849 5.81657 10.0088 5.81657C12.3191 5.81657 14.2162 7.69255 14.2162 10C14.2162 12.3075 12.3379 14.1834 10.0088 14.1834Z"
-                fill="currentColor"
-              ></path>
-            </svg>
-          </Section>
+        <Preview>Your Liqnic Invoice - Order #{order.display_id}</Preview>
+        <Body className="bg-[#f6f9fc] font-sans text-[#333333] my-4 mx-auto w-full">
+          <Container className="bg-white border border-gray-200 rounded-lg p-8 max-w-2xl mx-auto">
+            {/* Header: Logo and Company Info */}
+            <Section className="mb-6">
+              <Row>
+                <Column align="left">
+                  {/* Replace with your actual live logo URL */}
+                  <Text className="text-3xl font-bold tracking-widest m-0 text-black">
+                    LIQNIC
+                  </Text>
+                  <Text className="text-sm text-gray-500 m-0 mt-1">
+                    Kathmandu, Nepal
+                  </Text>
+                  <Text className="text-sm text-gray-500 m-0">
+                    hello@liqnic.com
+                  </Text>
+                </Column>
+                <Column align="right">
+                  <Text className="text-2xl font-bold text-gray-300 m-0">
+                    INVOICE
+                  </Text>
+                  <Text className="text-sm text-gray-500 m-0">
+                    #{order.display_id}
+                  </Text>
+                </Column>
+              </Row>
+            </Section>
 
-          {/* Thank You Message */}
-          <Container className="p-6">
-            <Heading className="text-2xl font-bold text-center text-gray-800">
-              Thank you for your order,{" "}
-              {order.customer?.first_name || order.shipping_address?.first_name}
-            </Heading>
-            <Text className="text-center text-gray-600 mt-2">
-              We're processing your order and will notify you when it ships.
-            </Text>
-          </Container>
+            <Hr className="border-gray-200 my-6" />
 
-          {/* Promotional Banner */}
-          {shouldDisplayBanner && (
-            <Container
-              className="mb-4 rounded-lg p-7"
-              style={{
-                background: "linear-gradient(to right, #3b82f6, #4f46e5)",
-              }}
-            >
-              <Section>
-                <Row>
-                  <Column align="left">
-                    <Heading className="text-white text-xl font-semibold">
-                      {email_banner.title}
-                    </Heading>
-                    <Text className="text-white mt-2">{email_banner.body}</Text>
-                  </Column>
-                  <Column align="right">
-                    <Link
-                      href={email_banner.url}
-                      className="font-semibold px-2 text-white underline"
-                    >
-                      Shop Now
-                    </Link>
-                  </Column>
-                </Row>
-              </Section>
-            </Container>
-          )}
+            {/* Info Section: Address and Order Details */}
+            <Section className="mb-8">
+              <Row>
+                <Column
+                  className="w-1/2"
+                  align="left"
+                  style={{ verticalAlign: "top" }}
+                >
+                  <Text className="text-xs font-bold text-gray-400 tracking-wider uppercase m-0 mb-2">
+                    Invoice To
+                  </Text>
+                  <Text className="text-sm font-bold text-gray-800 m-0">
+                    {order.shipping_address?.first_name || "Guest"}{" "}
+                    {order.shipping_address?.last_name || ""}
+                  </Text>
+                  <Text className="text-sm text-gray-600 m-0 mt-1">
+                    {order.shipping_address?.address_1 || "N/A"}
+                  </Text>
+                  <Text className="text-sm text-gray-600 m-0">
+                    {order.shipping_address?.city || ""},{" "}
+                    {order.shipping_address?.province || ""}{" "}
+                    {order.shipping_address?.postal_code || ""}
+                  </Text>
+                  <Text className="text-sm text-gray-600 m-0 mt-1">
+                    Phone: {order.shipping_address?.phone || "N/A"}
+                  </Text>
+                </Column>
 
-          {/* Order Items */}
-          <Container className="px-6">
-            <Heading className="text-xl font-semibold text-gray-800 mb-4">
-              Your Items
-            </Heading>
-            <Row>
-              <Column>
-                <Text className="text-sm m-0 my-2 text-gray-500">
-                  Order ID: #{order.display_id}
-                </Text>
-              </Column>
-            </Row>
+                <Column
+                  className="w-1/2"
+                  align="right"
+                  style={{ verticalAlign: "top" }}
+                >
+                  <Text className="text-xs font-bold text-gray-400 tracking-wider uppercase m-0 mb-2">
+                    Order Details
+                  </Text>
+                  <Text className="text-sm text-gray-600 m-0">
+                    <strong>Date:</strong> {orderDate}
+                  </Text>
+                  <Text className="text-sm text-gray-600 m-0 mt-1">
+                    <strong>Payment:</strong> {getPaymentMethod()}
+                  </Text>
+                  <Text className="text-sm text-gray-600 m-0 mt-1">
+                    <strong>Status:</strong>{" "}
+                    {order.payment_status?.toUpperCase() || "PENDING"}
+                  </Text>
+                </Column>
+              </Row>
+            </Section>
+
+            {/* Items Table Header */}
+            <Section className="bg-gray-50 rounded-t-lg p-3 border-b border-gray-200">
+              <Row>
+                <Column className="w-[50%]">
+                  <Text className="text-xs font-bold text-gray-500 uppercase m-0">
+                    Item
+                  </Text>
+                </Column>
+                <Column className="w-[15%] text-center">
+                  <Text className="text-xs font-bold text-gray-500 uppercase m-0">
+                    Qty
+                  </Text>
+                </Column>
+                <Column className="w-[35%] text-right">
+                  <Text className="text-xs font-bold text-gray-500 uppercase m-0">
+                    Total
+                  </Text>
+                </Column>
+              </Row>
+            </Section>
+
+            {/* Items List */}
             {order.items?.map((item) => (
-              <Section key={item.id} className="border-b border-gray-200 py-4">
+              <Section key={item.id} className="p-3 border-b border-gray-100">
                 <Row>
-                  <Column className="w-1/3">
-                    <Img
-                      src={item.thumbnail ?? ""}
-                      alt={item.product_title ?? ""}
-                      className="rounded-lg"
-                      width="100%"
-                    />
-                  </Column>
-                  <Column className="w-2/3 pl-4">
-                    <Text className="text-lg font-semibold text-gray-800">
+                  <Column className="w-[50%]">
+                    <Text className="text-sm font-semibold text-gray-800 m-0">
                       {item.product_title}
                     </Text>
-                    <Text className="text-gray-600">{item.variant_title}</Text>
-                    <Text className="text-gray-800 mt-2 font-bold">
+                    {item.variant_title !== "Default variant" && (
+                      <Text className="text-xs text-gray-500 m-0 mt-1">
+                        {item.variant_title}
+                      </Text>
+                    )}
+                  </Column>
+                  <Column className="w-[15%] text-center">
+                    <Text className="text-sm text-gray-600 m-0">
+                      {item.quantity}x
+                    </Text>
+                  </Column>
+                  <Column className="w-[35%] text-right">
+                    <Text className="text-sm font-semibold text-gray-800 m-0">
                       {formatPrice(item.total)}
                     </Text>
                   </Column>
@@ -152,63 +193,66 @@ function OrderPlacedEmailComponent({
               </Section>
             ))}
 
-            {/* Order Summary */}
-            <Section className="mt-8">
-              <Heading className="text-xl font-semibold text-gray-800 mb-4">
-                Order Summary
-              </Heading>
-              <Row className="text-gray-600">
-                <Column className="w-1/2">
-                  <Text className="m-0">Subtotal</Text>
+            {/* Summary / Totals */}
+            <Section className="mt-6 pl-[40%]">
+              <Row className="mb-2">
+                <Column>
+                  <Text className="text-sm text-gray-500 m-0">Subtotal</Text>
                 </Column>
-                <Column className="w-1/2 text-right">
-                  <Text className="m-0">{formatPrice(order.item_total)}</Text>
+                <Column align="right">
+                  <Text className="text-sm text-gray-800 m-0">
+                    {formatPrice(order.item_total)}
+                  </Text>
                 </Column>
               </Row>
-              {order.shipping_methods?.map((method) => (
-                <Row className="text-gray-600" key={method.id}>
-                  <Column className="w-1/2">
-                    <Text className="m-0">{method.name}</Text>
-                  </Column>
-                  <Column className="w-1/2 text-right">
-                    <Text className="m-0">{formatPrice(method.total)}</Text>
-                  </Column>
-                </Row>
-              ))}
-              <Row className="text-gray-600">
-                <Column className="w-1/2">
-                  <Text className="m-0">Tax</Text>
+              <Row className="mb-2">
+                <Column>
+                  <Text className="text-sm text-gray-500 m-0">Tax</Text>
                 </Column>
-                <Column className="w-1/2 text-right">
-                  <Text className="m-0">
+                <Column align="right">
+                  <Text className="text-sm text-gray-800 m-0">
                     {formatPrice(order.tax_total || 0)}
                   </Text>
                 </Column>
               </Row>
-              <Row className="border-t border-gray-200 mt-4 text-gray-800 font-bold">
-                <Column className="w-1/2">
-                  <Text>Total</Text>
+              <Row className="mb-4">
+                <Column>
+                  <Text className="text-sm text-gray-500 m-0">Shipping</Text>
                 </Column>
-                <Column className="w-1/2 text-right">
-                  <Text>{formatPrice(order.total)}</Text>
+                <Column align="right">
+                  <Text className="text-sm text-gray-800 m-0">
+                    {formatPrice(order.summary?.shipping_total || 0)}
+                  </Text>
+                </Column>
+              </Row>
+
+              <Hr className="border-gray-200 mb-4" />
+
+              <Row>
+                <Column>
+                  <Text className="text-base font-bold text-gray-800 m-0">
+                    Total
+                  </Text>
+                </Column>
+                <Column align="right">
+                  <Text className="text-lg font-bold text-gray-900 m-0">
+                    {formatPrice(orderTotal)}
+                  </Text>
                 </Column>
               </Row>
             </Section>
-          </Container>
 
-          {/* Footer */}
-          <Section className="bg-gray-50 p-6 mt-10">
-            <Text className="text-center text-gray-500 text-sm">
-              If you have any questions, reply to this email or contact our
-              support team at liqnichost@gmail.com.
-            </Text>
-            <Text className="text-center text-gray-500 text-sm">
-              Order Token: {order.id}
-            </Text>
-            <Text className="text-center text-gray-400 text-xs mt-4">
-              © {new Date().getFullYear()} Liqnic, All rights reserved.
-            </Text>
-          </Section>
+            {/* Footer */}
+            <Section className="mt-12 text-center">
+              <Text className="text-sm text-gray-500">
+                Thank you for shopping with Liqnic! 🥂
+              </Text>
+              <Text className="text-xs text-gray-400 mt-2">
+                If you have any questions about this invoice, Please email at
+                liqnichost@gmail.com
+              </Text>
+            </Section>
+          </Container>
         </Body>
       </Html>
     </Tailwind>

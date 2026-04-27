@@ -19,19 +19,30 @@ export const sendOrderConfirmationWorkflow = createWorkflow(
         "display_id",
         "email",
         "currency_code",
+        "created_at", // Add this so the date works in the email!
+        "payment_status", // Add this so the status works!
         "total",
         "item_total",
         "tax_total",
-        // Only fetch the specific names needed for the email greeting
+        "summary.*",
+
+        "payment_collections.*",
+        "payment_collections.payments.*",
+
         "customer.first_name",
         "shipping_address.first_name",
-        // Prune Items
+        "shipping_address.last_name",
+        "shipping_address.address_1",
+        "shipping_address.city",
+        "shipping_address.province",
+        "shipping_address.postal_code",
+        "shipping_address.phone",
         "items.id",
+        "items.quantity", // Make sure quantity is here
         "items.thumbnail",
         "items.product_title",
         "items.variant_title",
         "items.total",
-        // Prune Shipping Methods
         "shipping_methods.id",
         "shipping_methods.name",
         "shipping_methods.total",
