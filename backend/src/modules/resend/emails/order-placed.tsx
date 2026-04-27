@@ -21,6 +21,7 @@ import {
 type ExtendedOrderDTO = OrderDTO & {
   summary?: any;
   payment_collections?: any[];
+  payment_status?: string;
 };
 
 type OrderPlacedEmailProps = {
@@ -63,7 +64,9 @@ function OrderPlacedEmailComponent({ order }: OrderPlacedEmailProps) {
     <Tailwind>
       <Html>
         <Head />
-        <Preview>Your Liqnic Invoice - Order #{order.display_id}</Preview>
+        <Preview>
+          Your Liqnic Invoice - Order ${String(order.display_id)}
+        </Preview>
         <Body className="bg-[#f6f9fc] font-sans text-[#333333] my-4 mx-auto w-full">
           <Container className="bg-white border border-gray-200 rounded-lg p-8 max-w-2xl mx-auto">
             {/* Header: Logo and Company Info */}
@@ -78,7 +81,7 @@ function OrderPlacedEmailComponent({ order }: OrderPlacedEmailProps) {
                     Kathmandu, Nepal
                   </Text>
                   <Text className="text-sm text-gray-500 m-0">
-                    hello@liqnic.com
+                    liqnichost@gmail.com
                   </Text>
                 </Column>
                 <Column align="right">
