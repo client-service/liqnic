@@ -53,7 +53,7 @@ export const sendOrderConfirmationWorkflow = createWorkflow(
     {
       to: process.env.ADMIN_ALERT_EMAIL || "liqnichost@gmail.com",
       channel: "email",
-      template: "order-placed", // Reusing the same beautiful React template!
+      template: "admin-order-alert", // Reusing the same beautiful React template!
       data: {
         order: orders[0],
       },
