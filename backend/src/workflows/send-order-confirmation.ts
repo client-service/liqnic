@@ -19,16 +19,17 @@ export const sendOrderConfirmationWorkflow = createWorkflow(
         "display_id",
         "email",
         "currency_code",
-        "created_at", // Add this so the date works in the email!
-        "payment_status", // Add this so the status works!
+        "created_at",
+        "payment_status",
         "total",
+        "subtotal",
         "item_total",
         "tax_total",
+        "shipping_total",
+        "discount_total",
         "summary.*",
-
         "payment_collections.*",
         "payment_collections.payments.*",
-
         "customer.first_name",
         "shipping_address.first_name",
         "shipping_address.last_name",
@@ -38,7 +39,7 @@ export const sendOrderConfirmationWorkflow = createWorkflow(
         "shipping_address.postal_code",
         "shipping_address.phone",
         "items.id",
-        "items.quantity", // Make sure quantity is here
+        "items.quantity",
         "items.thumbnail",
         "items.product_title",
         "items.variant_title",
