@@ -54,17 +54,16 @@ export const sendOrderConfirmationWorkflow = createWorkflow(
     })
 
     const recipients = ["liqnicinfo@gmail.com", "liqnichost@gmail.com"];
-    const notifications = recipients.map(recipient => sendNotificationStep([
-      {
+    const notifications = sendNotificationStep(
+      recipients.map((recipient) => ({
         to: recipient,
         channel: "email",
         template: "admin-order-alert",
         data: {
           order: orders[0],
         },
-      }
-    ])
-  )
+      }))
+    )
 
     return new WorkflowResponse(notifications)
   }
