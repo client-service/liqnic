@@ -1,7 +1,7 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
 import { uploadFilesWorkflow } from "@medusajs/medusa/core-flows";
 import EventModuleService from "../../../services/event.service";
-import { z } from "zod";
+import { z } from "@medusajs/framework/zod";
 
 // Zod schema for validating the text fields when creating an event
 const CreateEventSchema = z.object({

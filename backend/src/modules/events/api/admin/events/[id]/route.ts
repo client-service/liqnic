@@ -1,6 +1,6 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
 import EventModuleService from "../../../../services/event.service";
-import { z } from "zod";
+import { z } from "@medusajs/framework/zod";
 
 // Zod schema for updating an event
 const UpdateEventSchema = z.object({

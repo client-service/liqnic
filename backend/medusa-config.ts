@@ -162,36 +162,6 @@ module.exports = defineConfig({
       resolve: "./src/modules/loyalty"
     }
   ],
-  plugins: [
-    /**
-     * Custom SMTP Email
-     */
-    {
-      resolve: "medusa-plugin-smtp",
-      options: {
-        fromEmail: process.env.FROM_EMAIL_ADDRESS,
-        transport: {
-          host: process.env.SMTP_HOST,
-          port: process.env.SMTP_PORT,
-          secureConnection: false,
-          auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
-          },
-          preview: false,
-          tls: {
-            ciphers: "SSLv3",
-          },
-          requireTLS: false,
-        },
-        emailTemplatePath: "emails",
-        templateMap: {
-          "invite.created": "inviteCreated",
-          "order.placed": "orderPlaced",
-        },
-      },
-    },
-  ],
   projectConfig: {
     databaseDriverOptions: {
       connection: {
@@ -214,8 +184,8 @@ module.exports = defineConfig({
       storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,
       authCors: process.env.AUTH_CORS!,
-      jwtSecret: process.env.JWT_SECRET || "supersecret",
-      cookieSecret: process.env.COOKIE_SECRET || "supersecret",
+      jwtSecret: process.env.JWT_SECRET!,
+      cookieSecret: process.env.COOKIE_SECRET!,
     },
   },
 });
