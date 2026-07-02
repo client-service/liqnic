@@ -5,7 +5,7 @@ import {
   ContainerRegistrationKeys,
 } from "@medusajs/framework/utils";
 
-loadEnv(process.env.NODE_ENV || "development", process.cwd());
+loadEnv(process.env.APP_ENV || process.env.NODE_ENV || "development", process.cwd());
 
 module.exports = defineConfig({
   admin: {
