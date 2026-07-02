@@ -59,10 +59,8 @@ class ResendNotificationProviderService extends AbstractNotificationProviderServ
 
     static validateOptions(options: Record<any, any>) {
         if (!options.api_key) {
-            throw new MedusaError(
-                MedusaError.Types.INVALID_DATA,
-                "Option `api_key` is required in the provider's options."
-            )
+            // api_key is optional in local dev; email sending will be skipped
+            return
         }
         if (!options.from) {
             throw new MedusaError(
