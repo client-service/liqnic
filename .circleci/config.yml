@@ -1,11 +1,11 @@
 # Unified Monorepo CI/CD Pipeline
-# This single file manages the build and deployment for both the backend and dashboard services.
-# It runs the full pipeline for every commit on the 'development' and 'production' branches.
+# Manages build and deployment for backend, dashboard, and storefront.
+# Runs the full pipeline on 'development' and 'production' branches.
 version: 2.1
 
 jobs:
   # ====================================================================
-  # ==                         BACKEND JOBS                         ==
+  # ==                         BACKEND JOBS                           ==
   # ====================================================================
   build-and-test-backend:
     docker:
@@ -14,22 +14,21 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-deps-yarn-{{ checksum "backend/yarn.lock" }}
-            - v1-deps-yarn-
+            - v2-deps-pnpm-{{ checksum "pnpm-lock.yaml" }}
+            - v2-deps-pnpm-
       - run:
-          name: "Install Backend Dependencies"
-          working_directory: backend
-          # Use --frozen-lockfile to prevent modifications to yarn.lock in CI
-          command: "yarn install --frozen-lockfile"
+          name: "Install Dependencies"
+          command: "corepack enable && pnpm install --frozen-lockfile"
       - save_cache:
-          key: v1-deps-yarn-{{ checksum "backend/yarn.lock" }}
+          key: v2-deps-pnpm-{{ checksum "pnpm-lock.yaml" }}
           paths:
+            - "node_modules"
             - "backend/node_modules"
-            - "backend/.yarn/cache"
+            - "dashboard/node_modules"
+            - "storefront/node_modules"
       - run:
           name: "Build Backend"
-          working_directory: backend
-          command: "yarn build"
+          command: "pnpm --filter=backend build"
 
   docker-build-and-publish-backend:
     docker:
@@ -42,7 +41,6 @@ jobs:
       - setup_remote_docker
       - run:
           name: Build and Push Backend Docker Image
-          working_directory: backend
           command: |
             if [ "$CIRCLE_BRANCH" = "development" ]; then
               STATIC_TAG="dev"
@@ -51,14 +49,14 @@ jobs:
             fi
             UNIQUE_TAG="$STATIC_TAG-$CIRCLE_BUILD_NUM"
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-            docker build -t "$DOCKER_USERNAME/liqnic-backend:$UNIQUE_TAG" .
+            docker build -f backend/Dockerfile -t "$DOCKER_USERNAME/liqnic-backend:$UNIQUE_TAG" .
             docker tag "$DOCKER_USERNAME/liqnic-backend:$UNIQUE_TAG" "$DOCKER_USERNAME/liqnic-backend:$STATIC_TAG"
             docker push --all-tags "$DOCKER_USERNAME/liqnic-backend"
 
   deploy-backend:
     machine:
       image: ubuntu-2204:current
-    steps:  
+    steps:
       - run:
           name: Check if container exists
           command: |
@@ -80,7 +78,7 @@ jobs:
             else
               echo "Container liqnic-backend does not exist"
             fi"
-            
+
       - run:
           name: Deploy Backend to Environment
           command: |
@@ -99,7 +97,7 @@ jobs:
             "
 
   # ====================================================================
-  # ==                        DASHBOARD JOBS                        ==
+  # ==                        DASHBOARD JOBS                          ==
   # ====================================================================
   build-and-test-dashboard:
     docker:
@@ -108,22 +106,21 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-deps-npm-{{ checksum "dashboard/package-lock.json" }}
-            - v1-deps-npm-
+            - v2-deps-pnpm-{{ checksum "pnpm-lock.yaml" }}
+            - v2-deps-pnpm-
       - run:
-          name: "Install Dashboard Dependencies"
-          working_directory: dashboard
-          # Use 'npm ci' for faster, more reliable installs in CI environments.
-          command: "npm ci"
+          name: "Install Dependencies"
+          command: "corepack enable && pnpm install --frozen-lockfile"
       - save_cache:
-          key: v1-deps-npm-{{ checksum "dashboard/package-lock.json" }}
+          key: v2-deps-pnpm-{{ checksum "pnpm-lock.yaml" }}
           paths:
+            - "node_modules"
+            - "backend/node_modules"
             - "dashboard/node_modules"
-            - "~/.npm"
+            - "storefront/node_modules"
       - run:
           name: "Build Dashboard"
-          working_directory: dashboard
-          command: "npm run build"
+          command: "pnpm --filter=@medusajs/dashboard build"
 
   docker-build-and-publish-dashboard:
     docker:
@@ -136,7 +133,6 @@ jobs:
       - setup_remote_docker
       - run:
           name: Build and Push Dashboard Docker Image
-          working_directory: dashboard
           command: |
             if [ "$CIRCLE_BRANCH" = "development" ]; then
               STATIC_TAG="dev"
@@ -146,17 +142,18 @@ jobs:
             UNIQUE_TAG="$STATIC_TAG-$CIRCLE_BUILD_NUM"
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
             docker build \
-            --build-arg VITE_MEDUSA_BACKEND_URL=$MEDUSA_BACKEND_URL \
-            --build-arg VITE_MEDUSA_BASE=$VITE_MEDUSA_BASE \
-            --build-arg VITE_MEDUSA_STOREFRONT_URL=$NEXT_PUBLIC_BASE_URL \
-            -t "$DOCKER_USERNAME/liqnic-dashboard:$UNIQUE_TAG" .
+              --build-arg VITE_MEDUSA_BACKEND_URL=$MEDUSA_BACKEND_URL \
+              --build-arg VITE_MEDUSA_BASE=$VITE_MEDUSA_BASE \
+              --build-arg VITE_MEDUSA_STOREFRONT_URL=$NEXT_PUBLIC_BASE_URL \
+              -f dashboard/Dockerfile \
+              -t "$DOCKER_USERNAME/liqnic-dashboard:$UNIQUE_TAG" .
             docker tag "$DOCKER_USERNAME/liqnic-dashboard:$UNIQUE_TAG" "$DOCKER_USERNAME/liqnic-dashboard:$STATIC_TAG"
             docker push --all-tags "$DOCKER_USERNAME/liqnic-dashboard"
 
   deploy-dashboard:
     machine:
       image: ubuntu-2204:current
-    steps:  
+    steps:
       - run:
           name: Check if container exists
           command: |
@@ -178,7 +175,7 @@ jobs:
             else
               echo "Container liqnic-dashboard does not exist"
             fi"
-            
+
       - run:
           name: Deploy Dashboard to Environment
           command: |
@@ -196,8 +193,84 @@ jobs:
               echo '==> Dashboard deployment complete!'
             "
 
+  # ====================================================================
+  # ==                        STOREFRONT JOBS                         ==
+  # ====================================================================
+  docker-build-and-publish-storefront:
+    docker:
+      - image: cimg/node:22.4
+        auth:
+          username: $DOCKER_USERNAME
+          password: $DOCKER_PASSWORD
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build and Push Storefront Docker Image
+          command: |
+            if [ "$CIRCLE_BRANCH" = "development" ]; then
+              STATIC_TAG="dev"
+            elif [ "$CIRCLE_BRANCH" = "production" ]; then
+              STATIC_TAG="prod"
+            fi
+            UNIQUE_TAG="$STATIC_TAG-$CIRCLE_BUILD_NUM"
+            # Write runtime env vars — available inside the Docker build context
+            echo "MEDUSA_BACKEND_URL=${MEDUSA_BACKEND_URL}" >> .env
+            echo "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=${NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY}" >> .env
+            echo "NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}" >> .env
+            echo "NEXT_PUBLIC_DEFAULT_REGION=${NEXT_PUBLIC_DEFAULT_REGION}" >> .env
+            echo "REVALIDATE_SECRET=${REVALIDATE_SECRET}" >> .env
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+            docker build -f storefront/Dockerfile -t "$DOCKER_USERNAME/liqnic-storefront:$UNIQUE_TAG" .
+            docker tag "$DOCKER_USERNAME/liqnic-storefront:$UNIQUE_TAG" "$DOCKER_USERNAME/liqnic-storefront:$STATIC_TAG"
+            docker push --all-tags "$DOCKER_USERNAME/liqnic-storefront"
+
+  deploy-storefront:
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - run:
+          name: Check if container exists
+          command: |
+            if [ "$CIRCLE_BRANCH" = "development" ]; then
+              STATIC_TAG="dev"
+              CONTAINER_NAME="liqnic-storefront-dev"
+            elif [ "$CIRCLE_BRANCH" = "production" ]; then
+              STATIC_TAG="prod"
+              CONTAINER_NAME="liqnic-storefront-prod"
+            fi
+            SSH_COMMAND="ssh $SSH_USER@$SSH_HOST"
+            $SSH_COMMAND "
+              if docker ps -a --format '{{.Names}}' | grep -q "${CONTAINER_NAME}"; then
+                echo 'Container liqnic-storefront exists'
+                docker stop $CONTAINER_NAME
+                docker rm $CONTAINER_NAME
+                docker rmi $DOCKER_USERNAME/liqnic-storefront:$STATIC_TAG
+                echo 'Container liqnic-storefront stopped and removed'
+              else
+                echo 'Container liqnic-storefront does not exist'
+              fi
+            "
+
+      - run:
+          name: Deploy Storefront to Environment
+          command: |
+            if [ "$CIRCLE_BRANCH" = "development" ]; then
+              DEPLOY_PATH="/home/docker/liqnic/dev"
+            elif [ "$CIRCLE_BRANCH" = "production" ]; then
+              DEPLOY_PATH="/home/docker/liqnic/prod"
+            fi
+            SSH_COMMAND="ssh $SSH_USER@$SSH_HOST"
+            $SSH_COMMAND "
+              set -e
+              cd $DEPLOY_PATH
+              docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+              docker compose up -d storefront
+              echo '==> storefront deployment complete!'
+            "
+
 # ====================================================================
-# ==                         WORKFLOWS                            ==
+# ==                         WORKFLOWS                              ==
 # ====================================================================
 workflows:
   build-and-deploy:
@@ -216,7 +289,7 @@ workflows:
                 - development
                 - production
 
-      # Run Docker publish jobs in parallel after tests pass
+      # Run Docker publish jobs after tests pass
       - docker-build-and-publish-backend:
           requires:
             - build-and-test-backend
@@ -236,7 +309,15 @@ workflows:
                 - development
                 - production
 
-      # Deploy both services in parallel after their images are published
+      - docker-build-and-publish-storefront:
+          context: [liqnic-dev,liqnic-prod]
+          filters:
+            branches:
+              only:
+                - development
+                - production
+
+      # Deploy all services after their images are published
       - deploy-backend:
           requires:
             - docker-build-and-publish-backend
@@ -249,6 +330,15 @@ workflows:
       - deploy-dashboard:
           requires:
             - docker-build-and-publish-dashboard
+          filters:
+            branches:
+              only:
+                - development
+                - production
+
+      - deploy-storefront:
+          requires:
+            - docker-build-and-publish-storefront
           filters:
             branches:
               only:

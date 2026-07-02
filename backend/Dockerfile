@@ -1,23 +1,22 @@
-# Development Dockerfile for Medusa
 FROM node:22-alpine
-
-# Allocates 4GB instead of the default 512MB/1GB
 ENV NODE_OPTIONS=--max-old-space-size=4096
 
-# Set working directory
-WORKDIR /server
+WORKDIR /app
 
-# Copy package files and yarn config
-COPY package.json yarn.lock .yarnrc.yml ./
+RUN corepack enable
 
-# Install all dependencies using yarn
-RUN yarn install
+# Monorepo root files — layer invalidates only when lockfile changes
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml .npmrc ./
 
-# Copy source code
-COPY . .
+# Backend package manifest
+COPY backend/package.json ./backend/
 
-# Expose the port Medusa runs on
+# Install backend dependencies only
+RUN pnpm install --filter=backend --frozen-lockfile
+
+# Backend source
+COPY backend/ ./backend/
+
 EXPOSE 9000
 
-# Build the medusajs application
-RUN yarn build
+RUN pnpm --filter=backend run build
