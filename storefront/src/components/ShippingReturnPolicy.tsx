@@ -11,7 +11,7 @@ export default function ShippingReturnPolicy() {
       <div className="mb-6">
         <h3 className="text-xl font-semibold mb-2">Age Verification</h3>
         <p>
-          All customers must be <strong>21 years of age or older</strong> to
+          All customers must be <strong>21 years of age or older</strong> toIQOS ILUMA i ONE – Midnight Black
           purchase alcohol. By ordering from our site, you confirm that you are
           of legal drinking age. A valid{" "}
           <strong>government-issued photo ID</strong> is required upon delivery.

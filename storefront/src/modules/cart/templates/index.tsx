@@ -5,48 +5,58 @@ import SignInPrompt from "../components/sign-in-prompt"
 import Divider from "@modules/common/components/divider"
 import { HttpTypes } from "@medusajs/types"
 import { ContactSupportCTA } from "components/contact-support-cta"
+import UpsellModal from "components/product-suggestion-modal"
+import FeaturedProducts from "@modules/home/components/featured-products"
+import ModalProductRail from "@modules/home/components/featured-products/modal-product-suggestions"
 
 const CartTemplate = ({
   cart,
   customer,
+  region,
 }: {
   cart: HttpTypes.StoreCart | null
   customer: HttpTypes.StoreCustomer | null
+  region: HttpTypes.StoreRegion
 }) => {
   return (
-    <div className="py-12">
-      <div className="content-container" data-testid="cart-container">
-        {cart?.items?.length ? (
-          <div className="grid grid-cols-1 small:grid-cols-[1fr_360px] gap-x-40">
-            <div className="flex flex-col bg-white py-6 gap-y-6 overflow-auto">
-              <ItemsTemplate cart={cart} />
-              {!customer && (
-                <>
-                  <SignInPrompt />
-                  <Divider />
-                </>
-              )}
-            </div>
-            <div className="relative">
-              <div className="flex flex-col gap-y-8 sticky top-12">
-                {cart && cart.region && (
+    <>
+      <UpsellModal>
+        <ModalProductRail region={region} limit={6} />
+      </UpsellModal>
+      <div className="py-12">
+        <div className="content-container" data-testid="cart-container">
+          {cart?.items?.length ? (
+            <div className="grid grid-cols-1 small:grid-cols-[1fr_360px] gap-x-40">
+              <div className="flex flex-col bg-white py-6 gap-y-6 overflow-auto">
+                <ItemsTemplate cart={cart} />
+                {!customer && (
                   <>
-                    <div className="bg-white py-6">
-                      <Summary cart={cart as any} />
-                    </div>
+                    <SignInPrompt />
+                    <Divider />
                   </>
                 )}
               </div>
+              <div className="relative">
+                <div className="flex flex-col gap-y-8 sticky top-12">
+                  {cart && cart.region && (
+                    <>
+                      <div className="bg-white py-6">
+                        <Summary cart={cart as any} />
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
-        ) : (
-          <div>
-            <EmptyCartMessage />
-          </div>
-        )}
+          ) : (
+            <div>
+              <EmptyCartMessage />
+            </div>
+          )}
+        </div>
+        {/* <ContactSupportCTA />  */}
       </div>
-      <ContactSupportCTA />
-    </div>
+    </>
   )
 }
 

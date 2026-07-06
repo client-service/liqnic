@@ -6,10 +6,21 @@ import { listRegions } from "@lib/data/regions"
 import { StoreCollection, StoreRegion } from "@medusajs/types"
 import CollectionTemplate from "@modules/collections/templates"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
+import { Suspense } from 'react'
+import SkeletonProductGrid from '../../../../../modules/skeletons/templates/skeleton-product-grid'
 
 type Props = {
   params: Promise<{ handle: string; countryCode: string }>
   searchParams: Promise<{
+    page?: string
+    sortBy?: SortOptions
+  }>
+}
+
+type CollectionTemplateWrapperProps = {
+  collection: StoreCollection
+  countryCode: string
+  searchParamsPromise: Promise<{
     page?: string
     sortBy?: SortOptions
   }>
@@ -67,7 +78,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     }
 
     return {
-      title: `${collection.title} | Liqnic Store`,
+      title: `${collection.title} | Liqnic`,
       description: `${collection.title} collection`,
     } as Metadata
   } catch (err: any) {
@@ -80,9 +91,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 }
 
 export default async function CollectionPage(props: Props) {
-  const searchParams = await props.searchParams
+  // const searchParams = await props.searchParams
   const params = await props.params
-  const { sortBy, page } = searchParams
+  // const { sortBy, page } = searchParams
 
   let collection: StoreCollection | null = null
   try {
@@ -100,11 +111,33 @@ export default async function CollectionPage(props: Props) {
   }
 
   return (
+    <div>
+      {/* Wrap the Template in Suspense. 
+        Next.js will now cache the layout, nav, and shell of this page as STATIC HTML (0 CPU).
+        Only the CollectionTemplate will render dynamically based on searchParams.
+      */}
+      <Suspense fallback={<SkeletonProductGrid />}>
+        {/* Pass the PROMISE of searchParams down, let the template await it */}
+        <CollectionTemplateWrapper 
+           collection={collection}
+           countryCode={params.countryCode}
+           searchParamsPromise={props.searchParams} 
+        />
+      </Suspense>
+    </div>
+  )
+}
+
+async function CollectionTemplateWrapper({ collection, countryCode, searchParamsPromise }: CollectionTemplateWrapperProps) {
+  const searchParams = await searchParamsPromise;
+  const { sortBy, page } = searchParams;
+
+  return (
     <CollectionTemplate
       collection={collection}
       page={page}
       sortBy={sortBy}
-      countryCode={params.countryCode}
+      countryCode={countryCode}
     />
   )
 }

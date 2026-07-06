@@ -1,7 +1,31 @@
 # Unified Monorepo CI/CD Pipeline
 # Manages build and deployment for backend, dashboard, and storefront.
 # Runs the full pipeline on 'development' and 'production' branches.
+# Only builds/deploys services with relevant file changes.
 version: 2.1
+
+commands:
+  skip-if-no-changes:
+    parameters:
+      service:
+        type: string
+    steps:
+      - run:
+          name: "Skip if no changes in << parameters.service >>"
+          command: |
+            if git rev-parse HEAD~1 >/dev/null 2>&1; then
+              CHANGED=$(git diff --name-only HEAD~1 HEAD)
+            else
+              CHANGED=$(git diff --name-only $(git hash-object -t tree /dev/null) HEAD)
+            fi
+            echo "Changed files:"
+            echo "$CHANGED"
+            if echo "$CHANGED" | grep -qE "^(<< parameters.service >>/|pnpm-lock\.yaml|package\.json|\.circleci/)"; then
+              echo "Changes detected in << parameters.service >>. Proceeding."
+            else
+              echo "No changes in << parameters.service >>. Skipping job."
+              circleci-agent step halt
+            fi
 
 jobs:
   # ====================================================================
@@ -12,6 +36,8 @@ jobs:
       - image: cimg/node:22.4
     steps:
       - checkout
+      - skip-if-no-changes:
+          service: backend
       - restore_cache:
           keys:
             - v2-deps-pnpm-{{ checksum "pnpm-lock.yaml" }}
@@ -38,6 +64,8 @@ jobs:
           password: $DOCKER_PASSWORD
     steps:
       - checkout
+      - skip-if-no-changes:
+          service: backend
       - setup_remote_docker
       - run:
           name: Build and Push Backend Docker Image
@@ -57,6 +85,9 @@ jobs:
     machine:
       image: ubuntu-2204:current
     steps:
+      - checkout
+      - skip-if-no-changes:
+          service: backend
       - run:
           name: Check if container exists
           command: |
@@ -104,6 +135,8 @@ jobs:
       - image: cimg/node:22.4
     steps:
       - checkout
+      - skip-if-no-changes:
+          service: dashboard
       - restore_cache:
           keys:
             - v2-deps-pnpm-{{ checksum "pnpm-lock.yaml" }}
@@ -130,6 +163,8 @@ jobs:
           password: $DOCKER_PASSWORD
     steps:
       - checkout
+      - skip-if-no-changes:
+          service: dashboard
       - setup_remote_docker
       - run:
           name: Build and Push Dashboard Docker Image
@@ -154,6 +189,9 @@ jobs:
     machine:
       image: ubuntu-2204:current
     steps:
+      - checkout
+      - skip-if-no-changes:
+          service: dashboard
       - run:
           name: Check if container exists
           command: |
@@ -204,6 +242,8 @@ jobs:
           password: $DOCKER_PASSWORD
     steps:
       - checkout
+      - skip-if-no-changes:
+          service: storefront
       - setup_remote_docker
       - run:
           name: Build and Push Storefront Docker Image
@@ -229,6 +269,9 @@ jobs:
     machine:
       image: ubuntu-2204:current
     steps:
+      - checkout
+      - skip-if-no-changes:
+          service: storefront
       - run:
           name: Check if container exists
           command: |

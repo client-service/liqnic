@@ -10,6 +10,7 @@
     "dev:backend": "APP_ENV=local pnpm --filter=backend dev",
     "dev:backend:dev": "APP_ENV=dev pnpm --filter=backend dev",
     "dev:dashboard": "pnpm --filter=@medusajs/dashboard dev",
+    "dev:dashboard:dev": "pnpm --filter=@medusajs/dashboard dev --mode dev",
     "dev:storefront": "pnpm --filter=medusa-next dev",
     "build:backend": "pnpm --filter=backend build",
     "build:dashboard": "pnpm --filter=@medusajs/dashboard build",
@@ -17,6 +18,7 @@
     "build": "pnpm --filter=backend build && pnpm --filter=@medusajs/dashboard build && pnpm --filter=medusa-next build",
     "migrate:local": "APP_ENV=local pnpm --filter=backend exec npx medusa db:migrate",
     "migrate:dev": "APP_ENV=dev pnpm --filter=backend exec npx medusa db:migrate",
+    "migrate:prod": "APP_ENV=production pnpm --filter=backend exec npx medusa db:migrate",
     "seed:local": "APP_ENV=local pnpm --filter=backend seed",
     "lint": "pnpm --recursive run lint"
   }

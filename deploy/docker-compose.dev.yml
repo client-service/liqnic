@@ -1,0 +1,95 @@
+services:
+  # ==========================================
+  # ⚙️ MEDUSA BACKEND (DEV)
+  # ==========================================
+  backend:
+    image: riviainfosys/liqnic-backend:${BACKEND_VERSION:-dev}
+    container_name: liqnic-backend-dev
+    command: pnpm --filter=backend start
+    environment:
+      - APP_ENV=dev
+    env_file:
+      - .env.backend
+    restart: always
+    volumes:
+      - liqnic-local-storage-dev:/app/backend/static
+    networks:
+      - web-traefik
+      - db_default
+      - redis-net
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget --no-verbose --tries=1 --spider http://localhost:9000/health || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web-traefik"
+      - "traefik.http.routers.liqnic-backend-dev.rule=Host(`api.dev.liqnic.com`)"
+      - "traefik.http.routers.liqnic-backend-dev.entrypoints=websecure"
+      - "traefik.http.routers.liqnic-backend-dev.tls.certresolver=myresolver"
+      - "traefik.http.services.liqnic-backend-dev.loadbalancer.server.port=9000"
+
+  # ==========================================
+  # 📊 ADMIN DASHBOARD (DEV)
+  # ==========================================
+  dashboard:
+    image: riviainfosys/liqnic-dashboard:${DASHBOARD_VERSION:-dev}
+    container_name: liqnic-dashboard-dev
+    restart: always
+    networks:
+      - web-traefik
+    depends_on:
+      backend:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.liqnic-dashboard-dev.rule=Host(`cms.dev.liqnic.com`)"
+      - "traefik.http.routers.liqnic-dashboard-dev.entrypoints=websecure"
+      - "traefik.http.routers.liqnic-dashboard-dev.tls.certresolver=myresolver"
+      - "traefik.http.services.liqnic-dashboard-dev.loadbalancer.server.port=80"
+
+  # ==========================================
+  # 🛍️ NEXT.JS STOREFRONT (DEV)
+  # ==========================================
+  storefront:
+    image: riviainfosys/liqnic-storefront:${STOREFRONT_VERSION:-dev}
+    container_name: liqnic-storefront-dev
+    environment:
+      - MEDUSA_BACKEND_URL=http://liqnic-backend-dev:9000
+      - REVALIDATE_SECRET=${REVALIDATE_SECRET}
+    restart: always
+    networks:
+      - web-traefik
+    depends_on:
+      backend:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.liqnic-storefront-dev.rule=Host(`dev.liqnic.com`)"
+      - "traefik.http.routers.liqnic-storefront-dev.entrypoints=websecure"
+      - "traefik.http.routers.liqnic-storefront-dev.tls.certresolver=myresolver"
+      - "traefik.http.routers.liqnic-storefront-dev-http.entrypoints=web"
+      - "traefik.http.routers.liqnic-storefront-dev-http.rule=Host(`dev.liqnic.com`)"
+      - "traefik.http.routers.liqnic-storefront-dev-http.middlewares=redirect-to-https@file"
+      - "traefik.http.services.liqnic-storefront-dev.loadbalancer.server.port=3000"
+
+# ==========================================
+# 🌐 NETWORKS & VOLUMES (DEV)
+# ==========================================
+networks:
+  web-traefik:
+    external: true
+  db_default:
+    external: true
+  redis-net:
+    external: true
+
+volumes:
+  liqnic-local-storage-dev:
+    name: liqnic-local-storage-dev

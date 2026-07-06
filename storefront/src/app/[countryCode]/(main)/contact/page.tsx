@@ -12,6 +12,17 @@ export default function Contact() {
     agreeToPrivacy: false,
   })
 
+  const [toast, setToast] = useState<{
+    message: string
+    type: "success" | "error"
+  } | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const showToast = (message: string, type: "success" | "error") => {
+    setToast({ message, type })
+    setTimeout(() => setToast(null), 4000)
+  }
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -29,10 +40,34 @@ export default function Contact() {
     }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle form submission logic here
-    console.log("Form submitted:", formData)
+    setIsSubmitting(true)
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      })
+      const data = await res.json()
+      if (data.success) {
+        showToast("Message sent successfully!", "success")
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          contactNumber: "",
+          message: "",
+          agreeToPrivacy: false,
+        })
+      } else {
+        throw new Error(data.error)
+      }
+    } catch {
+      showToast("Something went wrong. Please try again.", "error")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -140,17 +175,17 @@ export default function Contact() {
 
                 {/* Privacy Policy and Submit */}
                 <div className="space-y-3 lg:space-y-[13px]">
-                  <div className="flex items-center gap-2 lg:gap-[5px]">
+                  <div className="flex items-center gap-2">
                     <input
                       type="checkbox"
                       id="privacy"
                       checked={formData.agreeToPrivacy}
                       onChange={handleCheckboxChange}
-                      className="w-3 h-3 lg:w-[12px] lg:h-[12px] rounded-[2px] border border-[#E6E5E5] bg-[#F4F4F4] checked:bg-[#C5A163] checked:border-[#C5A163] focus:ring-2 focus:ring-[#C5A163] transition-colors"
+                      className="shrink-0 w-3 h-3 lg:w-[12px] lg:h-[12px] rounded-[2px] border border-[#E6E5E5] bg-[#F4F4F4] checked:bg-[#C5A163] checked:border-[#C5A163] focus:ring-2 focus:ring-[#C5A163] transition-colors cursor-pointer"
                     />
                     <label
                       htmlFor="privacy"
-                      className="text-[#606060] text-xs lg:text-[12px] font-normal leading-[150%] font-manrope"
+                      className="text-[#606060] mt-4 text-xs lg:text-[12px] font-normal leading-none font-manrope cursor-pointer"
                     >
                       I agree to the privacy policy
                     </label>
@@ -158,10 +193,10 @@ export default function Contact() {
 
                   <button
                     type="submit"
-                    disabled={!formData.agreeToPrivacy}
+                    disabled={!formData.agreeToPrivacy || isSubmitting}
                     className="w-full py-3 lg:py-[10.5px] px-4 lg:px-[7px] rounded-[3.5px] bg-[#B3935A] hover:bg-[#C5A163] disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-xs sm:text-sm lg:text-[12.6px] font-bold leading-[150%] font-manrope transition-colors"
                   >
-                    Submit My Message
+                    {isSubmitting ? "Sending..." : "Submit My Message"}
                   </button>
                 </div>
               </form>
@@ -206,7 +241,7 @@ export default function Contact() {
                             Email
                           </h3>
                           <p className="text-black text-sm lg:text-[14.4px] font-medium leading-[150%] font-manrope">
-                            contact@liqnic.com
+                            liqnichost@gmail.com
                           </p>
                         </div>
                       </div>
@@ -235,7 +270,7 @@ export default function Contact() {
                             Phone
                           </h3>
                           <p className="text-black text-sm lg:text-[14.4px] font-medium leading-[150%] font-manrope">
-                            98605912345
+                            9802532700
                           </p>
                         </div>
                       </div>
@@ -304,6 +339,47 @@ export default function Contact() {
           </div>
         </div>
       </section>
+
+      {toast && (
+        <div
+          className={`fixed top-6 right-6 z-50 flex items-center gap-3 px-5 py-4 rounded-[8px] shadow-lg text-white text-sm font-medium font-manrope transition-all duration-300 ${
+            toast.type === "success" ? "bg-[#B3935A]" : "bg-red-500"
+          }`}
+        >
+          {toast.type === "success" ? (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-5 h-5 shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          ) : (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-5 h-5 shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          )}
+          {toast.message}
+        </div>
+      )}
     </div>
   )
 }

@@ -1,3 +1,5 @@
+import IllumaAd from "./illuma-ad"
+
 export default function IqosDeviceSection() {
   return (
     <section className="py-16 px-0 bg-white">
@@ -10,16 +12,9 @@ export default function IqosDeviceSection() {
 
         <div className="w-full component-px">
           <div className="relative aspect-video w-full rounded-xl overflow-hidden shadow-lg">
-            <iframe
-              width="100%"
-              height="100%"
-              src="https://www.youtube.com/embed/xqa2IUm5O-w?rel=0&modestbranding=1&controls=1"
-              title="IQOS Device Video"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerPolicy="strict-origin-when-cross-origin"
-              allowFullScreen
-              className="absolute inset-0"
+            <IllumaAd
+              src="https://res.cloudinary.com/dtc5wqlst/video/upload/v1778725728/iqos_iluma_ad_2_tb8hx0.mp4"
+              poster="/images/video-thumbnail.jpg" // optional
             />
           </div>
         </div>

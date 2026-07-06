@@ -1,162 +1,211 @@
 import React from "react"
 
-// Terms & Conditions Page Component
 export default function TermsAndConditions() {
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12 text-gray-800">
-      <h1 className="text-4xl font-bold mb-8 text-center border-b pb-4">
-        Terms & Conditions
-      </h1>
+    <div className="max-w-2xl mx-auto px-4 py-10 text-gray-800 font-sans">
+      <div className="border-b border-gray-300 pb-4 mb-6">
+        <p className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-1">
+          Terms & Conditions — Liqnic
+        </p>
+        <p className="text-xs text-gray-400">
+          Operated by Khirkhirya Enterprises Pvt. Ltd. · Effective immediately
+          upon posting · Governed by the laws of Nepal
+        </p>
+      </div>
 
-      <div className="space-y-6 leading-relaxed text-justify">
-        <section>
-          <h2 className="text-2xl font-semibold mb-2">1. Agreement to Terms</h2>
-          <p>
-            By using this website (the “Site”), operated by{" "}
-            <strong>Liqnic</strong>, you agree to be bound by these Terms &
-            Conditions. If you do not agree, you may not use the Site. We
-            reserve the right to update or modify these terms at any time
-            without prior notice. Please review these terms periodically.
-          </p>
-        </section>
+      <p className="text-xs leading-relaxed text-gray-600 mb-6">
+        By accessing this website and purchasing products, you agree to be bound
+        by the following terms. Please read them carefully before placing an
+        order.
+      </p>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-2">
-            2. Legal Age Requirement
-          </h2>
-          <p>
-            You must be of legal age in your jurisdiction to purchase alcohol,
-            cigarettes, or tobacco products. By placing an order, you confirm
-            you meet the required legal age, and we may request proof of age
-            (such as a government-issued ID) before fulfilling your order. If
-            you are unable to provide satisfactory proof of age, your order will
-            be canceled.
+      {[
+        {
+          title: "1. Age Verification & Legal Compliance",
+          content: (
+            <>
+              <p>
+                You represent that you are at least 18 years of age, the legal
+                age for purchasing e-cigarettes and alcohol/whiskey as defined
+                by the Government of Nepal.
+              </p>
+              <ul className="list-disc ml-4 mt-1 space-y-1">
+                <li>
+                  <strong>Verification:</strong> A valid government-issued ID
+                  (Citizenship, Passport, or License) may be required upon
+                  delivery. Failure to present ID will result in order
+                  cancellation without a refund of delivery fees.
+                </li>
+              </ul>
+            </>
+          ),
+        },
+        {
+          title: "2. Products and Pricing",
+          content: (
+            <ul className="list-disc ml-4 space-y-1">
+              <li>
+                <strong>Inventory:</strong> Product colors and images are
+                displayed as accurately as possible; exact monitor reproduction
+                cannot be guaranteed.
+              </li>
+              <li>
+                <strong>Pricing:</strong> All prices are in Nepalese Rupees
+                (NPR) and inclusive of applicable taxes unless stated otherwise.
+                Prices may change without prior notice.
+              </li>
+              <li>
+                <strong>Prohibitions:</strong> Products are for personal use
+                only. Reselling without a valid wholesale license is strictly
+                prohibited.
+              </li>
+            </ul>
+          ),
+        },
+        {
+          title: "3. No Refund and No Exchange Policy",
+          content: (
+            <>
+              <p>
+                Due to the consumable and sensitive nature of our products, we
+                maintain a{" "}
+                <strong>strict no-refund and no-exchange policy</strong>. All
+                purchases are final once dispatched or the seal is broken.
+              </p>
+              <ul className="list-disc ml-4 mt-1 space-y-1">
+                <li>
+                  <strong>Exception:</strong> Items physically damaged on
+                  arrival or incorrectly shipped. You must notify us within{" "}
+                  <strong>2 hours</strong> of delivery with photographic
+                  evidence.
+                </li>
+              </ul>
+            </>
+          ),
+        },
+        {
+          title: "4. Shipping and Delivery",
+          content: (
+            <ul className="list-disc ml-4 space-y-1">
+              <li>
+                <strong>Coverage:</strong> We deliver across Nepal.
+              </li>
+              <li>
+                <strong>Delays:</strong> We are not liable for delays caused by
+                roadblocks, bandhs, or extreme weather conditions.
+              </li>
+              <li>
+                <strong>Delivery Fees:</strong> Shipping costs are calculated at
+                checkout and are non-refundable.
+              </li>
+            </ul>
+          ),
+        },
+        {
+          title: "5. Order Cancellations",
+          content: (
+            <p>
+              Orders may be cancelled within <strong>12 hours</strong> of
+              placement, provided they have not been processed or dispatched.
+            </p>
+          ),
+        },
+        {
+          title: "6. Delivery Conditions",
+          content: (
+            <ul className="list-disc ml-4 space-y-1">
+              <li>
+                <strong>Proof of Identity:</strong> Goods will only be handed to
+                the person who placed the order and can verify their age.
+              </li>
+              <li>
+                <strong>Refusal of Service:</strong> We reserve the right to
+                refuse delivery if the recipient appears intoxicated or underage
+                at the point of delivery.
+              </li>
+            </ul>
+          ),
+        },
+        {
+          title: "7. Billing & Account Information",
+          content: (
+            <p>
+              You agree to provide accurate and complete account information.
+              Khirkhirya Enterprises Pvt. Ltd. is not responsible for delivery
+              failures due to incorrect addresses or contact numbers.
+            </p>
+          ),
+        },
+        {
+          title: "8. Health Warning & Liability",
+          content: (
+            <ul className="list-disc ml-4 space-y-1">
+              <li>
+                <strong>Health Risk:</strong> Consumption of alcohol and
+                tobacco/nicotine products is injurious to health. By purchasing,
+                you acknowledge the associated risks.
+              </li>
+              <li>
+                <strong>Limitation of Liability:</strong> Khirkhirya Enterprises
+                Pvt. Ltd. shall not be held liable for any health complications,
+                accidents, or misuse resulting from the use of products sold on
+                this site.
+              </li>
+            </ul>
+          ),
+        },
+        {
+          title: "9. Prohibited Uses",
+          content: (
+            <p>
+              You may not use this site for any unlawful purpose, to solicit
+              unlawful acts, or to violate any applicable Nepalese or
+              international regulations.
+            </p>
+          ),
+        },
+        {
+          title: "10. Compliance with Nepalese Law",
+          content: (
+            <ul className="list-disc ml-4 space-y-1">
+              <li>
+                <strong>Taxation:</strong> All prices include applicable VAT and
+                Excise Duty as mandated by the Government of Nepal.
+              </li>
+              <li>
+                <strong>Restricted Areas:</strong> We do not ship to areas where
+                the sale of alcohol or nicotine products is restricted by local
+                municipality bylaws.
+              </li>
+            </ul>
+          ),
+        },
+        {
+          title: "11. Changes to Terms",
+          content: (
+            <p>
+              We reserve the right to update these Terms at any time. Amendments
+              take effect immediately upon posting. Continued use of the website
+              constitutes acceptance of any changes.
+            </p>
+          ),
+        },
+      ].map(({ title, content }) => (
+        <div key={title} className="mb-5">
+          <p className="text-xs font-medium uppercase tracking-widest text-gray-600 border-b border-gray-200 pb-1 mb-2">
+            {title}
           </p>
-        </section>
+          <div className="text-xs leading-relaxed text-gray-600 space-y-1">
+            {content}
+          </div>
+        </div>
+      ))}
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-2">
-            3. Product Information & Pricing
-          </h2>
-          <p>
-            While we aim for accuracy, product descriptions, images, and prices
-            may contain errors. We reserve the right to correct any pricing
-            errors or inaccuracies at our discretion. Prices are subject to
-            change without notice, and all orders depend on stock availability
-            at the time of purchase.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold mb-2">4. Orders & Payments</h2>
-          <p>
-            Orders are confirmed once payment has been processed. It is your
-            responsibility to provide accurate shipping and billing details. We
-            accept payments through the following methods:
-          </p>
-          <ul className="list-disc ml-6 mt-2">
-            <li>
-              <strong>Cash on Delivery (COD)</strong> – Pay in cash at the time
-              of delivery.
-            </li>
-            <li>
-              <strong>Banking Services</strong> – Payments via bank transfer or
-              other banking methods.
-            </li>
-            <li>
-              <strong>Credit/Debit Cards</strong> – Payments via major credit or
-              debit cards, including <strong>Visa</strong>,{" "}
-              <strong>MasterCard</strong>, and <strong>American Express</strong>
-              .
-            </li>
-            <li>
-              <strong>Digital Wallets</strong> – Pay via digital wallets like{" "}
-              <strong>PayPal</strong>, <strong>Google Pay</strong>, or{" "}
-              <strong>Apple Pay</strong>.
-            </li>
-            <li>
-              <strong>Mobile Payments</strong> – Payments through mobile apps
-              like <strong>Khalti</strong> or <strong>eSewa</strong>.
-            </li>
-          </ul>
-          <p className="mt-2">
-            If your payment method is declined, we may cancel your order or
-            request alternative payment details.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold mb-2">
-            5. Shipping & Delivery
-          </h2>
-          <p>
-            Delivery is only available where permitted by law. Risk of loss or
-            damage passes to you once the order has been handed to the carrier.
-            Delivery timelines are estimates and may vary depending on carrier
-            availability, weather, or other factors beyond our control. We will
-            not be responsible for delays caused by such factors.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold mb-2">6. Returns & Refunds</h2>
-          <p>
-            Due to legal restrictions, returns are limited. If you receive a
-            damaged or incorrect order, you must report the issue within 3 days
-            of delivery. We will process refunds or replacements in accordance
-            with our Return & Refund Policy, subject to eligibility under our
-            guidelines. All alcohol sales are final and cannot be returned or
-            exchanged once the order has been completed.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold mb-2">
-            7. Limitation of Liability
-          </h2>
-          <p>
-            We are not liable for indirect, incidental, or consequential damages
-            related to your use of the Site or products purchased. Our total
-            liability, under any circumstances, will not exceed the amount paid
-            for your order. This includes any liability for errors,
-            interruptions, or delays in service.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold mb-2">8. Governing Law</h2>
-          <p>
-            These Terms & Conditions are governed by the laws of{" "}
-            <strong>Nepal</strong>. Any disputes arising from or related to
-            these Terms will be resolved exclusively in the courts of{" "}
-            <strong>Nepal</strong>. By using this Site, you consent to the
-            jurisdiction and venue of such courts.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold mb-2">
-            9. Changes to Terms & Conditions
-          </h2>
-          <p>
-            We reserve the right to update or modify these Terms & Conditions at
-            any time. When we make material changes to the Terms, we will post
-            the updated version on this page with an updated effective date.
-            Your continued use of the Site after such changes constitutes your
-            acceptance of the new Terms.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold mb-2">
-            10. Contact Information
-          </h2>
-          <p>
-            If you have any questions or concerns regarding these Terms &
-            Conditions, please contact us at <strong>support@liqnic.com</strong>{" "}
-            or via our contact form.
-          </p>
-        </section>
+      <div className="border-t border-gray-200 mt-6 pt-4">
+        <p className="text-xs text-gray-400">
+          For queries, contact us before placing your order. · Khirkhirya
+          Enterprises Pvt. Ltd. reserves all rights under applicable law.
+        </p>
       </div>
     </div>
   )

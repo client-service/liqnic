@@ -1,4 +1,6 @@
-export const printPosReceipt = (order: any) => {
+import { HttpTypes } from "@medusajs/types"
+
+export const printPosReceipt = (order: HttpTypes.AdminOrder) => {
   const printWindow = window.open('', '_blank');
   if (!printWindow) return;
 

@@ -1,12 +1,11 @@
 "use client"
 
-import { Button, Heading } from "@medusajs/ui"
+import { Heading } from "@medusajs/ui"
 
-import CartTotals from "@modules/common/components/cart-totals"
-import Divider from "@modules/common/components/divider"
-import DiscountCode from "@modules/checkout/components/discount-code"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { HttpTypes } from "@medusajs/types"
+import DiscountCode from "@modules/checkout/components/discount-code"
+import CartTotals from "@modules/common/components/cart-totals"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 type SummaryProps = {
   cart: HttpTypes.StoreCart & {
@@ -44,7 +43,7 @@ const Summary = ({ cart }: SummaryProps) => {
           data-testid="checkout-button"
           className="w-full"
         >
-          <button className="w-full py-3 px-4 bg-primary text-white text-sm font-medium rounded hover:bg-brand-primary transition-colors">
+          <button className="w-full py-3 px-4 bg-primary hover:bg-primary/80 transition-all duration-300 text-white text-sm font-medium rounded hover:bg-brand-primary ">
             Go to Checkout
           </button>
         </LocalizedClientLink>

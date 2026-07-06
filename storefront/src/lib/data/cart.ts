@@ -33,6 +33,7 @@ export async function retrieveCart(cartId?: string) {
 
   const next = {
     ...(await getCacheOptions("carts")),
+    revalidate: 60,
   }
 
   return await sdk.client
@@ -111,6 +112,7 @@ export async function updateCart(data: HttpTypes.StoreUpdateCart) {
     .catch(medusaError)
 }
 
+// Replace your existing addToCart function with this optimized version
 export async function addToCart({
   variantId,
   quantity,
@@ -124,19 +126,29 @@ export async function addToCart({
     throw new Error("Missing variant ID when adding to cart")
   }
 
-  const cart = await getOrSetCart(countryCode)
+  // OPTIMIZATION 1: Instantly read the cookie. (0ms)
+  let cartId = await getCartId()
+  const headers = { ...(await getAuthHeaders()) }
 
-  if (!cart) {
-    throw new Error("Error retrieving or creating cart")
+  // OPTIMIZATION 2: Only do a database fetch if the user is completely new (no cart cookie)
+  if (!cartId) {
+    const region = await getRegion(countryCode)
+    if (!region) throw new Error("Region not found")
+
+    const cartResp = await sdk.store.cart.create(
+      { region_id: region.id },
+      {},
+      headers
+    )
+    cartId = cartResp.cart.id
+    await setCartId(cartId)
   }
 
-  const headers = {
-    ...(await getAuthHeaders()),
-  }
-
+  // OPTIMIZATION 3: Add the item directly using the ID!
+  // We completely skip the heavy retrieveCart() database JOIN query.
   await sdk.store.cart
     .createLineItem(
-      cart.id,
+      cartId,
       {
         variant_id: variantId,
         quantity,
@@ -145,6 +157,7 @@ export async function addToCart({
       headers
     )
     .then(async () => {
+      // Trigger the Next.js UI update
       const cartCacheTag = await getCacheTag("carts")
       revalidateTag(cartCacheTag)
 
@@ -341,46 +354,49 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
       throw new Error("No existing cart found when setting addresses")
     }
 
+    const sanitize = (val: FormDataEntryValue | null): string =>
+      (val as string) || ""
+
     const data = {
       shipping_address: {
-        first_name: formData.get("shipping_address.first_name"),
-        last_name: formData.get("shipping_address.last_name"),
-        address_1: formData.get("shipping_address.address_1"),
+        first_name: sanitize(formData.get("shipping_address.first_name")),
+        last_name: sanitize(formData.get("shipping_address.last_name")),
+        address_1: sanitize(formData.get("shipping_address.address_1")),
         address_2: "",
-        company: formData.get("shipping_address.company"),
-        postal_code: formData.get("shipping_address.postal_code"),
-        city: formData.get("shipping_address.city"),
-        country_code: formData.get("shipping_address.country_code"),
-        province: formData.get("shipping_address.province"),
-        phone: formData.get("shipping_address.phone"),
+        company: "",
+        postal_code: sanitize(formData.get("shipping_address.postal_code")),
+        city: sanitize(formData.get("shipping_address.city")),
+        country_code: "np",
+        province: "",
+        phone: sanitize(formData.get("shipping_address.phone")),
       },
-      email: formData.get("email"),
+      email: sanitize(formData.get("email")),
     } as any
 
     const sameAsBilling = formData.get("same_as_billing")
-    if (sameAsBilling === "on") data.billing_address = data.shipping_address
-
-    if (sameAsBilling !== "on")
+    if (sameAsBilling === "on") {
+      data.billing_address = data.shipping_address
+    } else {
       data.billing_address = {
-        first_name: formData.get("billing_address.first_name"),
-        last_name: formData.get("billing_address.last_name"),
-        address_1: formData.get("billing_address.address_1"),
+        first_name: sanitize(formData.get("billing_address.first_name")),
+        last_name: sanitize(formData.get("billing_address.last_name")),
+        address_1: sanitize(formData.get("billing_address.address_1")),
         address_2: "",
-        company: formData.get("billing_address.company"),
-        postal_code: formData.get("billing_address.postal_code"),
-        city: formData.get("billing_address.city"),
-        country_code: formData.get("billing_address.country_code"),
-        province: formData.get("billing_address.province"),
-        phone: formData.get("billing_address.phone"),
+        company: "",
+        postal_code: sanitize(formData.get("billing_address.postal_code")),
+        city: sanitize(formData.get("billing_address.city")),
+        country_code: "np",
+        province: "",
+        phone: sanitize(formData.get("billing_address.phone")),
       }
+    }
+
     await updateCart(data)
   } catch (e: any) {
     return e.message
   }
 
-  redirect(
-    `/${formData.get("shipping_address.country_code")}/checkout?step=delivery`
-  )
+  redirect(`/np/checkout?step=delivery`)
 }
 
 /**
@@ -457,6 +473,7 @@ export async function listCartOptions() {
   }
   const next = {
     ...(await getCacheOptions("shippingOptions")),
+    revalidate: 60,
   }
 
   return await sdk.client.fetch<{

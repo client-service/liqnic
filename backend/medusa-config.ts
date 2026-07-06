@@ -4,8 +4,31 @@ import {
   Modules,
   ContainerRegistrationKeys,
 } from "@medusajs/framework/utils";
+import * as fs from "fs";
+import * as path from "path";
 
-loadEnv(process.env.APP_ENV || process.env.NODE_ENV || "development", process.cwd());
+const appEnv = process.env.APP_ENV || process.env.NODE_ENV || "development";
+
+// Medusa's loadEnv only handles "staging", "production", "test" specially.
+// For custom environments (e.g. "dev", "local"), pre-populate process.env from
+// .env.{appEnv} before calling loadEnv so the base .env provides defaults only.
+const MEDUSA_KNOWN_ENVS = ["staging", "production", "test"];
+if (!MEDUSA_KNOWN_ENVS.includes(appEnv)) {
+  const envFile = path.join(process.cwd(), `.env.${appEnv}`);
+  if (fs.existsSync(envFile)) {
+    for (const line of fs.readFileSync(envFile, "utf8").split("\n")) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("#")) continue;
+      const eq = trimmed.indexOf("=");
+      if (eq < 0) continue;
+      const key = trimmed.slice(0, eq).trim();
+      const val = trimmed.slice(eq + 1).trim().replace(/^["']|["']$/g, "");
+      if (!(key in process.env)) process.env[key] = val;
+    }
+  }
+}
+
+loadEnv(appEnv, process.cwd());
 
 module.exports = defineConfig({
   admin: {

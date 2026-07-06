@@ -16,6 +16,7 @@ export async function buildMenuItems(): Promise<MenuItem[]> {
 
       return {
         label: parent.name,
+        href: parent.handle,
         dropdown: subcategories.length > 0,
         children: subcategories.map((sub: any) => ({
           label: sub.name,
@@ -26,11 +27,11 @@ export async function buildMenuItems(): Promise<MenuItem[]> {
   )
 
   return [
-    { label: "Home", href: "/" },
-    { label: "Shop", href: "/shop" },
+    // { label: "Home", href: "/" }, 
+    { label: "All Products", href: "/shop" },
     ...menuItems,
-    { label: "Bundles & Gifts", href: "/bundles" },
-    { label: "About", href: "/about" },
+    // { label: "Bundles & Gifts", href: "/bundles" },
+    // { label: "About us", href: "/about" }, 
     { label: "Contact", href: "/contact" },
   ]
 }

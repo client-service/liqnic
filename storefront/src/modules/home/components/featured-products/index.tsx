@@ -23,9 +23,5 @@ export default async function FeaturedProducts({
 }: {
   region: HttpTypes.StoreRegion
 }) {
-  return (
-    <li>
-      <ProductRail region={region} limit={8} />
-    </li>
-  )
+  return <ProductRail region={region} limit={8} />
 }

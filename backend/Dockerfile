@@ -20,3 +20,5 @@ COPY backend/ ./backend/
 EXPOSE 9000
 
 RUN pnpm --filter=backend run build
+
+CMD ["pnpm", "--filter=backend", "start"]

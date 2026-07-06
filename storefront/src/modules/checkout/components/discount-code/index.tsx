@@ -1,6 +1,6 @@
 "use client"
 
-import { Badge, Heading, Input, Label, Text } from "@medusajs/ui"
+import { Badge, Heading, Text } from "@medusajs/ui"
 import React from "react"
 
 import { applyPromotions } from "@lib/data/cart"
@@ -21,13 +21,14 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
   const [errorMessage, setErrorMessage] = React.useState("")
 
   const { promotions = [] } = cart
+
   const removePromotionCode = async (code: string) => {
     const validPromotions = promotions.filter(
       (promotion) => promotion.code !== code
     )
 
     await applyPromotions(
-      validPromotions.filter((p) => p.code === undefined).map((p) => p.code!)
+      validPromotions.filter((p) => p.code !== undefined).map((p) => p.code!)
     )
   }
 
@@ -38,16 +39,31 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
     if (!code) {
       return
     }
+
     const input = document.getElementById("promotion-input") as HTMLInputElement
     const codes = promotions
-      .filter((p) => p.code === undefined)
+      .filter((p) => p.code !== undefined)
       .map((p) => p.code!)
     codes.push(code.toString())
 
     try {
       await applyPromotions(codes)
     } catch (e: any) {
-      setErrorMessage(e.message)
+      const raw = e?.message?.toLowerCase() || ""
+
+      if (raw.includes("not found") || raw.includes("invalid")) {
+        setErrorMessage("Invalid promo code. Please check and try again.")
+      } else if (raw.includes("expired")) {
+        setErrorMessage("This promo code has expired.")
+      } else if (raw.includes("already") || raw.includes("duplicate")) {
+        setErrorMessage("This promo code has already been applied.")
+      } else if (raw.includes("minimum") || raw.includes("requirement")) {
+        setErrorMessage(
+          "Your cart doesn't meet the minimum requirement for this code."
+        )
+      } else {
+        setErrorMessage("Unable to apply promo code. Please try again.")
+      }
     }
 
     if (input) {
@@ -59,36 +75,8 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
     <div className="w-full bg-white flex flex-col">
       <div className="txt-medium">
         <form action={(a) => addPromotionCode(a)} className="w-full mb-2">
-          {/* <Label className="flex gap-x-1 my-2 items-center">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              type="button"
-              className="txt-medium text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
-              data-testid="add-discount-button"
-            >
-              Add Promotion Code(s)
-            </button> */}
-
-          {/* <Tooltip content="You can add multiple promotion codes">
-              <InformationCircleSolid color="var(--fg-muted)" />
-            </Tooltip> */}
-          {/* </Label> */}
-
           {isOpen && (
             <>
-              <div className="flex items-center gap-4">
-                <div className="flex-1 relative">
-                  {/* <Input
-                  className="size-full"
-                  id="promotion-input"
-                  name="code"
-                  type="text"
-                  autoFocus={false}
-                  data-testid="discount-input"
-                /> */}
-                </div>
-              </div>
-
               <div className="flex items-center border border-[#E4E4E4] rounded-md bg-white">
                 <input
                   type="text"
@@ -155,11 +143,6 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                             </>
                           )}
                         )
-                        {/* {promotion.is_automatic && (
-                          <Tooltip content="This promotion is automatically applied">
-                            <InformationCircleSolid className="inline text-zinc-400" />
-                          </Tooltip>
-                        )} */}
                       </span>
                     </Text>
                     {!promotion.is_automatic && (
@@ -169,7 +152,6 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                           if (!promotion.code) {
                             return
                           }
-
                           removePromotionCode(promotion.code)
                         }}
                         data-testid="remove-discount-button"

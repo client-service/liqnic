@@ -119,8 +119,12 @@ const Payment = ({
             }
           )}
         >
-          Payment
-          {!isOpen && paymentReady && <CheckCircleSolid />}
+          <h2 className="flex items-center gap-2 text-lg sm:text-xl font-semibold text-gray-900">
+            Payment
+          </h2>
+          {!isOpen && (cart.shipping_methods?.length ?? 0) > 0 && (
+            <CheckCircleSolid className="text-[#C5A163]" />
+          )}
         </Heading>
         {!isOpen && paymentReady && (
           <Text>

@@ -12,13 +12,13 @@ export default function IllumaProducts() {
               <div className="flex flex-col items-start gap-3 sm:gap-4">
                 <div className="flex flex-col items-start gap-1">
                   <h3 className="text-gray-900 text-xl sm:text-2xl font-bold leading-tight font-sans">
-                    IQOS Illuma
+                    IQOS Illuma i one
                   </h3>
                   <p className="text-gray-600 text-sm sm:text-base lg:text-lg  leading-relaxed font-sans">
                     Nationwide, anytime you need.
                   </p>
                 </div>
-                <Link href="/products/iqos-prime-mid-moss-green">
+                <Link href="/products/iqos-leafy-green">
                   <button className="inline-flex py-2 px-4 sm:px-5 justify-center items-center rounded-md bg-[#5BE419] hover:bg-green-600 active:bg-green-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
                     <span className="text-white text-sm sm:text-base lg:text-lg  font-sans">
                       Buy now
@@ -32,7 +32,7 @@ export default function IllumaProducts() {
                 width={250}
                 height={500}
                 quality={100}
-                src="/images/illuma.png"
+                src="/images/illuma-green-leafy.png"
                 alt="IQOS Illuma Device"
                 className="md:-mr-20 -mt-8 md:-mt-16  w-32 h-48 md:w-auto md:h-auto"
               />
