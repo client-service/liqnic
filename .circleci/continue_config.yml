@@ -229,10 +229,12 @@ jobs:
             ENV_TAG=$([ "$CIRCLE_BRANCH" = "production" ] && echo "prod" || echo "dev")
             UNIQUE_TAG="$ENV_TAG-${CIRCLE_SHA1:0:7}"
 
-            # Inject build-time environment variables for Docker Next.js build
-            echo "MEDUSA_BACKEND_URL=${MEDUSA_BACKEND_URL}" > storefront/.env
-            echo "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=${NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY}" >> storefront/.env
-            echo "NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}" >> storefront/.env
+            # Inject build-time environment variables for Docker Next.js build.
+            # Written to repo root (not storefront/.env) — storefront/Dockerfile:21 does
+            # `COPY .env ./storefront/.env` from the build context root.
+            echo "MEDUSA_BACKEND_URL=${MEDUSA_BACKEND_URL}" > .env
+            echo "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=${NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY}" >> .env
+            echo "NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}" >> .env
 
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
