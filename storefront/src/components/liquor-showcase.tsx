@@ -24,7 +24,7 @@ export default function LiquorShowcase() {
             </h2>
 
             <p className="w-full text-[#606060] text-base sm:text-lg lg:text-[18px] font-medium leading-relaxed lg:leading-[35px] font-manrope">
-              xplore our collection of fine spirits and liquors, carefully
+              Explore our collection of fine spirits and liquors, carefully
               curated for quality and taste. From smooth whiskey to refined
               vodka, enjoy premium beverages delivered straight to your door.
               Perfect for any occasion.

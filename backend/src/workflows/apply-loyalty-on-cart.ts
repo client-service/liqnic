@@ -107,7 +107,7 @@ export const applyLoyaltyOnCartWorkflow = createWorkflow(
             promoToCreate,
         ] as CreatePromotionDTO[])
 
-        const { metadata, ...updatePromoData } = transform({
+        const fullUpdateData = transform({
             carts,
             promoToCreate,
             loyaltyPromo,
@@ -127,6 +127,14 @@ export const applyLoyaltyOnCartWorkflow = createWorkflow(
             }
         })
 
+        const updatePromoData = transform(fullUpdateData, (d) => ({
+            cart_id: d.cart_id,
+            promo_codes: d.promo_codes,
+            action: d.action,
+        }))
+
+        const cartMetadata = transform(fullUpdateData, (d) => d.metadata)
+
         updateCartPromotionsWorkflow.runAsStep({
             input: updatePromoData,
         })
@@ -134,7 +142,7 @@ export const applyLoyaltyOnCartWorkflow = createWorkflow(
         updateCartsStep([
             {
                 id: input.cart_id,
-                metadata,
+                metadata: cartMetadata,
             },
         ])
 

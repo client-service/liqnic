@@ -1,11 +1,11 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
 import EventModuleService from "../../../../../services/event.service";
-import { z } from "zod";
+import { z } from "@medusajs/framework/zod";
 
 // Zod schema for validating a new subscriber
 const SubscribeEventSchema = z.object({
   name: z.string().min(1),
-  email: z.string().email(),
+  email: z.email(),
 });
 
 /**

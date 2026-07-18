@@ -1,5 +1,5 @@
-import { 
-  createWorkflow, 
+import {
+  createWorkflow,
   WorkflowResponse,
 } from "@medusajs/framework/workflows-sdk"
 import { useQueryGraphStep } from "@medusajs/medusa/core-flows"
@@ -19,19 +19,31 @@ export const sendOrderConfirmationWorkflow = createWorkflow(
         "display_id",
         "email",
         "currency_code",
+        "created_at",
+        "payment_status",
         "total",
+        "subtotal",
         "item_total",
         "tax_total",
-        // Only fetch the specific names needed for the email greeting
+        "shipping_total",
+        "discount_total",
+        "summary.*",
+        "payment_collections.*",
+        "payment_collections.payments.*",
         "customer.first_name",
         "shipping_address.first_name",
-        // Prune Items
+        "shipping_address.last_name",
+        "shipping_address.address_1",
+        "shipping_address.city",
+        "shipping_address.province",
+        "shipping_address.postal_code",
+        "shipping_address.phone",
         "items.id",
+        "items.quantity",
         "items.thumbnail",
         "items.product_title",
         "items.variant_title",
         "items.total",
-        // Prune Shipping Methods
         "shipping_methods.id",
         "shipping_methods.name",
         "shipping_methods.total",
@@ -40,16 +52,19 @@ export const sendOrderConfirmationWorkflow = createWorkflow(
         id,
       },
     })
-    
-    const notification = sendNotificationStep([{
-      to: orders[0].email!,
-      channel: "email",
-      template: "order-placed",
-      data: {
-        order: orders[0],
-      },
-    }])
 
-    return new WorkflowResponse(notification)
+    const recipients = ["liqnicinfo@gmail.com", "liqnichost@gmail.com"];
+    const notifications = sendNotificationStep(
+      recipients.map((recipient) => ({
+        to: recipient,
+        channel: "email",
+        template: "admin-order-alert",
+        data: {
+          order: orders[0],
+        },
+      }))
+    )
+
+    return new WorkflowResponse(notifications)
   }
 )

@@ -17,9 +17,9 @@ export const handleOrderPointsWorkflow = createWorkflow(
     const { data: orders } = useQueryGraphStep({
       entity: "order",
       fields: [
-        "id", 
-        "total", 
-        "customer.id", 
+        "id",
+        "total",
+        "customer.id",
         "cart.id",
         "cart.metadata",
         "cart.promotions.id",
@@ -44,34 +44,34 @@ export const handleOrderPointsWorkflow = createWorkflow(
       cart: orders[0].cart as unknown as CartData,
     })
 
-    when(orders, (orders) => 
-      orderHasLoyaltyPromotion(orders[0] as unknown as OrderData) && 
+    when(orders, (orders) =>
+      orderHasLoyaltyPromotion(orders[0] as unknown as OrderData) &&
       loyaltyPointsPromotion !== undefined
     )
-    .then(() => {
-      deductPurchasePointsStep({
-        customer_id: orders[0].customer!.id,
-        amount: loyaltyPointsPromotion.application_method!.value as number,
-      })
+      .then(() => {
+        deductPurchasePointsStep({
+          customer_id: orders[0].customer!.id,
+          amount: loyaltyPointsPromotion.application_method!.value as number,
+        })
 
-      updatePromotionsStep([
-        {
-          id: loyaltyPointsPromotion.id,
-          status: "inactive",
-        },
-      ])
-    })
+        updatePromotionsStep([
+          {
+            id: loyaltyPointsPromotion.id,
+            status: "inactive",
+          },
+        ])
+      })
 
 
     when(
-      orders, 
+      orders,
       (order) => !orderHasLoyaltyPromotion(order[0] as unknown as OrderData)
     )
-    .then(() => {
-      addPurchaseAsPointsStep({
-        customer_id: orders[0].customer!.id,
-        amount: orders[0].total,
+      .then(() => {
+        addPurchaseAsPointsStep({
+          customer_id: orders[0].customer!.id,
+          amount: orders[0].total,
+        })
       })
-    })
   }
 )

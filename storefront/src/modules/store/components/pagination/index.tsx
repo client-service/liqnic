@@ -1,114 +1,187 @@
 "use client"
 
-import { clx } from "@medusajs/ui"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { useTransition } from "react"
+import { LuChevronLeft, LuChevronRight } from "react-icons/lu"
 
 export function Pagination({
   page,
   totalPages,
-  'data-testid': dataTestid
+  "data-testid": dataTestid,
 }: {
   page: number
   totalPages: number
-  'data-testid'?: string
+  "data-testid"?: string
 }) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const [isPending, startTransition] = useTransition()
 
-  // Helper function to generate an array of numbers within a range
-  const arrayRange = (start: number, stop: number) =>
-    Array.from({ length: stop - start + 1 }, (_, index) => start + index)
+  if (totalPages <= 1) return null
 
-  // Function to handle page changes
   const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams)
+    if (newPage < 1 || newPage > totalPages) return
+    const params = new URLSearchParams(searchParams.toString())
     params.set("page", newPage.toString())
-    router.push(`${pathname}?${params.toString()}`)
+    startTransition(() => {
+      router.push(`${pathname}?${params.toString()}`)
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    })
   }
 
-  // Function to render a page button
-  const renderPageButton = (
-    p: number,
-    label: string | number,
-    isCurrent: boolean
-  ) => (
+  const arrayRange = (start: number, stop: number) =>
+    Array.from({ length: stop - start + 1 }, (_, i) => start + i)
+
+  const PageButton = ({ p, isCurrent }: { p: number; isCurrent: boolean }) => (
     <button
-      key={p}
-      className={clx("txt-xlarge-plus text-ui-fg-muted", {
-        "text-ui-fg-base hover:text-ui-fg-subtle": isCurrent,
-      })}
-      disabled={isCurrent}
       onClick={() => handlePageChange(p)}
+      disabled={isCurrent || isPending}
+      aria-label={`Page ${p}`}
+      aria-current={isCurrent ? "page" : undefined}
+      className={`
+        w-8 h-8 sm:w-9 sm:h-9 flex-shrink-0
+        flex items-center justify-center
+        rounded-lg text-xs sm:text-sm font-medium
+        transition-all duration-150
+        ${
+          isCurrent
+            ? "bg-[#C5A163] text-white shadow-sm cursor-default"
+            : isPending
+            ? "text-gray-300 cursor-not-allowed"
+            : "text-gray-600 hover:bg-gray-100 active:scale-95"
+        }
+      `}
     >
-      {label}
+      {p}
     </button>
   )
 
-  // Function to render ellipsis
-  const renderEllipsis = (key: string) => (
+  const Ellipsis = ({ id }: { id: string }) => (
     <span
-      key={key}
-      className="txt-xlarge-plus text-ui-fg-muted items-center cursor-default"
+      key={id}
+      className="w-5 sm:w-6 flex items-center justify-center text-gray-400 text-sm select-none flex-shrink-0"
     >
-      ...
+      ···
     </span>
   )
 
-  // Function to render page buttons based on the current page and total pages
-  const renderPageButtons = () => {
-    const buttons = []
+  const renderPageButtons = (compact: boolean) => {
+    const delta = compact ? 0 : 1
+    const btns: React.ReactNode[] = []
+    const threshold = compact ? 5 : 7
 
-    if (totalPages <= 7) {
-      // Show all pages
-      buttons.push(
-        ...arrayRange(1, totalPages).map((p) =>
-          renderPageButton(p, p, p === page)
-        )
+    if (totalPages <= threshold) {
+      arrayRange(1, totalPages).forEach((p) =>
+        btns.push(<PageButton key={p} p={p} isCurrent={p === page} />)
+      )
+    } else if (page <= 2 + delta) {
+      arrayRange(1, 3 + delta).forEach((p) =>
+        btns.push(<PageButton key={p} p={p} isCurrent={p === page} />)
+      )
+      btns.push(<Ellipsis key="e1" id="e1" />)
+      btns.push(
+        <PageButton
+          key={totalPages}
+          p={totalPages}
+          isCurrent={totalPages === page}
+        />
+      )
+    } else if (page >= totalPages - 1 - delta) {
+      btns.push(<PageButton key={1} p={1} isCurrent={page === 1} />)
+      btns.push(<Ellipsis key="e2" id="e2" />)
+      arrayRange(totalPages - 2 - delta, totalPages).forEach((p) =>
+        btns.push(<PageButton key={p} p={p} isCurrent={p === page} />)
       )
     } else {
-      // Handle different cases for displaying pages and ellipses
-      if (page <= 4) {
-        // Show 1, 2, 3, 4, 5, ..., lastpage
-        buttons.push(
-          ...arrayRange(1, 5).map((p) => renderPageButton(p, p, p === page))
-        )
-        buttons.push(renderEllipsis("ellipsis1"))
-        buttons.push(
-          renderPageButton(totalPages, totalPages, totalPages === page)
-        )
-      } else if (page >= totalPages - 3) {
-        // Show 1, ..., lastpage - 4, lastpage - 3, lastpage - 2, lastpage - 1, lastpage
-        buttons.push(renderPageButton(1, 1, 1 === page))
-        buttons.push(renderEllipsis("ellipsis2"))
-        buttons.push(
-          ...arrayRange(totalPages - 4, totalPages).map((p) =>
-            renderPageButton(p, p, p === page)
-          )
-        )
-      } else {
-        // Show 1, ..., page - 1, page, page + 1, ..., lastpage
-        buttons.push(renderPageButton(1, 1, 1 === page))
-        buttons.push(renderEllipsis("ellipsis3"))
-        buttons.push(
-          ...arrayRange(page - 1, page + 1).map((p) =>
-            renderPageButton(p, p, p === page)
-          )
-        )
-        buttons.push(renderEllipsis("ellipsis4"))
-        buttons.push(
-          renderPageButton(totalPages, totalPages, totalPages === page)
-        )
-      }
+      btns.push(<PageButton key={1} p={1} isCurrent={page === 1} />)
+      btns.push(<Ellipsis key="e3" id="e3" />)
+      arrayRange(page - delta, page + delta).forEach((p) =>
+        btns.push(<PageButton key={p} p={p} isCurrent={p === page} />)
+      )
+      btns.push(<Ellipsis key="e4" id="e4" />)
+      btns.push(
+        <PageButton
+          key={totalPages}
+          p={totalPages}
+          isCurrent={totalPages === page}
+        />
+      )
     }
-
-    return buttons
+    return btns
   }
 
-  // Render the component
+  const NavButton = ({
+    onClick,
+    disabled,
+    label,
+    children,
+  }: {
+    onClick: () => void
+    disabled: boolean
+    label: string
+    children: React.ReactNode
+  }) => (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={label}
+      className={`w-8 h-8 sm:w-9 sm:h-9 flex-shrink-0 flex items-center justify-center rounded-lg border text-sm transition-all duration-150
+        ${
+          disabled
+            ? "border-gray-100 text-gray-300 cursor-not-allowed"
+            : "border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300 active:scale-95"
+        }`}
+    >
+      {children}
+    </button>
+  )
+
   return (
-    <div className="flex justify-center w-full mt-12">
-      <div className="flex gap-3 items-end" data-testid={dataTestid}>{renderPageButtons()}</div>
-    </div>
+    <nav
+      aria-label="Pagination"
+      className="flex flex-col items-center gap-2 w-full mt-10 sm:mt-14"
+      data-testid={dataTestid}
+    >
+      {/* Progress bar — visible instantly on click */}
+      <div className="w-full h-0.5 rounded-full bg-gray-100 overflow-hidden mb-1">
+        <div
+          className={`h-full bg-[#C5A163] transition-all duration-300 ${
+            isPending ? "w-3/4 animate-pulse" : "w-0"
+          }`}
+        />
+      </div>
+
+      <div
+        className={`flex items-center gap-1 transition-opacity duration-200 ${
+          isPending ? "opacity-50" : "opacity-100"
+        }`}
+      >
+        <NavButton
+          onClick={() => handlePageChange(page - 1)}
+          disabled={page <= 1 || isPending}
+          label="Previous page"
+        >
+          <LuChevronLeft size={15} />
+        </NavButton>
+        <div className="flex sm:hidden items-center gap-1">
+          {renderPageButtons(true)}
+        </div>
+        <div className="hidden sm:flex items-center gap-1">
+          {renderPageButtons(false)}
+        </div>
+        <NavButton
+          onClick={() => handlePageChange(page + 1)}
+          disabled={page >= totalPages || isPending}
+          label="Next page"
+        >
+          <LuChevronRight size={15} />
+        </NavButton>
+      </div>
+
+      <p className="text-xs text-gray-400">
+        {isPending ? "Loading..." : `Page ${page} of ${totalPages}`}
+      </p>
+    </nav>
   )
 }

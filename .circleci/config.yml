@@ -16,9 +16,9 @@ workflows:
             backend/.* run-backend-pipeline true
             dashboard/.* run-dashboard-pipeline true
             storefront/.* run-storefront-pipeline true
-            yarn.lock run-backend-pipeline true
-            yarn.lock run-dashboard-pipeline true
-            yarn.lock run-storefront-pipeline true
+            pnpm-lock.yaml run-backend-pipeline true
+            pnpm-lock.yaml run-dashboard-pipeline true
+            pnpm-lock.yaml run-storefront-pipeline true
           # Compare against the previous commit, not 'main'
           base-revision: << pipeline.git.base_revision >>
           # This line tells CircleCI to hand off execution to your heavy lifter

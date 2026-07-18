@@ -72,7 +72,7 @@ export default function CategoryTemplate({
         )}
 
         {/* Child Categories */}
-        {category.category_children &&
+        {/* {category.category_children &&
           category.category_children.length > 0 && (
             <div className="mb-8">
               <h3 className="font-semibold mb-2">Subcategories</h3>
@@ -81,7 +81,7 @@ export default function CategoryTemplate({
                   <li key={c.id}>
                     <Link
                       href={`/categories/${c.handle}`}
-                      className="px-3 py-1 bg-gray-100 rounded-full hover:bg-gray-200 transition"
+                      className="px-3 py-1 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
                     >
                       {c.name}
                     </Link>
@@ -89,7 +89,7 @@ export default function CategoryTemplate({
                 ))}
               </ul>
             </div>
-          )}
+          )} */}
 
         {/* Products */}
         <Suspense

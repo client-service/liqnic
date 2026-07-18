@@ -1,11 +1,12 @@
 import { Metadata } from "next"
-import { notFound } from "next/navigation"
 
 import { getCategoryByHandle, listCategories } from "@lib/data/categories"
 import { listRegions } from "@lib/data/regions"
 import { StoreRegion } from "@medusajs/types"
 import CategoryTemplate from "@modules/categories/templates"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
+import { Suspense } from "react"
+import SkeletonProductGrid from "../../../../../modules/skeletons/templates/skeleton-product-grid"
 
 type Props = {
   params: Promise<{ category: string[]; countryCode: string }>
@@ -29,7 +30,7 @@ export async function generateStaticParams() {
     )
 
     const staticParams = countryCodes
-      ?.filter((c): c is string => !!c) // <--- TypeScript fix
+      ?.filter((c): c is string => !!c)
       .map((countryCode) =>
         categoryHandles.map((handle: string) => ({
           countryCode,
@@ -53,32 +54,64 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       return {
         title: "Category Not Found",
         description: "Category data not available",
+        robots: { index: false, follow: false },
       }
     }
 
-    const title = productCategory.name + " | Liqnic Store"
-    const description = productCategory.description ?? `${title} category.`
+    const title = `Buy ${productCategory.name} Online in Nepal`
+    const description = `Buy authentic ${productCategory.name} online in Nepal at Liqnic. Genuine products with fast delivery across Kathmandu. Order ${productCategory.name} today and get 100% verified products with cash on delivery available.`
+    const canonical = `/${params.countryCode}/categories/${params.category.join(
+      "/"
+    )}`
 
     return {
       title,
       description,
+      keywords: [
+        `${productCategory.name} Nepal`,
+        `buy ${productCategory.name} online Nepal`,
+        `${productCategory.name} Kathmandu`,
+        `${productCategory.name} delivery Nepal`,
+        `${productCategory.name} cash on delivery Nepal`,
+        "Liqnic",
+      ],
       alternates: {
-        canonical: `${params.category.join("/")}`,
+        canonical,
+      },
+      openGraph: {
+        title: `${title} | Liqnic`,
+        description,
+        type: "website",
+        url: `https://liqnic.com${canonical}`,
+        siteName: "Liqnic",
+        images: [
+          {
+            url: "/images/og-image.png",
+            width: 1200,
+            height: 630,
+            alt: `${productCategory.name} — Liqnic Nepal`,
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `${title} | Liqnic`,
+        description,
+        images: ["/images/og-image.png"],
+      },
+      robots: {
+        index: true,
+        follow: true,
       },
     }
   } catch (err: any) {
     console.warn("Could not fetch category metadata:", err.message)
-    return {
-      title: "Category Not Available",
-      description: "Category data could not be fetched",
-    }
+    return { title: "Category Not Available" }
   }
 }
 
 export default async function CategoryPage(props: Props) {
-  const searchParams = await props.searchParams
   const params = await props.params
-  const { sortBy, page } = searchParams
 
   let productCategory = null
   try {
@@ -114,12 +147,64 @@ export default async function CategoryPage(props: Props) {
     )
   }
 
+  // BreadcrumbList JSON-LD
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: `https://liqnic.com/${params.countryCode}`,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: productCategory.name,
+        item: `https://liqnic.com/${
+          params.countryCode
+        }/categories/${params.category.join("/")}`,
+      },
+    ],
+  }
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <Suspense fallback={<SkeletonProductGrid />}>
+        <CategoryTemplateWrapper
+          category={productCategory}
+          countryCode={params.countryCode}
+          searchParamsPromise={props.searchParams}
+        />
+      </Suspense>
+    </>
+  )
+}
+
+// Wrapper to safely await searchParams inside the Suspense boundary
+async function CategoryTemplateWrapper({
+  category,
+  countryCode,
+  searchParamsPromise,
+}: {
+  category: any
+  countryCode: string
+  searchParamsPromise: Props["searchParams"]
+}) {
+  const searchParams = await searchParamsPromise
+  const { sortBy, page } = searchParams
+
   return (
     <CategoryTemplate
-      category={productCategory}
+      category={category}
       sortBy={sortBy}
       page={page}
-      countryCode={params.countryCode}
+      countryCode={countryCode}
     />
   )
 }

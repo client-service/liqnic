@@ -28,19 +28,21 @@ executors:
 
 commands:
   install-monorepo-deps:
-    description: "Install dependencies strictly using Yarn v3 workspaces"
+    description: "Install dependencies strictly using pnpm workspaces"
     steps:
       - restore_cache:
           keys:
-            - v1-yarn-deps-{{ checksum "yarn.lock" }}
+            - v1-pnpm-deps-{{ checksum "pnpm-lock.yaml" }}
       - run:
-          name: "Strict Yarn Install"
-          command: yarn install --immutable
+          name: "Strict pnpm Install"
+          command: corepack enable && pnpm install --frozen-lockfile
       - save_cache:
-          key: v1-yarn-deps-{{ checksum "yarn.lock" }}
+          key: v1-pnpm-deps-{{ checksum "pnpm-lock.yaml" }}
           paths:
-            - .yarn/cache
             - node_modules
+            - backend/node_modules
+            - dashboard/node_modules
+            - storefront/node_modules
 
 jobs:
   # ====================================================================
@@ -53,7 +55,7 @@ jobs:
       - install-monorepo-deps
       - run:
           name: Build Backend
-          command: yarn workspace backend build
+          command: pnpm --filter=backend build
 
   docker-publish-backend:
     executor: node-docker
@@ -65,10 +67,10 @@ jobs:
           command: |
             ENV_TAG=$([ "$CIRCLE_BRANCH" = "production" ] && echo "prod" || echo "dev")
             UNIQUE_TAG="$ENV_TAG-${CIRCLE_SHA1:0:7}"
-            
+
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-            
-            # Note the '.' at the end! It builds from the root to read yarn.lock
+
+            # Note the '.' at the end! It builds from the root to read pnpm-lock.yaml
             docker build -f backend/Dockerfile -t "$DOCKER_USERNAME/liqnic-backend:$UNIQUE_TAG" .
             docker tag "$DOCKER_USERNAME/liqnic-backend:$UNIQUE_TAG" "$DOCKER_USERNAME/liqnic-backend:$ENV_TAG"
             docker push --all-tags "$DOCKER_USERNAME/liqnic-backend"
@@ -85,7 +87,7 @@ jobs:
             ENV_TAG=$([ "$CIRCLE_BRANCH" = "production" ] && echo "prod" || echo "dev")
             export APP_VERSION="$ENV_TAG-${CIRCLE_SHA1:0:7}"
             DEPLOY_PATH="/home/docker/liqnic/$ENV_TAG"
-            
+
             ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
               set -e
               cd $DEPLOY_PATH
@@ -107,7 +109,7 @@ jobs:
       - install-monorepo-deps
       - run:
           name: Build Dashboard
-          command: yarn workspace @medusajs/dashboard build
+          command: pnpm --filter=@medusajs/dashboard build
 
   docker-publish-dashboard:
     executor: node-docker
@@ -119,9 +121,9 @@ jobs:
           command: |
             ENV_TAG=$([ "$CIRCLE_BRANCH" = "production" ] && echo "prod" || echo "dev")
             UNIQUE_TAG="$ENV_TAG-${CIRCLE_SHA1:0:7}"
-            
+
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-            
+
             # Pass build arguments explicitly
             docker build \
               -f dashboard/Dockerfile \
@@ -129,7 +131,7 @@ jobs:
               --build-arg VITE_MEDUSA_BASE=$VITE_MEDUSA_BASE \
               --build-arg VITE_MEDUSA_STOREFRONT_URL=$NEXT_PUBLIC_BASE_URL \
               -t "$DOCKER_USERNAME/liqnic-dashboard:$UNIQUE_TAG" .
-              
+
             docker tag "$DOCKER_USERNAME/liqnic-dashboard:$UNIQUE_TAG" "$DOCKER_USERNAME/liqnic-dashboard:$ENV_TAG"
             docker push --all-tags "$DOCKER_USERNAME/liqnic-dashboard"
 
@@ -146,28 +148,28 @@ jobs:
             ENV_TAG=$([ "$CIRCLE_BRANCH" = "production" ] && echo "prod" || echo "dev")
             export DASHBOARD_VERSION="$ENV_TAG-${CIRCLE_SHA1:0:7}"
             DEPLOY_PATH="/home/docker/liqnic/$ENV_TAG"
-            
+
             ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
               set -e
               cd $DEPLOY_PATH
               export DASHBOARD_VERSION=$DASHBOARD_VERSION
               docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
               docker compose pull dashboard
-              
+
               echo '==> Checking Backend Health Status...'
               for i in {1..30}; do
                 # Get the health status, ignore errors if it doesn't exist yet
                 STATUS=\$(docker inspect -f '{{.State.Health.Status}}' liqnic-backend-\$ENV_TAG 2>/dev/null || echo \"missing\")
-                
+
                 if [ \"\$STATUS\" = \"healthy\" ] || [ \"\$STATUS\" = \"missing\" ]; then
-                  echo '==> Backend is healthy! Proceeding with frontend deployment...'
+                  echo '==> Backend is healthy! Proceeding with dashboard deployment...'
                   break
                 fi
-                
+
                 echo \"==> Backend is currently \$STATUS. Waiting 10 seconds... (\$i/30)\"
                 sleep 10
               done
-              
+
               # Now it is safe to deploy the dashboard
               docker compose up -d --remove-orphans dashboard
               nohup docker image prune -af > /dev/null 2>&1 &
@@ -189,8 +191,8 @@ jobs:
             echo "MEDUSA_BACKEND_URL=${STOREFRONT_MEDUSA_BACKEND_URL}" > storefront/.env
             echo "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=${NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY}" >> storefront/.env
             echo "NEXT_PUBLIC_BASE_URL=${STOREFRONT_NEXT_PUBLIC_BASE_URL}" >> storefront/.env
-            
-            yarn workspace medusa-next build
+
+            pnpm --filter=medusa-next build
 
   docker-publish-storefront:
     executor: node-docker
@@ -202,14 +204,14 @@ jobs:
           command: |
             ENV_TAG=$([ "$CIRCLE_BRANCH" = "production" ] && echo "prod" || echo "dev")
             UNIQUE_TAG="$ENV_TAG-${CIRCLE_SHA1:0:7}"
-            
+
             # Inject build-time environment variables for Docker Next.js build
             echo "MEDUSA_BACKEND_URL=${STOREFRONT_MEDUSA_BACKEND_URL}" > storefront/.env
             echo "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=${NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY}" >> storefront/.env
             echo "NEXT_PUBLIC_BASE_URL=${STOREFRONT_NEXT_PUBLIC_BASE_URL}" >> storefront/.env
-            
+
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-            
+
             # Build from Root
             docker build -f storefront/Dockerfile -t "$DOCKER_USERNAME/liqnic-storefront:$UNIQUE_TAG" .
             docker tag "$DOCKER_USERNAME/liqnic-storefront:$UNIQUE_TAG" "$DOCKER_USERNAME/liqnic-storefront:$ENV_TAG"
@@ -221,39 +223,39 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - "SHA256:bu4d5JVl8kARC8wsDVC72vhPvS2ZlRUFjb/PAhyvb+U"
-            
+
       - run:
-          name: Zero-Downtime Deploy Dashboard
+          name: Zero-Downtime Deploy Storefront
           command: |
             ENV_TAG=$([ "$CIRCLE_BRANCH" = "production" ] && echo "prod" || echo "dev")
-            export DASHBOARD_VERSION="$ENV_TAG-${CIRCLE_SHA1:0:7}"
+            export STOREFRONT_VERSION="$ENV_TAG-${CIRCLE_SHA1:0:7}"
             DEPLOY_PATH="/home/docker/liqnic/$ENV_TAG"
-            
+
             ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
               set -e
               cd $DEPLOY_PATH
-              export DASHBOARD_VERSION=$DASHBOARD_VERSION
+              export STOREFRONT_VERSION=$STOREFRONT_VERSION
               docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-              docker compose pull dashboard
-              
+              docker compose pull storefront
+
               echo '==> Checking Backend Health Status...'
               for i in {1..30}; do
                 # Get the health status, ignore errors if it doesn't exist yet
                 STATUS=\$(docker inspect -f '{{.State.Health.Status}}' liqnic-backend-\$ENV_TAG 2>/dev/null || echo \"missing\")
-                
+
                 if [ \"\$STATUS\" = \"healthy\" ] || [ \"\$STATUS\" = \"missing\" ]; then
-                  echo '==> Backend is healthy! Proceeding with frontend deployment...'
+                  echo '==> Backend is healthy! Proceeding with storefront deployment...'
                   break
                 fi
-                
+
                 echo \"==> Backend is currently \$STATUS. Waiting 10 seconds... (\$i/30)\"
                 sleep 10
               done
-              
-              # Now it is safe to deploy the dashboard
-              docker compose up -d --remove-orphans dashboard
+
+              # Now it is safe to deploy the storefront
+              docker compose up -d --remove-orphans storefront
               nohup docker image prune -af > /dev/null 2>&1 &
-              echo '==> Dashboard deployment complete!'
+              echo '==> Storefront deployment complete!'
             "
 
 # ====================================================================

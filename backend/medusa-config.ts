@@ -4,8 +4,31 @@ import {
   Modules,
   ContainerRegistrationKeys,
 } from "@medusajs/framework/utils";
+import * as fs from "fs";
+import * as path from "path";
 
-loadEnv(process.env.NODE_ENV || "development", process.cwd());
+const appEnv = process.env.APP_ENV || process.env.NODE_ENV || "development";
+
+// Medusa's loadEnv only handles "staging", "production", "test" specially.
+// For custom environments (e.g. "dev", "local"), pre-populate process.env from
+// .env.{appEnv} before calling loadEnv so the base .env provides defaults only.
+const MEDUSA_KNOWN_ENVS = ["staging", "production", "test"];
+if (!MEDUSA_KNOWN_ENVS.includes(appEnv)) {
+  const envFile = path.join(process.cwd(), `.env.${appEnv}`);
+  if (fs.existsSync(envFile)) {
+    for (const line of fs.readFileSync(envFile, "utf8").split("\n")) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("#")) continue;
+      const eq = trimmed.indexOf("=");
+      if (eq < 0) continue;
+      const key = trimmed.slice(0, eq).trim();
+      const val = trimmed.slice(eq + 1).trim().replace(/^["']|["']$/g, "");
+      if (!(key in process.env)) process.env[key] = val;
+    }
+  }
+}
+
+loadEnv(appEnv, process.cwd());
 
 module.exports = defineConfig({
   admin: {
@@ -58,6 +81,14 @@ module.exports = defineConfig({
       resolve: "@medusajs/medusa/payment",
       options: {
         providers: [
+          // new COD Payment Provider
+          {
+            resolve: "./src/modules/cod-payment",
+          },
+          // new custom QR Payment Provider
+          {
+            resolve: "./src/modules/qr-payment",
+          },
           // Uncomment this to enable Stripe later
           // {
           //   resolve: "@medusajs/medusa/payment-stripe",
@@ -74,9 +105,9 @@ module.exports = defineConfig({
      * Caching
      */
     {
-      key: "cacheService",
+      key: Modules.CACHE,
       resolve: "@medusajs/cache-redis",
-      options: { 
+      options: {
         redisUrl: process.env.CACHE_REDIS_URL,
       },
     },
@@ -86,11 +117,11 @@ module.exports = defineConfig({
      */
     // Redis-based Event Bus (for production)
     {
-      key: "eventBus",
+      key: Modules.EVENT_BUS,
       resolve: "@medusajs/event-bus-redis",
       options: {
         redisUrl: process.env.EVENTS_REDIS_URL,
-        
+
       },
     },
 
@@ -131,15 +162,15 @@ module.exports = defineConfig({
             },
           },
           // Example for custom Resend module
-          // {
-          //   resolve: "./src/modules/resend",
-          //   id: "resend",
-          //   options: {
-          //     channels: ["email"],
-          //     api_key: process.env.RESEND_API_KEY,
-          //     from: process.env.RESEND_FROM_EMAIL,
-          //   },
-          // },
+          {
+            resolve: "./src/modules/resend",
+            id: "notification-resend",
+            options: {
+              channels: ["email"],
+              api_key: process.env.RESEND_API_KEY,
+              from: process.env.RESEND_FROM_EMAIL,
+            },
+          },
         ],
       },
     },
@@ -154,36 +185,6 @@ module.exports = defineConfig({
       resolve: "./src/modules/loyalty"
     }
   ],
-  plugins: [
-    /**
-     * Custom SMTP Email
-     */
-    {
-      resolve: "medusa-plugin-smtp",
-      options: {
-        fromEmail: process.env.FROM_EMAIL_ADDRESS,
-        transport: {
-          host: process.env.SMTP_HOST,
-          port: process.env.SMTP_PORT,
-          secureConnection: false,
-          auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
-          },
-          preview: false,
-          tls: {
-            ciphers: "SSLv3",
-          },
-          requireTLS: false,
-        },
-        emailTemplatePath: "emails",
-        templateMap: {
-          "invite.created": "inviteCreated",
-          "order.placed": "orderPlaced",
-        },
-      },
-    },
-  ],
   projectConfig: {
     databaseDriverOptions: {
       connection: {
@@ -197,7 +198,7 @@ module.exports = defineConfig({
       },
       // Force Postgres to assassinate queries taking longer than 2.5 seconds
       extra: {
-        statement_timeout: 2500 
+        statement_timeout: 2500
       }
     },
     databaseUrl: process.env.DATABASE_URL,
@@ -206,8 +207,8 @@ module.exports = defineConfig({
       storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,
       authCors: process.env.AUTH_CORS!,
-      jwtSecret: process.env.JWT_SECRET || "supersecret",
-      cookieSecret: process.env.COOKIE_SECRET || "supersecret",
+      jwtSecret: process.env.JWT_SECRET!,
+      cookieSecret: process.env.COOKIE_SECRET!,
     },
   },
 });

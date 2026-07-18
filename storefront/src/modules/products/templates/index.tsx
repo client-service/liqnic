@@ -1,16 +1,13 @@
-import { Suspense } from "react"
 import { HttpTypes } from "@medusajs/types"
-import ImageGallery from "@modules/products/components/image-gallery"
 import ProductActions from "@modules/products/components/product-actions"
 import ProductOnboardingCta from "@modules/products/components/product-onboarding-cta"
 import RelatedProducts from "@modules/products/components/related-products"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
 import { notFound } from "next/navigation"
+import { Suspense } from "react"
 import ProductActionsWrapper from "./product-actions-wrapper"
-import ProductTabsClient from "./product-tab-client"
-import { Span } from "next/dist/trace"
-import { divide } from "lodash"
 import ProductGalleryClient from "./product-gallery-client"
+import ProductTabsClient from "./product-tab-client"
 
 type ProductTemplateProps = {
   product: HttpTypes.StoreProduct
@@ -27,14 +24,37 @@ const ProductTemplate = async ({
     return notFound()
   }
 
+  const formatTitle = (title: string) => {
+    return title
+      .toLowerCase()
+      .replace(/(\d+)\s*ml\b/g, "$1 ML")
+      .replace(/(\d+)ml\b/g, "$1 ML")
+      .replace(/(\d+)\s*ltr\b/g, "$1 LTR")
+      .replace(/(\d+)ltr\b/g, "$1 LTR")
+      .split(" ")
+      .map((word) => {
+        if (word === "ml" || word === "ltr") return word.toUpperCase()
+
+        return word
+          .split("'")
+          .map((part, i) => {
+            if (!part) return part
+            if (i === 0) return part.charAt(0).toUpperCase() + part.slice(1) // ✅ only capitalize before apostrophe
+            return part // ✅ leave "s", "t", "re" etc. as lowercase
+          })
+          .join("'")
+      })
+      .join(" ")
+  }
+
   return (
     <>
       <section
-        className="grid grid-cols-1 md:grid-cols-6 gap-8 lg:gap-16 component-px w-full py-8 lg:py-16 bg-gray-100"
+        className="w-full grid grid-cols-1 md:grid-cols-7 md:gap-8 component-px py-8 lg:py-16 bg-gray-100"
         data-testid="product-container"
       >
         {/* Left Section (Gallery + Info) */}
-        <div className="md:col-span-4">
+        <div className="md:col-span-4 w-full">
           <ProductGalleryClient
             images={product?.images || []}
             title={product?.title}
@@ -42,31 +62,51 @@ const ProductTemplate = async ({
         </div>
 
         {/* Right Section (Details + Actions) */}
-        <aside className="col-span-2 flex flex-col small:sticky small:top-48 w-full py-8 gap-y-6">
+        <aside className="col-span-3 flex flex-col small:sticky small:top-48 w-full py-8 gap-y-6 md:px-4">
           {/* Tags */}
-          <div className="flex gap-2">
-            <span className="px-2 py-0 bg-success-light text-success text-sm font-bold rounded">
-              New!
-            </span>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Stock status */}
+            {!product?.variants?.length ? (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-black/5 text-black/60 border border-black/10">
+                <span className="w-1.5 h-1.5 rounded-full bg-black/40 inline-block" />
+                Out of Stock
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block animate-pulse" />
+                In Stock
+              </span>
+            )}
+
+            <span className="w-px h-4 bg-black/10" />
+
+            {/* New badge */}
+            {/* <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-primary text-white tracking-wide uppercase">
+              New
+            </span> */}
+
+            {/* Collection */}
             {product?.collection?.title && (
-              <span className="px-2 py-0 bg-info-light text-info text-sm font-bold rounded">
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-black/5 text-black/70 border border-black/10">
                 {product.collection.title}
               </span>
             )}
-            {!product?.variants?.length ? (
-              <span className="px-2 py-0 bg-error-light text-error text-sm font-bold rounded">
-                Out of stock
+
+            {/* Categories */}
+            {product?.categories?.map((cat) => (
+              <span
+                key={cat.id}
+                className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-black/5 text-black/70 border border-black/10"
+              >
+                {cat.name}
               </span>
-            ) : (
-              <span className="px-2 py-0 text-green-800 text-success text-sm font-bold rounded">
-                Available
-              </span>
-            )}
+            ))}
           </div>
 
           {/* Product Title */}
           <h1 className="text-gray-600 text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight lg:leading-[48px] tracking-[-0.792px]">
-            {product.title}
+            {formatTitle(product.title)}
           </h1>
 
           {/* Subtitle */}
@@ -79,7 +119,7 @@ const ProductTemplate = async ({
           <hr />
 
           {/* Variants */}
-          {product?.variants?.length > 0 && (
+          {/* {product?.variants?.length > 0 && (
             <div className="flex flex-col gap-4">
               <label className="text-gray-600 text-sm font-normal">
                 Variant
@@ -95,7 +135,7 @@ const ProductTemplate = async ({
                 ))}
               </div>
             </div>
-          )}
+          )} */}
 
           {/* CTA + Actions */}
           <ProductOnboardingCta />

@@ -26,7 +26,7 @@ export default defineMiddlewares({
                     limits: {
                         fileSize: 5 * 1024 * 1024, // Optional: 5MB file size limit
                     },
-                }).single("image_url"), // Expect a single file in the 'image_url' field
+                }).single("image_url") as any, // multer types use express@4, Medusa uses express@5
             ],
         },
         {
@@ -41,7 +41,7 @@ export default defineMiddlewares({
                     limits: {
                         fileSize: 5 * 1024 * 1024, // Optional: 5MB file size limit
                     },
-                }).single("image_url"), // Expect a single file in the 'image_url' field
+                }).single("image_url") as any, // multer types use express@4, Medusa uses express@5
             ],
         },
     ],

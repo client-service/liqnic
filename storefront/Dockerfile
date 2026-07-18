@@ -1,43 +1,43 @@
-# ==========================================
-# STAGE 1: BUILDER
-# ==========================================
-FROM node:24-alpine AS builder
+# Stage 1: Install + Build
+FROM node:22-alpine AS builder
+ENV NODE_ENV=production
+ENV SHARP_CONCURRENCY=1
+
 WORKDIR /app
 
-# 1. Enable Corepack and copy the ROOT lockfile and configs
+RUN apk add --no-cache libc6-compat
 RUN corepack enable
-COPY package.json yarn.lock .yarnrc.yml ./
-COPY .yarn .yarn
 
-# 2. Copy ONLY the workspace package.json files (to preserve Docker cache)
+# Monorepo root files — layer invalidates only when lockfile changes
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml .npmrc ./
+
+# Storefront package manifest
 COPY storefront/package.json ./storefront/
-COPY backend/package.json ./backend/
-COPY dashboard/package.json ./dashboard/
 
-# 3. Install ALL dependencies to access root TypeScript
-RUN yarn install --immutable
+# Install storefront dependencies only
+RUN pnpm install --filter=medusa-next --frozen-lockfile
 
-# 4. Copy the actual Storefront source code
-COPY storefront ./storefront
+# .env is written by CI to the repo root before docker build
+COPY .env ./storefront/.env
 
-# 5. Build the Storefront
-WORKDIR /app/storefront
-# Pass Next.js environment variables here if needed
-RUN yarn build
+# Storefront source
+COPY storefront/ ./storefront/
 
-# ==========================================
-# STAGE 2: RUNNER (Production Image)
-# ==========================================
-FROM node:24-alpine AS runner
+RUN pnpm --filter=medusa-next run build
+
+# Stage 2: Production (Next.js standalone)
+FROM node:22-alpine AS runner
+ENV NODE_ENV=production
+ENV SHARP_CONCURRENCY=1
+ENV NODE_OPTIONS=--max-old-space-size=2048
+
 WORKDIR /app
 
-# Copy the built output from the builder stage
 COPY --from=builder /app/storefront/public ./public
 COPY --from=builder /app/storefront/.next/standalone ./
 COPY --from=builder /app/storefront/.next/static ./.next/static
+COPY storefront/check-env-variables.js ./check-env-variables.js
 
 EXPOSE 3000
-ENV PORT=3000
 
-# Start the standalone Next.js server
 CMD ["node", "server.js"]

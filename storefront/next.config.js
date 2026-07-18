@@ -7,6 +7,7 @@ checkEnvVariables()
  */
 const nextConfig = {
   reactStrictMode: true,
+  output: "standalone",
   logging: {
     fetches: {
       fullUrl: true,
@@ -19,6 +20,17 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
+    // 1. Force WebP only. AVIF encoding requires significantly more CPU than WebP.
+    formats: ['image/webp'], 
+    
+    // 2. Reduce the matrix of generated sizes. 
+    // This prevents the CPU from generating 8 different sizes of the same image.
+    deviceSizes: [640, 1080, 1920], // Mobile, Laptop, Desktop
+    imageSizes: [256, 384],         // Thumbnails
+
+    // 3. Maximize Cache TTL (in seconds). Set to 1 year (31536000).
+    // The CPU will optimize the image exactly once, and serve from cache forever.
+    minimumCacheTTL: 31536000,
     remotePatterns: [
       {
         protocol: "http",
@@ -30,16 +42,8 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "medusa-public-images.s3.eu-west-1.amazonaws.com",
-      },
-      {
-        protocol: "https",
-        hostname: "medusa-server-testing.s3.amazonaws.com",
-      },
-      {
-        protocol: "https",
-        hostname: "medusa-server-testing.s3.us-east-1.amazonaws.com",
-      },
+        hostname: "api.dev.liqnic.com",
+      }
     ],
   },
 }

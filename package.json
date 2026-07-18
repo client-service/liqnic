@@ -1,49 +1,25 @@
 {
-  "name": "liqnic-monorepo",
+  "name": "liqnic",
   "version": "1.0.0",
   "private": true,
-  "workspaces": [
-    "backend",
-    "dashboard",
-    "storefront"
-  ],
-  "packageManager": "yarn@3.8.7",
+  "packageManager": "pnpm@11.9.0",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "medusa": "yarn workspace backend medusa",
-    "dev:backend": "yarn workspace backend dev",
-    "dev:dashboard": "yarn workspace @medusajs/dashboard dev",
-    "dev:storefront": "yarn workspace medusa-next dev",
-    "dev": "concurrently \"yarn dev:backend\" \"yarn dev:storefront\" \"yarn dev:dashboard\"",
-    "build:backend": "yarn workspace backend build",
-    "build:dashboard": "yarn workspace @medusajs/dashboard build",
-    "build:storefront": "yarn workspace medusa-next build",
-    "build": "yarn workspaces foreach -pt run build",
-    "start:backend": "yarn workspace backend start",
-    "start:dashboard": "yarn workspace @medusajs/dashboard start",
-    "start:storefront": "yarn workspace medusa-next start",
-    "lint": "eslint . --ext .ts,.tsx",
-    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
-  },
-  "resolutions": {
-    "@medusajs/admin-sdk": "2.9.0",
-    "@medusajs/cli": "2.9.0",
-    "@medusajs/framework": "2.9.0",
-    "@medusajs/medusa": "2.9.0",
-    "@medusajs/medusa-oas-cli": "2.9.0",
-    "@medusajs/test-utils": "2.9.0",
-    "@medusajs/admin-shared": "2.9.0",
-    "@medusajs/icons": "2.9.0",
-    "@medusajs/js-sdk": "2.9.0",
-    "@medusajs/admin-vite-plugin": "2.9.0",
-    "@medusajs/types": "2.9.0",
-    "@medusajs/ui-preset": "2.9.0",
-    "@types/express": "4.17.21",
-    "@types/express-serve-static-core": "4.17.41"
-  },
-  "devDependencies": {
-    "concurrently": "^8.2.2",
-    "eslint": "^8.57.0",
-    "prettier": "^3.2.5",
-    "typescript": "^5.6.2"
+    "dev:backend": "APP_ENV=local pnpm --filter=backend dev",
+    "dev:backend:dev": "APP_ENV=dev pnpm --filter=backend dev",
+    "dev:dashboard": "pnpm --filter=@medusajs/dashboard dev",
+    "dev:dashboard:dev": "pnpm --filter=@medusajs/dashboard dev --mode dev",
+    "dev:storefront": "pnpm --filter=medusa-next dev",
+    "build:backend": "pnpm --filter=backend build",
+    "build:dashboard": "pnpm --filter=@medusajs/dashboard build",
+    "build:storefront": "pnpm --filter=medusa-next build",
+    "build": "pnpm --filter=backend build && pnpm --filter=@medusajs/dashboard build && pnpm --filter=medusa-next build",
+    "migrate:local": "APP_ENV=local pnpm --filter=backend exec npx medusa db:migrate",
+    "migrate:dev": "APP_ENV=dev pnpm --filter=backend exec npx medusa db:migrate",
+    "migrate:prod": "APP_ENV=production pnpm --filter=backend exec npx medusa db:migrate",
+    "seed:local": "APP_ENV=local pnpm --filter=backend seed",
+    "lint": "pnpm --recursive run lint"
   }
 }

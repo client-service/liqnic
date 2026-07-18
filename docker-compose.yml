@@ -6,7 +6,7 @@ services:
     # Fallback to :dev if run manually without CI
     image: ${DOCKER_USERNAME:-<org>}/liqnic-backend:${APP_VERSION:-dev}
     container_name: liqnic-backend-dev
-    command: yarn start
+    command: ["pnpm", "--filter=backend", "start"]
     env_file:
       - .env.backend
     restart: always

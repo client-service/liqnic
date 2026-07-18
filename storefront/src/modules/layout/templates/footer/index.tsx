@@ -1,5 +1,7 @@
+import Image from "next/image"
 import Link from "next/link"
 import { LuMail, LuMapPin, LuPhone } from "react-icons/lu"
+
 export default function Footer() {
   return (
     <footer className="w-full bg-[#F9F6EF] px-4 py-8 sm:py-12 lg:py-[50px]">
@@ -7,16 +9,140 @@ export default function Footer() {
         {/* Main Footer Content */}
         <div className="flex flex-col lg:flex-row justify-between items-start gap-8 lg:gap-12 mb-8 lg:mb-[35px]">
           {/* Logo and Social Section */}
-          <div className="w-full lg:w-[282px] flex flex-col items-start gap-6 lg:gap-[34px]">
+          <div className="w-full lg:w-[400px] flex flex-col items-start gap-6 lg:gap-[34px]">
             <div className="flex flex-col items-start gap-4 lg:gap-[17px]">
-              <img src="/logo.png" className="h-[55px] w-auto" />
+              <Image width={100} height={100} alt="Logo" src="/logo.png" />
               <p className="text-[#606060] text-[13px] font-medium leading-[20px] font-manrope">
-                Short description of the company
+                Nepal's premier digital boutique for the refined connoisseur.
+                Our name represents the dual nature of modern relaxation, the
+                timeless tradition of fine liquor and the cutting-edge
+                innovation of nicotine technology.
               </p>
             </div>
+          </div>
 
-            {/* Social Media Icons */}
-            <div className="flex items-center gap-[14px]">
+          {/* Navigation Links Grid */}
+          <div className="flex flex-col sm:flex-row items-start gap-8 sm:gap-12 lg:gap-[135px] w-full lg:w-auto">
+            {/* Explore Section */}
+            <div className="flex flex-col items-start gap-[10px]">
+              <h3 className="text-[#606060] text-[14px] font-bold leading-[35px] tracking-[0.84px] uppercase font-manrope">
+                Explore
+              </h3>
+              <div className="flex flex-col items-start gap-[6px]">
+                <Link
+                  href="/shop"
+                  className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
+                >
+                  Shop
+                </Link>
+                <Link
+                  href="/about"
+                  className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
+                >
+                  About
+                </Link>
+                <Link
+                  href="/contact"
+                  className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
+                >
+                  Contact
+                </Link>
+                {/* FAQs page not yet available */}
+                {/* <Link
+                  href="/faqs"
+                  className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
+                >
+                  FAQs / Help
+                </Link> */}
+              </div>
+            </div>
+
+            {/* Legal Section */}
+            <div className="flex flex-col items-start gap-[10px]">
+              <h3 className="text-[#606060] text-[14px] font-bold leading-[35px] tracking-[0.84px] uppercase font-manrope">
+                Legal
+              </h3>
+              <div className="flex flex-col items-start gap-[6px]">
+                <Link
+                  href="/terms-and-conditions"
+                  className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
+                >
+                  Terms and Conditions
+                </Link>
+                <Link
+                  href="/privacy-policy"
+                  className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
+                >
+                  Privacy Policy
+                </Link>
+                {/* Disclaimer page not yet available */}
+                {/* <Link
+                  href="/disclaimer"
+                  className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
+                >
+                  Disclaimer
+                </Link> */}
+                {/* Shipping & Returns page not yet available */}
+                <Link
+                  href="/return-policy"
+                  className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
+                >
+                  Return Policy
+                </Link>
+              </div>
+            </div>
+
+            {/* Contact Section */}
+            <div className="flex flex-col items-start gap-[10px]">
+              <h3 className="text-[#606060] text-[14px] font-bold leading-[35px] tracking-[0.84px] uppercase font-manrope">
+                Contact
+              </h3>
+              <div className="flex flex-col items-start gap-[6px]">
+                <div className="flex items-center gap-[10px]">
+                  <LuPhone className="w-4 h-4 text-black" />
+                  <span className="text-[#606060] text-[13px] font-medium leading-[20px] font-manrope">
+                    +977 9802532700 (Whatsapp only)
+                  </span>
+                </div>
+                <div className="flex items-center gap-[10px]">
+                  <LuMail className="w-4 h-4 text-black" />
+                  <span className="text-[#606060] text-[13px] font-medium leading-[20px] font-manrope">
+                    liqnichost@gmail.com
+                  </span>
+                </div>
+                <div className="flex items-center gap-[10px]">
+                  <LuMapPin className="w-4 h-4 text-black" />
+                  <span className="text-[#606060] text-[13px] font-medium leading-[20px] font-manrope">
+                    Kathmandu, Nepal
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Section with Border */}
+        <div className="border-t border-[#E2E8F0] pt-4">
+          <div className="text-center">
+            <p className="text-[#606060] text-[14px] font-medium leading-[24px] font-manrope">
+              © {new Date().getFullYear()} Liqnic. All rights reserved.
+              <br className="sm:hidden" />
+              <span className="hidden sm:inline"> </span>
+              You must be 18+ to access this website. Please consume
+              responsibly.
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+  )
+}
+
+{
+  /* Social Media Icons — commented out until pages are ready */
+}
+{
+  /* <div className="flex items-center gap-[14px]">
               <a href="#" className="group">
                 <div className="w-[22px] h-[22px]">
                   <svg
@@ -104,119 +230,5 @@ export default function Footer() {
                   </svg>
                 </div>
               </a>
-            </div>
-          </div>
-
-          {/* Navigation Links Grid */}
-          <div className="flex flex-col sm:flex-row items-start gap-8 sm:gap-12 lg:gap-[135px] w-full lg:w-auto">
-            {/* Explore Section */}
-            <div className="flex flex-col items-start gap-[10px]">
-              <h3 className="text-[#606060] text-[14px] font-bold leading-[35px] tracking-[0.84px] uppercase font-manrope">
-                Explore
-              </h3>
-              <div className="flex flex-col items-start gap-[6px]">
-                <a
-                  href="/shop"
-                  className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
-                >
-                  Shop
-                </a>
-                <a
-                  href="/about"
-                  className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
-                >
-                  About
-                </a>
-                <a
-                  href="/contact"
-                  className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
-                >
-                  Contact
-                </a>
-                <a
-                  href="#"
-                  className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
-                >
-                  FAQs/help
-                </a>
-              </div>
-            </div>
-
-            {/* Legal Section */}
-            <div className="flex flex-col items-start gap-[10px]">
-              <h3 className="text-[#606060] text-[14px] font-bold leading-[35px] tracking-[0.84px] uppercase font-manrope">
-                Legal
-              </h3>
-              <div className="flex flex-col items-start gap-[6px]">
-                <Link
-                  href="/terms-and-conditions"
-                  className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
-                >
-                  Terms and Conditions
-                </Link>
-                <Link
-                  href="/privacy-policy"
-                  className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
-                >
-                  Privacy Policy
-                </Link>
-                <Link
-                  href="#"
-                  className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
-                >
-                  Disclaimer
-                </Link>
-                <Link
-                  href="/shipping-return-policy"
-                  className="text-[#606060] text-[13px] font-medium leading-[20px] hover:text-[#C5A163] transition-colors font-manrope"
-                >
-                  Shipping and Returns
-                </Link>
-              </div>
-            </div>
-
-            {/* Contact Section */}
-            <div className="flex flex-col items-start gap-[10px]">
-              <h3 className="text-[#606060] text-[14px] font-bold leading-[35px] tracking-[0.84px] uppercase font-manrope">
-                Contact
-              </h3>
-              <div className="flex flex-col items-start gap-[6px]">
-                <div className="flex items-center gap-[10px]">
-                  <LuPhone className="w-4 h-4 text-black" />
-                  <span className="text-[#606060] text-[13px] font-medium leading-[20px] font-manrope">
-                    +977 9823123457
-                  </span>
-                </div>
-                <div className="flex items-center gap-[10px]">
-                  <LuMail className="w-4 h-4 text-black" />
-                  <span className="text-[#606060] text-[13px] font-medium leading-[20px] font-manrope">
-                    support@liqnic.com
-                  </span>
-                </div>
-                <div className="flex items-center gap-[10px]">
-                  <LuMapPin className="w-4 h-4 text-black" />
-                  <span className="text-[#606060] text-[13px] font-medium leading-[20px] font-manrope">
-                    Kathmandu, Nepal
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Section with Border */}
-        <div className="border-t border-[#E2E8F0] pt-4">
-          <div className="text-center">
-            <p className="text-[#606060] text-[14px] font-medium leading-[24px] font-manrope">
-              © 2025 Liqnic. All rights reserved.
-              <br className="sm:hidden" />
-              <span className="hidden sm:inline"> </span>
-              You must be 18+ to access this website. Please consume
-              responsibly.
-            </p>
-          </div>
-        </div>
-      </div>
-    </footer>
-  )
+            </div> */
 }

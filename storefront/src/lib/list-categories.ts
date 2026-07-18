@@ -6,7 +6,6 @@ export async function listCategories() {
     if (!res.ok) throw new Error("Failed to fetch categories")
 
     const categories = await res.json() // raw category objects from API
-    console.log("Raw categories from API:", categories)
 
     // Flatten all categories into { value, label }
     const flat: { value: string; label: string }[] = []
@@ -21,7 +20,6 @@ export async function listCategories() {
       }
     })
 
-    console.log("Flattened categories:", flat)
     return flat
   } catch (err) {
     console.error("Error fetching categories:", err)

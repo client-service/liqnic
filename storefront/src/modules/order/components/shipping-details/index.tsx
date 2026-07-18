@@ -14,12 +14,12 @@ const ShippingDetails = ({ order }: ShippingDetailsProps) => {
       <Heading level="h2" className="flex flex-row text-3xl-regular my-6">
         Delivery
       </Heading>
-      <div className="flex items-start gap-x-8">
+      <div className="flex flex-col md:flex-row items-start gap-x-8">
         <div
-          className="flex flex-col w-1/3"
+          className="flex flex-col w-1/3 mb-3"
           data-testid="shipping-address-summary"
         >
-          <Text className="txt-medium-plus text-ui-fg-base mb-1">
+          <Text className="txt-medium-plus text-ui-fg-base mb-1 font-medium ">
             Shipping Address
           </Text>
           <Text className="txt-medium text-ui-fg-subtle">
@@ -40,10 +40,12 @@ const ShippingDetails = ({ order }: ShippingDetailsProps) => {
         </div>
 
         <div
-          className="flex flex-col w-1/3 "
+          className="flex flex-col w-1/3 mb-3 "
           data-testid="shipping-contact-summary"
         >
-          <Text className="txt-medium-plus text-ui-fg-base mb-1">Contact</Text>
+          <Text className="txt-medium-plus text-ui-fg-base mb-1 font-medium">
+            Contact
+          </Text>
           <Text className="txt-medium text-ui-fg-subtle">
             {order.shipping_address?.phone}
           </Text>
@@ -51,10 +53,12 @@ const ShippingDetails = ({ order }: ShippingDetailsProps) => {
         </div>
 
         <div
-          className="flex flex-col w-1/3"
+          className="flex flex-col w-1/3 mb-3"
           data-testid="shipping-method-summary"
         >
-          <Text className="txt-medium-plus text-ui-fg-base mb-1">Method</Text>
+          <Text className="txt-medium-plus text-ui-fg-base mb-1 font-medium">
+            Method
+          </Text>
           <Text className="txt-medium text-ui-fg-subtle">
             {(order as any).shipping_methods[0]?.name} (
             {convertToLocale({

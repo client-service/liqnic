@@ -3,28 +3,38 @@ export default function About() {
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
       {/* Hero Section */}
-      <section className="w-full px-4 lg:px-[100px] py-8 sm:py-12 lg:py-16">
-        <div className="flex flex-col lg:flex-row items-start justify-between gap-8 lg:gap-[96px] max-w-[1240px] mx-auto">
+      <section className="w-full component-px py-8 sm:py-12 lg:py-16 c">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-16  mx-auto">
           {/* Left Content */}
-          <div className="flex flex-col items-start gap-3 lg:gap-[10px] w-full lg:w-[620px]">
-            <h2 className="text-[#C5A163] text-xl sm:text-2xl lg:text-[25px]  leading-[150%] ">
-              The Licniq Story:
+          <div className="col-span-2 flex flex-col gap-3">
+            <h2 className="text-[#C5A163] text-xl sm:text-2xl lg:text-[25px] leading-[150%]">
+              The Liqnic Story:
             </h2>
-            <h1 className="text-[#323232] text-2xl sm:text-3xl lg:text-[36px] font-bold leading-tight lg:leading-[48px] tracking-tight lg:tracking-[-0.792px] ">
+            <h1 className="text-[#323232] text-2xl sm:text-3xl lg:text-[36px] font-bold leading-tight lg:leading-[48px] tracking-tight lg:tracking-[-0.792px]">
               Where Authenticity Meets Aspiration
             </h1>
           </div>
 
           {/* Right Content */}
-          <div className="w-full lg:w-[523px] text-[#606060] text-sm sm:text-base lg:text-[16px]  leading-relaxed lg:leading-[26px] ">
-            Welcome to Licniq. We are curators of a refined lifestyle, offering
-            unmatched access to premium spirits and innovative nicotine
-            alternatives. Our goal is to make luxury accessible, ensuring you
-            get the products you want, whenever you want them.
+          <div className="col-span-3 text-[#606060] text-sm sm:text-base lg:text-[16px] leading-relaxed lg:leading-[26px] space-y-4 text-justify">
+            <p>
+              Welcome to Liqnic, Nepal's premier digital boutique for the
+              refined connoisseur. Our name represents the dual nature of modern
+              relaxation, the timeless tradition of fine liquor and the
+              cutting-edge innovation of nicotine technology.
+            </p>
+            <p>
+              At Liqnic, we believe that quality should never be a guessing
+              game. We have curated an elite selection of world class liquor and
+              premium e-cigarette hardware, ensuring that every bottle poured
+              and every cloud chased meets the highest standards of excellence.
+              Based in the heart of Nepal, we are dedicated to providing a
+              seamless, discreet, and sophisticated shopping experience for
+              those who appreciate the finer things in life.
+            </p>
           </div>
         </div>
       </section>
-
       {/* Hero Image Section */}
       <Image
         src="/images/about-page/About.png"
@@ -32,177 +42,149 @@ export default function About() {
         width={2000}
         alt="hero"
       />
-
       {/* Mission & Vision Header */}
-      <section className="w-full px-4 py-12 sm:py-16 lg:py-20">
+      <section className="w-full px-4 py-12 sm:py-16 ">
         <div className="max-w-[1157px] mx-auto text-center">
           <h2 className="text-[#C5A163] text-xl sm:text-2xl lg:text-[25px]  leading-[150%]  mb-3 lg:mb-[10px]">
             Our Mission & Vision
           </h2>
           <h1 className="text-[#323232] text-2xl sm:text-3xl lg:text-[36px] font-bold leading-tight lg:leading-[48px] tracking-tight lg:tracking-[-0.792px] ">
-            At Licniq, we're driven by a dual purpose: to elevate your
+            At Liqnic, we're driven by a dual purpose: to elevate your
             experience and simplify your access to world-class products.
           </h1>
         </div>
       </section>
-
       {/* Mission & Vision Content */}
-      <section className="w-full px-4 lg:px-[100px] py-8 sm:py-12 lg:py-16">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12 max-w-[1240px] mx-auto">
-          <Image
-            src="/images/about-page/Mission.png"
-            height={600}
-            width={600}
-            alt="hero"
-          />
 
-          {/* Right Content */}
-          <div className="flex flex-col items-start gap-8 sm:gap-10 lg:gap-[50px] w-full lg:w-[562px] order-1 lg:order-2">
-            {/* Our Mission */}
-            <div className="flex flex-col items-start gap-3 lg:gap-[10px] w-full">
-              <h3 className="text-[#323232] text-2xl sm:text-3xl lg:text-[36px] font-bold leading-tight lg:leading-[48px] tracking-tight lg:tracking-[-0.792px] ">
-                Our Mission:
+      <section className="bg-[#FAFAF8] px-6 lg:px-[100px] mb-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-[72px] max-w-[1100px] mx-auto items-center">
+          {/* Left — Image */}
+          <div className="relative">
+            {/* Gold offset border — sits bottom-left */}
+            <div className="absolute inset-0 lg:-translate-x-[20px] lg:translate-y-[20px] border-[1.5px] border-[#C5A163] rounded-bl-[40px] z-0" />
+
+            {/* Image */}
+            <div className="relative overflow-hidden rounded-bl-[40px] z-10 aspect-[4/3]">
+              <Image
+                src="/images/about-page/about-1.webp"
+                fill
+                alt="About Liqnic"
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#C5A163]/12 to-transparent" />
+            </div>
+          </div>
+
+          {/* Right — Content */}
+          <div className="flex flex-col pt-2">
+            {/* Mission */}
+            <div className="flex flex-col gap-3 py-7 ">
+              <h3 className="font-['Playfair_Display'] text-[30px] font-normal text-[#1E1C18] leading-tight">
+                Our Mission
               </h3>
-              <p className="text-[#606060] text-sm sm:text-base lg:text-[16px]  leading-relaxed lg:leading-[26px] ">
-                To redefine convenience by providing real-time, 24/7 access to a
-                curated selection of authentic, high-quality spirits and
-                cutting-edge nicotine products throughout Nepal. We aim to be
-                the most trusted and efficient source for adult consumers.
+              <p className="text-[14.5px] text-[#7A7060] font-light leading-relaxed">
+                To be Nepal's most trusted 24/7 source for authentic drinks and
+                e-cigarettes. We believe you shouldn't have to worry about fakes
+                or long wait times.
               </p>
             </div>
 
-            {/* Our Vision */}
-            <div className="flex flex-col items-start gap-3 lg:gap-[10px] w-full">
-              <h3 className="text-[#323232] text-2xl sm:text-3xl lg:text-[36px] font-bold leading-tight lg:leading-[48px] tracking-tight lg:tracking-[-0.792px] ">
-                Our Vision:
+            {/* Vision */}
+            <div className="flex flex-col gap-3 py-7 border-t  border-[#EAE5DC]">
+              <h3 className="font-['Playfair_Display'] text-[30px] font-normal text-[#1E1C18] leading-tight">
+                Our Vision
               </h3>
-              <p className="text-[#606060] text-sm sm:text-base lg:text-[16px]  leading-relaxed lg:leading-[26px] ">
-                To be the leading luxury retail platform in Nepal, known for our
-                exceptional service, unwavering authenticity, and commitment to
-                a responsible, sophisticated lifestyle. We are building more
-                than a business; we are fostering a community of discerning
-                individuals who value quality and convenience above all.
+              <p className="text-[14.5px] text-[#7A7060] font-light leading-relaxed">
+                To build a community in Nepal that values quality above all
+                else. We aren't just selling products; we're delivering a
+                simpler, more sophisticated way to shop.
               </p>
             </div>
           </div>
         </div>
       </section>
-
       {/* Founder Message */}
-      <section className="w-full px-4 lg:px-[100px] py-8 sm:py-12 lg:py-16">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12 max-w-[1240px] mx-auto">
-          {/* Left Content */}
-          <div className="flex flex-col items-start gap-4 sm:gap-5 lg:gap-[20px] w-full lg:w-[548px]">
-            <h2 className="text-[#323232] text-2xl sm:text-3xl lg:text-[36px] font-bold leading-tight lg:leading-[48px] tracking-tight lg:tracking-[-0.792px] ">
+      <section className="w-full px-4 lg:px-[100px] py-8 sm:py-12 lg:py-16 bg-white">
+        <div className="max-w-[900px] mx-auto">
+          {/* Card */}
+          <div className="bg-[#FAFAFA] rounded-2xl p-6 sm:p-8 lg:p-10 flex flex-col gap-6 relative">
+            {/* Subtle Quote Icon */}
+            <span className="absolute top-6 left-6 text-[60px] text-gray-200 font-serif leading-none">
+              “
+            </span>
+
+            {/* Heading */}
+            <h2 className="text-[#323232] text-2xl sm:text-3xl lg:text-[36px] font-bold leading-tight lg:leading-[48px] tracking-tight">
               A Message From Our Founder
             </h2>
 
-            <p className="text-[#606060] text-sm sm:text-base lg:text-[16px]  leading-relaxed lg:leading-[26px] ">
-              When I started Licniq, it was because I saw a gap in the market.
-              As consumers, we've come to expect speed and authenticity in every
-              part of our lives, yet a premium experience for spirits and
-              nicotine products was nowhere to be found.
-            </p>
+            {/* Content */}
+            <div className="flex flex-col gap-4 text-[#606060] text-sm sm:text-base lg:text-[16px] leading-relaxed lg:leading-[26px]">
+              <p>
+                I started Liqnic because I was tired of the struggle. In Nepal,
+                it’s surprisingly hard to find high quality liquor or genuine
+                e-cigarettes gear without worrying if what you’re buying is the
+                real deal. We expect speed and honesty in every other part of
+                our lives, why should this be any different?
+              </p>
 
-            <p className="text-[#606060] text-sm sm:text-base lg:text-[16px]  leading-relaxed lg:leading-[26px] ">
-              My goal was simple: to bring you a service that's not just
-              convenient, but also completely trustworthy. We've built Licniq to
-              be a platform where you can discover authentic, high-quality
-              products and get them delivered to your doorstep in real time.
-            </p>
+              <p>
+                I wanted to create a place where 'authentic' isn't just a
+                marketing word, but a guarantee. Liqnic is my commitment to you,
+                a service that is fast, reliable, and completely trustworthy.
+                Whether you are stocking up your home bar or need a refill for
+                your e-cigarettes, we’ve got your back.
+              </p>
 
-            <p className="text-[#606060] text-sm sm:text-base lg:text-[16px]  leading-relaxed lg:leading-[26px] ">
-              This isn't just a business for me; it's a commitment. A commitment
-              to bringing you the best, with the speed and reliability you
-              deserve. Thank you for trusting us to be your go-to source.
-            </p>
+              <p>Thanks for trusting us and being part of our story.</p>
+            </div>
+
+            {/* Bottom subtle line */}
+            <div className="mt-4 h-[1px] w-16 bg-gray-300"></div>
           </div>
-
-          {/* Right Image */}
-          <Image
-            src="/images/about-page/Message.png"
-            height={600}
-            width={600}
-            alt="hero"
-          />
         </div>
       </section>
 
-      {/* Team Section Header */}
-      <section className="w-full px-4 py-8 sm:py-12 lg:py-16">
-        <div className="max-w-[1157px] mx-auto text-center">
-          <h2 className="text-[#C5A163] text-xl sm:text-2xl lg:text-[25px]  leading-[150%]  mb-3 lg:mb-[10px]">
-            Our Experts Behind Licniq
+      {/* Company Details */}
+      <section className="w-full px-4 lg:px-[100px] py-8 sm:py-12 lg:py-16 bg-[#FAFAF8]">
+        <div className="max-w-[900px] mx-auto">
+          <h2 className="text-[#C5A163] text-xl sm:text-[25px] leading-[150%] mb-2">
+            Company Details
           </h2>
-          <h1 className="text-[#323232] text-2xl sm:text-3xl lg:text-[36px] font-bold leading-tight lg:leading-[48px] tracking-tight lg:tracking-[-0.792px] ">
-            Meet the team making luxury and convenience effortless.
-          </h1>
-        </div>
-      </section>
+          <h3 className="text-[#323232] text-2xl sm:text-[30px] font-bold leading-tight tracking-tight mb-8">
+            Business Information
+          </h3>
 
-      {/* Team Members */}
-      <section className="w-full px-4 lg:px-[100px] py-8 sm:py-12">
-        <div className="max-w-[1240px] mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-[50px] justify-items-center">
-            {/* Team Member 1 */}
-            <div className="flex flex-col items-center text-center">
-              <div className="w-[280px] sm:w-[320px] lg:w-[380px] h-[280px] sm:h-[320px] lg:h-[380px] rounded-lg overflow-hidden mb-6 lg:mb-8">
-                <Image
-                  src="/images/about-page/Bibek.png"
-                  height={900}
-                  width={500}
-                  alt="Bibek Adhikari"
-                />
-              </div>
-              <div className="flex flex-col items-start gap-3 lg:gap-[10px] w-[280px]">
-                <h3 className="text-[#111] text-xl sm:text-2xl lg:text-[25px] font-semibold leading-[26px] ">
-                  Bibek Adhikari
-                </h3>
-                <p className="text-[#606060] text-sm sm:text-base lg:text-[16px]  leading-[26px] ">
-                  Lead of Marketing & Communications
+          <div className="border border-[#EAE5DC] rounded-xl overflow-hidden">
+            {[
+              { label: "E-Commerce Platform Name", value: "Liqnic" },
+              {
+                label: "Company Name",
+                value: "Khirkhirya Enterprises Pvt. Ltd.",
+              },
+              { label: "Company Address", value: "Kathmandu, Nepal" },
+              {
+                label: "Business Activities",
+                value:
+                  "Online retail of premium liquor and e-cigarette products",
+              },
+              { label: "Business Email", value: "liqnichost@gmail.com" },
+              { label: "Business Phone", value: "+977-9802532700" },
+            ].map(({ label, value }, i, arr) => (
+              <div
+                key={label}
+                className={`grid grid-cols-2 sm:grid-cols-5 px-6 py-4 ${
+                  i !== arr.length - 1 ? "border-b border-[#EAE5DC]" : ""
+                } ${i % 2 === 0 ? "bg-white" : "bg-[#FAFAF8]"}`}
+              >
+                <p className="col-span-1 sm:col-span-2 text-xs font-medium uppercase tracking-widest text-[#A08B6E]">
+                  {label}
+                </p>
+                <p className="col-span-1 sm:col-span-3 text-sm text-[#323232]">
+                  {value}
                 </p>
               </div>
-            </div>
-
-            {/* Team Member 2 */}
-            <div className="flex flex-col items-center text-center">
-              <div className="w-[280px] sm:w-[320px] lg:w-[380px] h-[280px] sm:h-[320px] lg:h-[380px] rounded-lg overflow-hidden mb-6 lg:mb-8">
-                <Image
-                  src="/images/about-page/Subash.png"
-                  height={900}
-                  width={500}
-                  alt="Subash Thapa"
-                />
-              </div>
-              <div className="flex flex-col items-start gap-3 lg:gap-[10px] w-[280px]">
-                <h3 className="text-[#111] text-xl sm:text-2xl lg:text-[25px] font-semibold leading-[26px] ">
-                  Subash Thapa
-                </h3>
-                <p className="text-[#606060] text-sm sm:text-base lg:text-[16px]  leading-[26px] ">
-                  Lead of Marketing & Communications
-                </p>
-              </div>
-            </div>
-
-            {/* Team Member 3 */}
-            <div className="flex flex-col items-center text-center">
-              <div className="w-[280px] sm:w-[320px] lg:w-[380px] h-[280px] sm:h-[320px] lg:h-[380px] rounded-lg overflow-hidden mb-6 lg:mb-8">
-                <Image
-                  src="/images/about-page/Alina.png"
-                  height={900}
-                  width={500}
-                  alt="Alina Gurung"
-                />
-              </div>
-              <div className="flex flex-col items-start gap-3 lg:gap-[10px] w-[280px]">
-                <h3 className="text-[#111] text-xl sm:text-2xl lg:text-[25px] font-semibold leading-[26px] ">
-                  Alina Gurung
-                </h3>
-                <p className="text-[#606060] text-sm sm:text-base lg:text-[16px]  leading-[26px] ">
-                  Lead of Marketing & Communications
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>

@@ -6,10 +6,11 @@ import { getBaseURL } from "@lib/util/env"
 import { StoreCartShippingOption } from "@medusajs/types"
 import CartMismatchBanner from "@modules/layout/components/cart-mismatch-banner"
 import Footer from "@modules/layout/templates/footer"
-import Nav from "@modules/layout/templates/nav"
 import FreeShippingPriceNudge from "@modules/shipping/components/free-shipping-price-nudge"
 import Navbar from "components/navbar"
 import PromoBanner from "components/promo-banner"
+import { ToastContainer } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
@@ -30,6 +31,7 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
     <>
       <PromoBanner />
       <Navbar />
+      <main className="min-h-screen overflow-hidden">{props.children}</main>
 
       {customer && cart && (
         <CartMismatchBanner customer={customer} cart={cart} />
@@ -42,8 +44,16 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
           shippingOptions={shippingOptions}
         />
       )}
-      {props.children}
+
       <Footer />
+      <ToastContainer
+        toastClassName="custom-toast"
+        hideProgressBar
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="light"
+      />
     </>
   )
 }

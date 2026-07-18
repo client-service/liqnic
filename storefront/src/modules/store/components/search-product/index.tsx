@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
-import { FiSearch } from "react-icons/fi"
+import { FiSearch, FiX } from "react-icons/fi"
 
 type SearchBarProps = {
   initialQuery?: string
@@ -10,53 +10,93 @@ type SearchBarProps = {
 
 const SearchBar = ({ initialQuery = "" }: SearchBarProps) => {
   const [searchTerm, setSearchTerm] = useState(initialQuery)
+  // Track if this is the first render — prevents debounce firing on mount
+  const isMounted = useRef(false)
+
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const handleSearch = () => {
+  const navigate = (term: string) => {
     const params = new URLSearchParams(searchParams.toString())
-    if (searchTerm) {
-      params.set("query", searchTerm)
+    if (term.trim()) {
+      params.set("query", term.trim())
     } else {
       params.delete("query")
     }
     router.push(`${pathname}?${params.toString()}`)
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      handleSearch()
+  // Debounced search — skips the initial mount render
+  useEffect(() => {
+    if (!isMounted.current) {
+      isMounted.current = true
+      return
     }
+    const delay = setTimeout(() => navigate(searchTerm), 500)
+    return () => clearTimeout(delay)
+  }, [searchTerm, pathname, searchParams]) // all deps included
+
+  const handleClear = () => {
+    setSearchTerm("")
+    navigate("")
   }
 
   return (
     <div className="w-full">
+      {/* Label visible only on sm+ — saves vertical space on mobile */}
       <label
         htmlFor="search-input"
-        className="block mb-2 text-gray-700 font-medium"
+        className="hidden sm:block mb-2 text-sm font-medium text-gray-700"
       >
         Search Products
       </label>
-      <div className="relative w-full">
-        <span className="absolute inset-y-0 left-3 flex items-center text-gray-400">
-          <FiSearch size={20} />
+
+      <div className="relative w-full flex items-center">
+        {/* Search icon */}
+        <span className="absolute left-3 text-gray-400 pointer-events-none">
+          <FiSearch size={18} />
         </span>
+
         <input
           id="search-input"
-          type="text"
+          type="search" // enables native clear on mobile + correct keyboard
+          inputMode="search" // shows search keyboard on iOS/Android
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Searh with product name"
-          className="w-full pl-10 pr-28 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-[0.5px] focus:ring-primary focus:border-primary transition shadow-sm"
+          onKeyDown={(e) => e.key === "Enter" && navigate(searchTerm)}
+          placeholder="Search products..."
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
+          className="
+            w-full h-11 sm:h-12
+            pl-9 pr-10              
+            rounded-lg border border-gray-200
+            bg-white text-sm text-gray-900
+            placeholder:text-gray-400
+            focus:outline-none focus:ring-2 focus:ring-[#C5A163]/40 focus:border-[#C5A163]
+            transition-colors
+          "
+          // No right-side Search button — on mobile the keyboard has a Search/Go key
+          // On desktop, 500ms debounce handles it automatically
         />
-        <button
-          onClick={handleSearch}
-          className="absolute right-1 top-1 bottom-1 px-6 bg-primary text-white font-medium rounded-lg hover:bg-primary/90 transition shadow"
-        >
-          Search
-        </button>
+
+        {/* Clear button — only shown when there's a value */}
+        {searchTerm && (
+          <button
+            onClick={handleClear}
+            aria-label="Clear search"
+            className="
+              absolute right-2.5
+              w-6 h-6 flex items-center justify-center
+              rounded-full bg-gray-100 hover:bg-gray-200
+              text-gray-500 transition-colors
+            "
+          >
+            <FiX size={13} />
+          </button>
+        )}
       </div>
     </div>
   )

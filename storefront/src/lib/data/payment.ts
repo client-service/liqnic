@@ -11,6 +11,7 @@ export const listCartPaymentMethods = async (regionId: string) => {
 
   const next = {
     ...(await getCacheOptions("payment_providers")),
+    revalidate: 60,
   }
 
   return sdk.client

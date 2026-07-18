@@ -213,10 +213,29 @@ const Payment = ({
             )}
           </Text>
         </div>
-        <div className="hidden items-center justify-end sm:flex">
-          <Text size="small" leading="compact" className="capitalize">
-            {payment.provider_id}
+        <div className="hidden flex-col items-end justify-center sm:flex">
+          <Text size="small" leading="compact" className="capitalize font-medium">
+            {/* Use .includes() to safely catch Medusa's "pp_" prefixes */}
+            {payment.provider_id.includes("qr-payment") 
+              ? "Bank Transfer (QR)" 
+              : payment.provider_id.includes("cod-payment")
+              ? "Cash on Delivery"
+              : payment.provider_id}
           </Text>
+          
+          {/* If it's a QR payment, pull the data from the Order Metadata */}
+          {payment.provider_id.includes("qr-payment") && order?.metadata?.qr_transaction_id && (
+            <div className="flex flex-col items-end mt-2 gap-1">
+              {order?.metadata?.qr_bank_name && (
+                <Badge size="small" color="grey" className="font-mono">
+                  Bank: {order.metadata.qr_bank_name as string}
+                </Badge>
+              )}
+              <Badge size="small" color="blue" className="font-mono">
+                Ref: {order.metadata.qr_transaction_id as string}
+              </Badge>
+            </div>
+          )}
         </div>
         <div className="flex items-center justify-end">
           <StatusBadge color={color} className="text-nowrap">
@@ -246,6 +265,7 @@ const Payment = ({
           ]}
         />
       </div>
+      
       {showCapture && (
         <div className="bg-ui-bg-subtle flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-x-2">

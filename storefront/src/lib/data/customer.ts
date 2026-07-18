@@ -27,6 +27,7 @@ export const retrieveCustomer =
 
     const next = {
       ...(await getCacheOptions("customers")),
+      revalidate: 60,
     }
 
     return await sdk.client
