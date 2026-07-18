@@ -1,3 +1,4 @@
+// path-filtering isolation test: storefront-only change, no-op
 import Medusa from "@medusajs/js-sdk"
 
 // Defaults to standard port for Medusa server
