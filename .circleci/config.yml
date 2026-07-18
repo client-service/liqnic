@@ -19,6 +19,18 @@ workflows:
             pnpm-lock.yaml run-backend-pipeline true
             pnpm-lock.yaml run-dashboard-pipeline true
             pnpm-lock.yaml run-storefront-pipeline true
+            ^\.circleci/.* run-backend-pipeline true
+            ^\.circleci/.* run-dashboard-pipeline true
+            ^\.circleci/.* run-storefront-pipeline true
+            ^package\.json$ run-backend-pipeline true
+            ^package\.json$ run-dashboard-pipeline true
+            ^package\.json$ run-storefront-pipeline true
+            ^pnpm-workspace\.yaml$ run-backend-pipeline true
+            ^pnpm-workspace\.yaml$ run-dashboard-pipeline true
+            ^pnpm-workspace\.yaml$ run-storefront-pipeline true
+            ^docker-compose\.yml$ run-backend-pipeline true
+            ^docker-compose\.yml$ run-dashboard-pipeline true
+            ^docker-compose\.yml$ run-storefront-pipeline true
           # Compare against the previous commit, not 'main'
           base-revision: << pipeline.git.base_revision >>
           # This line tells CircleCI to hand off execution to your heavy lifter
