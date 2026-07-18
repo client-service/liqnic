@@ -23,3 +23,13 @@ workflows:
           base-revision: << pipeline.git.base_revision >>
           # This line tells CircleCI to hand off execution to your heavy lifter
           config-path: .circleci/continue_config.yml
+          # Only run on branches where builds/deploys actually happen.
+          # Feature branches have no prior tip on first push, so
+          # pipeline.git.base_revision is empty → orb crashes with
+          # "empty string is not a valid pathspec". Filtering here
+          # ensures base_revision is always populated when we run.
+          filters:
+            branches:
+              only:
+                - development
+                - production
