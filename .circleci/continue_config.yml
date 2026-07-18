@@ -35,7 +35,7 @@ commands:
             - v1-pnpm-deps-{{ checksum "pnpm-lock.yaml" }}
       - run:
           name: "Strict pnpm Install"
-          command: corepack enable && pnpm install --frozen-lockfile
+          command: sudo corepack enable && pnpm install --frozen-lockfile
       - save_cache:
           key: v1-pnpm-deps-{{ checksum "pnpm-lock.yaml" }}
           paths:
