@@ -78,6 +78,7 @@ jobs:
   deploy-backend:
     executor: deploy-machine
     steps:
+      - checkout
       - add_ssh_keys:
           fingerprints:
             - "SHA256:bu4d5JVl8kARC8wsDVC72vhPvS2ZlRUFjb/PAhyvb+U"
@@ -85,17 +86,28 @@ jobs:
           name: Zero-Downtime Deploy Backend
           command: |
             ENV_TAG=$([ "$CIRCLE_BRANCH" = "production" ] && echo "prod" || echo "dev")
-            export APP_VERSION="$ENV_TAG-${CIRCLE_SHA1:0:7}"
+            export BACKEND_VERSION="$ENV_TAG-${CIRCLE_SHA1:0:7}"
             DEPLOY_PATH="/home/docker/liqnic/$ENV_TAG"
+
+            # Ship the repo-owned compose file for this environment (repo is the source of truth).
+            # Falls back to the existing server compose if no repo file exists yet for this env (e.g. prod).
+            if [ -f "deploy/docker-compose.$ENV_TAG.yml" ]; then
+              scp -o StrictHostKeyChecking=no "deploy/docker-compose.$ENV_TAG.yml" $SSH_USER@$SSH_HOST:$DEPLOY_PATH/docker-compose.yml
+            else
+              echo "==> No repo compose for $ENV_TAG; using existing server compose."
+            fi
 
             ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
               set -e
               cd $DEPLOY_PATH
-              export BACKEND_VERSION=$APP_VERSION
+              touch .env
+              grep -v '^BACKEND_VERSION=' .env > .env.tmp || true
+              echo 'BACKEND_VERSION=$BACKEND_VERSION' >> .env.tmp
+              mv .env.tmp .env
               docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
               docker compose pull backend
               docker compose up -d --remove-orphans backend
-              docker image prune -af
+              docker image prune -f --filter until=24h
               echo '==> Backend deployment complete!'
             "
 
@@ -138,6 +150,7 @@ jobs:
   deploy-dashboard:
     executor: deploy-machine
     steps:
+      - checkout
       - add_ssh_keys:
           fingerprints:
             - "SHA256:bu4d5JVl8kARC8wsDVC72vhPvS2ZlRUFjb/PAhyvb+U"
@@ -149,10 +162,21 @@ jobs:
             export DASHBOARD_VERSION="$ENV_TAG-${CIRCLE_SHA1:0:7}"
             DEPLOY_PATH="/home/docker/liqnic/$ENV_TAG"
 
+            # Ship the repo-owned compose file for this environment (repo is the source of truth).
+            # Falls back to the existing server compose if no repo file exists yet for this env (e.g. prod).
+            if [ -f "deploy/docker-compose.$ENV_TAG.yml" ]; then
+              scp -o StrictHostKeyChecking=no "deploy/docker-compose.$ENV_TAG.yml" $SSH_USER@$SSH_HOST:$DEPLOY_PATH/docker-compose.yml
+            else
+              echo "==> No repo compose for $ENV_TAG; using existing server compose."
+            fi
+
             ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
               set -e
               cd $DEPLOY_PATH
-              export DASHBOARD_VERSION=$DASHBOARD_VERSION
+              touch .env
+              grep -v '^DASHBOARD_VERSION=' .env > .env.tmp || true
+              echo 'DASHBOARD_VERSION=$DASHBOARD_VERSION' >> .env.tmp
+              mv .env.tmp .env
               docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
               docker compose pull dashboard
 
@@ -172,7 +196,7 @@ jobs:
 
               # Now it is safe to deploy the dashboard
               docker compose up -d --remove-orphans dashboard
-              nohup docker image prune -af > /dev/null 2>&1 &
+              nohup docker image prune -f --filter until=24h > /dev/null 2>&1 &
               echo '==> Dashboard deployment complete!'
             "
 
@@ -188,9 +212,9 @@ jobs:
           name: Build Storefront
           command: |
             # Inject build-time environment variables for Next.js
-            echo "MEDUSA_BACKEND_URL=${STOREFRONT_MEDUSA_BACKEND_URL}" > storefront/.env
+            echo "MEDUSA_BACKEND_URL=${MEDUSA_BACKEND_URL}" > storefront/.env
             echo "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=${NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY}" >> storefront/.env
-            echo "NEXT_PUBLIC_BASE_URL=${STOREFRONT_NEXT_PUBLIC_BASE_URL}" >> storefront/.env
+            echo "NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}" >> storefront/.env
 
             pnpm --filter=medusa-next build
 
@@ -206,9 +230,9 @@ jobs:
             UNIQUE_TAG="$ENV_TAG-${CIRCLE_SHA1:0:7}"
 
             # Inject build-time environment variables for Docker Next.js build
-            echo "MEDUSA_BACKEND_URL=${STOREFRONT_MEDUSA_BACKEND_URL}" > storefront/.env
+            echo "MEDUSA_BACKEND_URL=${MEDUSA_BACKEND_URL}" > storefront/.env
             echo "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=${NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY}" >> storefront/.env
-            echo "NEXT_PUBLIC_BASE_URL=${STOREFRONT_NEXT_PUBLIC_BASE_URL}" >> storefront/.env
+            echo "NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}" >> storefront/.env
 
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
@@ -220,6 +244,7 @@ jobs:
   deploy-storefront:
     executor: deploy-machine
     steps:
+      - checkout
       - add_ssh_keys:
           fingerprints:
             - "SHA256:bu4d5JVl8kARC8wsDVC72vhPvS2ZlRUFjb/PAhyvb+U"
@@ -231,10 +256,22 @@ jobs:
             export STOREFRONT_VERSION="$ENV_TAG-${CIRCLE_SHA1:0:7}"
             DEPLOY_PATH="/home/docker/liqnic/$ENV_TAG"
 
+            # Ship the repo-owned compose file for this environment (repo is the source of truth).
+            # Falls back to the existing server compose if no repo file exists yet for this env (e.g. prod).
+            if [ -f "deploy/docker-compose.$ENV_TAG.yml" ]; then
+              scp -o StrictHostKeyChecking=no "deploy/docker-compose.$ENV_TAG.yml" $SSH_USER@$SSH_HOST:$DEPLOY_PATH/docker-compose.yml
+            else
+              echo "==> No repo compose for $ENV_TAG; using existing server compose."
+            fi
+
             ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
               set -e
               cd $DEPLOY_PATH
-              export STOREFRONT_VERSION=$STOREFRONT_VERSION
+              touch .env
+              grep -vE '^(STOREFRONT_VERSION|REVALIDATE_SECRET)=' .env > .env.tmp || true
+              echo 'STOREFRONT_VERSION=$STOREFRONT_VERSION' >> .env.tmp
+              echo 'REVALIDATE_SECRET=$REVALIDATE_SECRET' >> .env.tmp
+              mv .env.tmp .env
               docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
               docker compose pull storefront
 
@@ -254,7 +291,7 @@ jobs:
 
               # Now it is safe to deploy the storefront
               docker compose up -d --remove-orphans storefront
-              nohup docker image prune -af > /dev/null 2>&1 &
+              nohup docker image prune -f --filter until=24h > /dev/null 2>&1 &
               echo '==> Storefront deployment complete!'
             "
 
@@ -272,6 +309,7 @@ workflows:
           requires: [build-test-backend]
           filters: { branches: { only: [development, production] } }
       - deploy-backend:
+          context: [liqnic-dev, liqnic-prod]
           requires: [docker-publish-backend]
           filters: { branches: { only: [development, production] } }
 
@@ -285,6 +323,7 @@ workflows:
           requires: [build-test-dashboard]
           filters: { branches: { only: [development, production] } }
       - deploy-dashboard:
+          context: [liqnic-dev, liqnic-prod]
           requires: [docker-publish-dashboard]
           filters: { branches: { only: [development, production] } }
 
@@ -292,11 +331,13 @@ workflows:
     when: << pipeline.parameters.run-storefront-pipeline >>
     jobs:
       - build-test-storefront:
+          context: [liqnic-dev, liqnic-prod]
           filters: { branches: { only: [development, production] } }
       - docker-publish-storefront:
           context: [liqnic-dev, liqnic-prod]
           requires: [build-test-storefront]
           filters: { branches: { only: [development, production] } }
       - deploy-storefront:
+          context: [liqnic-dev, liqnic-prod]
           requires: [docker-publish-storefront]
           filters: { branches: { only: [development, production] } }
