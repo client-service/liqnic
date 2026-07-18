@@ -33,11 +33,17 @@ ENV NODE_OPTIONS=--max-old-space-size=2048
 
 WORKDIR /app
 
-COPY --from=builder /app/storefront/public ./public
+# .next/standalone contains BOTH the hoisted pnpm-store node_modules (flat, at
+# repo-root-relative position) AND the app itself nested at its workspace-relative
+# path (storefront/server.js, storefront/node_modules/next -> relative symlink into
+# the hoisted store). Copying it as a whole preserves that relationship — do not
+# flatten storefront/* into the runner root, the relative symlinks depend on the
+# sibling layout.
 COPY --from=builder /app/storefront/.next/standalone ./
-COPY --from=builder /app/storefront/.next/static ./.next/static
-COPY storefront/check-env-variables.js ./check-env-variables.js
+COPY --from=builder /app/storefront/.next/static ./storefront/.next/static
+COPY --from=builder /app/storefront/public ./storefront/public
+COPY storefront/check-env-variables.js ./storefront/check-env-variables.js
 
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+CMD ["node", "storefront/server.js"]
