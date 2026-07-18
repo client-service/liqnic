@@ -47,6 +47,24 @@ on a server-resident compose file until `deploy/docker-compose.prod.yml` is adde
     CircleCI context every deploy.
 - **Version tag** — `STOREFRONT_VERSION` in `.env`, same pattern as backend/dashboard.
 
+## Restarting after a manual `.env` / `.env.backend` edit
+
+Editing `.env` or `.env.backend` directly on the server does **not** take effect on its own — Docker bakes
+`env_file`/`environment` values in at container *creation*, not at container start, and `docker compose restart`
+reuses the existing container (and its already-baked-in env) rather than reading the file again. Recreate the
+container instead. A helper script is shipped alongside `docker-compose.yml` on every deploy (CI `scp`s
+`deploy/restart.sh` to the same directory, regardless of which service deployed):
+
+```bash
+cd /home/docker/liqnic/<env>
+bash restart.sh backend        # or dashboard / storefront / all
+```
+
+This only helps for values read at **runtime** (backend's `.env.backend`, storefront's `REVALIDATE_SECRET`) —
+per the build-time vars listed above (dashboard's `VITE_*` args, storefront's `NEXT_PUBLIC_*`/
+`MEDUSA_BACKEND_URL` baked at build time), a restart changes nothing; those need an actual rebuild (push a
+commit, or re-run the CircleCI workflow).
+
 ## Summary
 
 - **3 files** needed per environment: `docker-compose.yml` (CI-shipped), `.env` (CI-populated), `.env.backend`
