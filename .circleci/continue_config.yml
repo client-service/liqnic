@@ -301,45 +301,95 @@ jobs:
 # ==                         WORKFLOWS                            ==
 # ====================================================================
 workflows:
-  backend-workflow:
-    when: << pipeline.parameters.run-backend-pipeline >>
+  # Each service workflow is split per-branch so `liqnic-dev` and `liqnic-prod`
+  # are never both attached to the same job. CircleCI resolves duplicate
+  # variable names across contexts using the LAST-listed context, so
+  # `context: [liqnic-dev, liqnic-prod]` on every branch (the old shape) meant
+  # liqnic-prod always won -- dev builds silently got prod's MEDUSA_BACKEND_URL,
+  # NEXT_PUBLIC_BASE_URL, etc. baked in. Branch-level `when` here replaces the
+  # old per-job `filters: { branches: ... } }`, which is now redundant.
+  backend-workflow-dev:
+    when:
+      and:
+        - << pipeline.parameters.run-backend-pipeline >>
+        - equal: [development, << pipeline.git.branch >>]
     jobs:
-      - build-test-backend:
-          filters: { branches: { only: [development, production] } }
+      - build-test-backend
       - docker-publish-backend:
-          context: [liqnic-dev, liqnic-prod]
+          context: [liqnic-dev]
           requires: [build-test-backend]
-          filters: { branches: { only: [development, production] } }
       - deploy-backend:
-          context: [liqnic-dev, liqnic-prod]
+          context: [liqnic-dev]
           requires: [docker-publish-backend]
-          filters: { branches: { only: [development, production] } }
 
-  dashboard-workflow:
-    when: << pipeline.parameters.run-dashboard-pipeline >>
+  backend-workflow-prod:
+    when:
+      and:
+        - << pipeline.parameters.run-backend-pipeline >>
+        - equal: [production, << pipeline.git.branch >>]
     jobs:
-      - build-test-dashboard:
-          filters: { branches: { only: [development, production] } }
-      - docker-publish-dashboard:
-          context: [liqnic-dev, liqnic-prod]
-          requires: [build-test-dashboard]
-          filters: { branches: { only: [development, production] } }
-      - deploy-dashboard:
-          context: [liqnic-dev, liqnic-prod]
-          requires: [docker-publish-dashboard]
-          filters: { branches: { only: [development, production] } }
+      - build-test-backend
+      - docker-publish-backend:
+          context: [liqnic-prod]
+          requires: [build-test-backend]
+      - deploy-backend:
+          context: [liqnic-prod]
+          requires: [docker-publish-backend]
 
-  storefront-workflow:
-    when: << pipeline.parameters.run-storefront-pipeline >>
+  dashboard-workflow-dev:
+    when:
+      and:
+        - << pipeline.parameters.run-dashboard-pipeline >>
+        - equal: [development, << pipeline.git.branch >>]
+    jobs:
+      - build-test-dashboard
+      - docker-publish-dashboard:
+          context: [liqnic-dev]
+          requires: [build-test-dashboard]
+      - deploy-dashboard:
+          context: [liqnic-dev]
+          requires: [docker-publish-dashboard]
+
+  dashboard-workflow-prod:
+    when:
+      and:
+        - << pipeline.parameters.run-dashboard-pipeline >>
+        - equal: [production, << pipeline.git.branch >>]
+    jobs:
+      - build-test-dashboard
+      - docker-publish-dashboard:
+          context: [liqnic-prod]
+          requires: [build-test-dashboard]
+      - deploy-dashboard:
+          context: [liqnic-prod]
+          requires: [docker-publish-dashboard]
+
+  storefront-workflow-dev:
+    when:
+      and:
+        - << pipeline.parameters.run-storefront-pipeline >>
+        - equal: [development, << pipeline.git.branch >>]
     jobs:
       - build-test-storefront:
-          context: [liqnic-dev, liqnic-prod]
-          filters: { branches: { only: [development, production] } }
+          context: [liqnic-dev]
       - docker-publish-storefront:
-          context: [liqnic-dev, liqnic-prod]
+          context: [liqnic-dev]
           requires: [build-test-storefront]
-          filters: { branches: { only: [development, production] } }
       - deploy-storefront:
-          context: [liqnic-dev, liqnic-prod]
+          context: [liqnic-dev]
           requires: [docker-publish-storefront]
-          filters: { branches: { only: [development, production] } }
+
+  storefront-workflow-prod:
+    when:
+      and:
+        - << pipeline.parameters.run-storefront-pipeline >>
+        - equal: [production, << pipeline.git.branch >>]
+    jobs:
+      - build-test-storefront:
+          context: [liqnic-prod]
+      - docker-publish-storefront:
+          context: [liqnic-prod]
+          requires: [build-test-storefront]
+      - deploy-storefront:
+          context: [liqnic-prod]
+          requires: [docker-publish-storefront]
