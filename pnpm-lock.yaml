@@ -52,6 +52,9 @@ importers:
       multer:
         specifier: ^2.0.2
         version: 2.2.0
+      nepali-date-converter:
+        specifier: ^3.4.0
+        version: 3.4.0
       nodemailer:
         specifier: ^7.0.5
         version: 7.0.13
@@ -197,6 +200,9 @@ importers:
       motion:
         specifier: ^11.15.0
         version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      nepali-date-converter:
+        specifier: ^3.4.0
+        version: 3.4.0
       qs:
         specifier: ^6.12.0
         version: 6.15.3
@@ -236,7 +242,7 @@ importers:
     devDependencies:
       '@medusajs/admin-vite-plugin':
         specifier: 2.17.1
-        version: 2.17.1(picomatch@4.0.4)(vite@5.4.21(@types/node@20.19.43)(terser@5.48.0))
+        version: 2.17.1(picomatch@4.0.4)(supports-color@8.1.1)(vite@5.4.21(@types/node@20.19.43)(terser@5.48.0))
       '@medusajs/types':
         specifier: 2.17.1
         version: 2.17.1(ioredis@5.11.1)(vite@5.4.21(@types/node@20.19.43)(terser@5.48.0))
@@ -295,7 +301,7 @@ importers:
         specifier: latest
         version: 2.17.2
       '@medusajs/ui':
-        specifier: latest
+        specifier: 4.1.18
         version: 4.1.18(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.9.3)
       '@radix-ui/react-accordion':
         specifier: ^1.2.1
@@ -7913,6 +7919,10 @@ packages:
   neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
 
+  nepali-date-converter@3.4.0:
+    resolution: {integrity: sha512-hBojNXCQN69I533CnxNubl72uNx2Zcow9t2bOML3CxXv227s7NKA2kStUGO5xysg0SwsubTTxAO6tcg9IhS61w==}
+    engines: {node: '>=6.0.0'}
+
   next@15.5.19:
     resolution: {integrity: sha512-xNOW6tYshGX1/Oi3F8uuk4gpDeWsSUE/1Z0G5uUMekIxaQ0xc03UXd9II0VQHYMWviMeA0OHpJFAKsHf8bTYVg==}
     engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
@@ -10829,7 +10839,7 @@ snapshots:
       '@babel/parser': 7.29.7
       '@babel/types': 7.29.7
 
-  '@babel/traverse@7.25.6':
+  '@babel/traverse@7.25.6(supports-color@8.1.1)':
     dependencies:
       '@babel/code-frame': 7.29.7
       '@babel/generator': 7.29.7
@@ -11820,7 +11830,7 @@ snapshots:
   '@medusajs/admin-bundler@2.17.1(@emotion/is-prop-valid@1.4.0)(@types/node@20.19.43)(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(terser@5.48.0)(typescript@5.9.3)':
     dependencies:
       '@medusajs/admin-shared': 2.17.1
-      '@medusajs/admin-vite-plugin': 2.17.1(picomatch@4.0.4)(vite@5.4.21(@types/node@20.19.43)(terser@5.48.0))
+      '@medusajs/admin-vite-plugin': 2.17.1(picomatch@4.0.4)(supports-color@8.1.1)(vite@5.4.21(@types/node@20.19.43)(terser@5.48.0))
       '@medusajs/dashboard': 2.17.1(@emotion/is-prop-valid@1.4.0)(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(typescript@5.9.3)
       '@vitejs/plugin-react': 4.2.1(vite@5.4.21(@types/node@20.19.43)(terser@5.48.0))
       autoprefixer: 10.5.2(postcss@8.5.16)
@@ -11858,10 +11868,10 @@ snapshots:
 
   '@medusajs/admin-shared@2.17.1': {}
 
-  '@medusajs/admin-vite-plugin@2.17.1(picomatch@4.0.4)(vite@5.4.21(@types/node@20.19.43)(terser@5.48.0))':
+  '@medusajs/admin-vite-plugin@2.17.1(picomatch@4.0.4)(supports-color@8.1.1)(vite@5.4.21(@types/node@20.19.43)(terser@5.48.0))':
     dependencies:
       '@babel/parser': 7.25.6
-      '@babel/traverse': 7.25.6
+      '@babel/traverse': 7.25.6(supports-color@8.1.1)
       '@babel/types': 7.25.6
       '@medusajs/admin-shared': 2.17.1
       chokidar: 3.6.0
@@ -19886,6 +19896,8 @@ snapshots:
   negotiator@1.0.0: {}
 
   neo-async@2.6.2: {}
+
+  nepali-date-converter@3.4.0: {}
 
   next@15.5.19(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1):
     dependencies:
