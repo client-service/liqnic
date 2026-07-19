@@ -35,6 +35,7 @@ const ProductAttributesSchema = zod.object({
   height: dimension,
   mid_code: zod.string().optional(),
   hs_code: zod.string().optional(),
+  uom: zod.string().optional(),
   origin_country: zod.string().optional(),
 })
 
@@ -56,6 +57,7 @@ export const ProductAttributesForm = ({
       weight: product.weight ? product.weight : null,
       mid_code: product.mid_code || "",
       hs_code: product.hs_code || "",
+      uom: (product.metadata?.uom as string) || "",
       origin_country: product.origin_country || "",
     },
     schema: ProductAttributesSchema,
@@ -74,6 +76,7 @@ export const ProductAttributesForm = ({
         height: data.height ? data.height : null,
         mid_code: data.mid_code,
         hs_code: data.hs_code,
+        metadata: { ...product.metadata, uom: data.uom || null },
         origin_country: data.origin_country,
       },
       {
@@ -230,6 +233,21 @@ export const ProductAttributesForm = ({
                       <Form.Label>{t("fields.hsCode")}</Form.Label>
                       <Form.Control>
                         <Input {...field} />
+                      </Form.Control>
+                      <Form.ErrorMessage />
+                    </Form.Item>
+                  )
+                }}
+              />
+              <Form.Field
+                control={form.control}
+                name="uom"
+                render={({ field }) => {
+                  return (
+                    <Form.Item>
+                      <Form.Label>{t("fields.unitOfMeasure")}</Form.Label>
+                      <Form.Control>
+                        <Input placeholder="Pcs." {...field} />
                       </Form.Control>
                       <Form.ErrorMessage />
                     </Form.Item>
