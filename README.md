@@ -1,6 +1,6 @@
 # 🛠️ MedusaJS Monorepo (Backend + Dashboard + Storefront)
 
-This repository contains three main components: test
+This repository contains three main components:
 
 * **Backend** → [MedusaJS v2](https://medusajs.com/) (TypeScript)
 * **Dashboard** → [Admin dashboard](https://github.com/medusajs/medusa/tree/develop/packages/admin/dashboard) (cloned from MedusaJS GitHub, Vite + React + TS)
@@ -39,6 +39,7 @@ Before you begin, ensure you have the following installed on your local machine:
 * [Node.js](https://nodejs.org/en/) (v20 or later)
 * [npm](https://www.npmjs.com/) (or [Yarn](https://yarnpkg.com/))
 * [PostgreSQL](https://www.postgresql.org/)
+* [Redis](https://redis.io/) — required by the backend (`REDIS_URL`, `CACHE_REDIS_URL`, `EVENTS_REDIS_URL`, `LOCKING_REDIS_URL` in `backend/.env.template`)
 
 ---
 

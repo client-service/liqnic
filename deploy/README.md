@@ -1,7 +1,9 @@
 # Deploy server layout
 
-Each environment (`dev`, `prod`) lives at `/home/docker/liqnic/<env>/` on the deploy server. Three files sit
-in that directory; all three are required for `docker compose` to bring up backend + dashboard + storefront.
+Each environment (`dev`, `prod`) lives at `/home/docker/liqnic/<env>/` on the deploy server. Three files are
+required for `docker compose` to bring up backend + dashboard + storefront; a fourth (`restart.sh`, a utility
+script — see "Restarting after a manual `.env` / `.env.backend` edit" below) also lands in the same directory
+but isn't a `docker compose` dependency.
 
 | File | Owner | How it gets there |
 |---|---|---|
@@ -37,9 +39,11 @@ on a server-resident compose file until `deploy/docker-compose.prod.yml` is adde
 
 ### Storefront
 - **Build-time** — `MEDUSA_BACKEND_URL`, `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`, `NEXT_PUBLIC_BASE_URL` are written
-  to a repo-root `.env` file inside the CI job (`build-test-storefront` / `docker-publish-storefront`), read by
-  `next build`, and baked into the Next.js standalone output. Sourced from the matching branch's CircleCI
-  context. Also requires a rebuild to change.
+  to a `.env` file inside the CI job and read by `next build`, baked into the Next.js standalone output.
+  `docker-publish-storefront` writes these to a **repo-root** `.env` (matching `storefront/Dockerfile`'s
+  `COPY .env ./storefront/.env`); `build-test-storefront` writes the same vars to `storefront/.env` instead,
+  for its own non-Docker `next build` CI check only — that copy is never shipped anywhere. Both are sourced
+  from the matching branch's CircleCI context. Changing either requires a rebuild.
 - **Runtime** — two vars in the compose service's `environment:` block:
   - `MEDUSA_BACKEND_URL` is hardcoded to the internal Docker DNS name (`http://liqnic-backend-dev:9000`) — not
     from any env file, doesn't need CI or context.
@@ -67,8 +71,9 @@ commit, or re-run the CircleCI workflow).
 
 ## Summary
 
-- **3 files** needed per environment: `docker-compose.yml` (CI-shipped), `.env` (CI-populated), `.env.backend`
-  (server-only, manual).
+- **3 files** required for `docker compose up` per environment: `docker-compose.yml` (CI-shipped), `.env`
+  (CI-populated), `.env.backend` (server-only, manual) — plus `restart.sh` (CI-shipped, but a standalone
+  utility, not a `docker compose` requirement).
 - **Build-time vs runtime** matters: dashboard and storefront's API URLs/keys are baked in at Docker build time
   from the CircleCI context — redeploying with a new context value does nothing until the image is rebuilt.
   Only backend config (via `.env.backend`) and storefront's `REVALIDATE_SECRET` are read at container start,
