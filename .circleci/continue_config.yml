@@ -110,7 +110,7 @@ jobs:
               docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
               docker compose pull backend
               docker compose up -d --remove-orphans backend
-              docker image prune -f --filter until=24h
+              docker image prune -af --filter until=24h
               echo '==> Backend deployment complete!'
             "
 
@@ -202,7 +202,7 @@ jobs:
 
               # Now it is safe to deploy the dashboard
               docker compose up -d --remove-orphans dashboard
-              nohup docker image prune -f --filter until=24h > /dev/null 2>&1 &
+              nohup docker image prune -af --filter until=24h > /dev/null 2>&1 &
               echo '==> Dashboard deployment complete!'
             "
 
@@ -302,7 +302,7 @@ jobs:
 
               # Now it is safe to deploy the storefront
               docker compose up -d --remove-orphans storefront
-              nohup docker image prune -f --filter until=24h > /dev/null 2>&1 &
+              nohup docker image prune -af --filter until=24h > /dev/null 2>&1 &
               echo '==> Storefront deployment complete!'
             "
 
