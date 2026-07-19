@@ -357,13 +357,17 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
     const sanitize = (val: FormDataEntryValue | null): string =>
       (val as string) || ""
 
+    const isBusiness = formData.get("is_business") === "on"
+    const businessName = sanitize(formData.get("business_name"))
+    const panVat = sanitize(formData.get("pan_vat"))
+
     const data = {
       shipping_address: {
         first_name: sanitize(formData.get("shipping_address.first_name")),
         last_name: sanitize(formData.get("shipping_address.last_name")),
         address_1: sanitize(formData.get("shipping_address.address_1")),
         address_2: "",
-        company: "",
+        company: isBusiness ? businessName : "",
         postal_code: sanitize(formData.get("shipping_address.postal_code")),
         city: sanitize(formData.get("shipping_address.city")),
         country_code: "np",
@@ -371,6 +375,12 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
         phone: sanitize(formData.get("shipping_address.phone")),
       },
       email: sanitize(formData.get("email")),
+      // Order-level flag for B2B tax invoicing (see backend invoice module) -
+      // only set metadata keys when the buyer identified as a business, so we
+      // never clobber other cart metadata that may already exist.
+      ...(isBusiness && panVat
+        ? { metadata: { pan_vat: panVat, business_name: businessName } }
+        : {}),
     } as any
 
     const sameAsBilling = formData.get("same_as_billing")
@@ -382,7 +392,7 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
         last_name: sanitize(formData.get("billing_address.last_name")),
         address_1: sanitize(formData.get("billing_address.address_1")),
         address_2: "",
-        company: "",
+        company: isBusiness ? businessName : "",
         postal_code: sanitize(formData.get("billing_address.postal_code")),
         city: sanitize(formData.get("billing_address.city")),
         country_code: "np",
