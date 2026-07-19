@@ -183,6 +183,9 @@ module.exports = defineConfig({
     },
     {
       resolve: "./src/modules/loyalty"
+    },
+    {
+      resolve: "./src/modules/invoice"
     }
   ],
   projectConfig: {
