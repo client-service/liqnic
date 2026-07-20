@@ -20,7 +20,7 @@ export const retrieveOrder = async (id: string) => {
       method: "GET",
       query: {
         fields:
-          "*payment_collections.payments,*items,*items.metadata,*items.variant,*items.product",
+          "id,display_id,email,currency_code,created_at,payment_status,fulfillment_status,total,subtotal,tax_total,shipping_total,discount_total,shipping_address.first_name,shipping_address.last_name,shipping_address.address_1,shipping_address.address_2,shipping_address.city,shipping_address.country_code,shipping_address.province,shipping_address.postal_code,shipping_address.phone,shipping_address.company,billing_address.first_name,billing_address.last_name,billing_address.address_1,billing_address.address_2,billing_address.city,billing_address.country_code,billing_address.province,billing_address.postal_code,billing_address.phone,billing_address.company,payment_collections.payments.provider_id,payment_collections.payments.amount,items.id,items.title,items.variant_title,items.product_title,items.product_handle,items.quantity,items.unit_price,items.total,items.subtotal,items.tax_total,items.thumbnail,items.metadata,items.tax_lines.rate,items.tax_lines.code,items.variant.id,items.variant.title,items.variant.sku,items.product.id,items.product.title,items.product.handle,items.product.thumbnail",
       },
       headers,
       next,
@@ -51,7 +51,8 @@ export const listOrders = async (
         limit,
         offset,
         order: "-created_at",
-        fields: "*items,+items.metadata,*items.variant,*items.product",
+        fields:
+          "id,display_id,email,currency_code,created_at,payment_status,fulfillment_status,total,items.id,items.title,items.variant_title,items.product_title,items.product_handle,items.quantity,items.unit_price,items.total,items.thumbnail,+items.metadata,items.variant.id,items.variant.title,items.variant.sku,items.product.id,items.product.title,items.product.handle,items.product.thumbnail",
         ...filters,
       },
       headers,
