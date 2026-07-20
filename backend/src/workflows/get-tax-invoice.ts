@@ -1,4 +1,4 @@
-import { createWorkflow, WorkflowResponse } from "@medusajs/framework/workflows-sdk"
+import { createWorkflow, transform, WorkflowResponse } from "@medusajs/framework/workflows-sdk"
 import { useQueryGraphStep } from "@medusajs/medusa/core-flows"
 import { getOrCreateTaxInvoiceStep } from "./steps/get-or-create-tax-invoice"
 
@@ -21,9 +21,14 @@ export const getTaxInvoiceWorkflow = createWorkflow(
       options: { throwIfKeyNotFound: true },
     })
 
+    const panVat = transform({ orders }, ({ orders }) => {
+      const metadata = orders[0].metadata as Record<string, unknown> | null
+      return (metadata?.pan_vat as string) ?? null
+    })
+
     const invoice = getOrCreateTaxInvoiceStep({
       order_id,
-      pan_vat: (orders[0].metadata?.pan_vat as string) ?? null,
+      pan_vat: panVat,
     })
 
     return new WorkflowResponse(invoice)
