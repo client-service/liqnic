@@ -105,14 +105,18 @@ const Addresses = ({
                     label="Business / Company Name"
                     name="business_name"
                     defaultValue={cartMetadata?.business_name || ""}
-                    required={isBusiness}
+                    required
                     data-testid="business-name-input"
                   />
                   <Input
                     label="PAN/VAT No."
                     name="pan_vat"
                     defaultValue={cartMetadata?.pan_vat || ""}
-                    required={isBusiness}
+                    required
+                    inputMode="numeric"
+                    pattern="[0-9]{9}"
+                    maxLength={9}
+                    title="Nepal PAN/VAT numbers are 9 digits"
                     data-testid="pan-vat-input"
                   />
                 </div>
