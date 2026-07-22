@@ -41,14 +41,35 @@ export const printTaxInvoice = (
     });
   };
 
+  // COD auto-authorizes at order placement so the order ships before cash is
+  // actually collected - label the method with the real payment_status
+  // rather than implying payment has already happened.
+  const getPaymentStatusLabel = () => {
+    switch (order.payment_status) {
+      case "captured":
+        return "Paid";
+      case "partially_captured":
+        return "Partially Paid";
+      case "refunded":
+      case "partially_refunded":
+        return "Refunded";
+      case "canceled":
+        return "Canceled";
+      default:
+        return "Pending";
+    }
+  };
+
   const getPaymentMethod = () => {
     const providerId = order.payment_collections?.[0]?.payments?.[0]?.provider_id;
     if (!providerId) return "N/A";
 
-    if (providerId.includes("cod-payment")) return "Cash";
-    if (providerId.includes("qr-payment")) return "QR";
+    const statusLabel = getPaymentStatusLabel();
 
-    return providerId.replace("pp_", "").toUpperCase();
+    if (providerId.includes("cod-payment")) return `Cash on Delivery (${statusLabel})`;
+    if (providerId.includes("qr-payment")) return `QR (${statusLabel})`;
+
+    return `${providerId.replace("pp_", "").toUpperCase()} (${statusLabel})`;
   };
 
   const billing = order.billing_address;
