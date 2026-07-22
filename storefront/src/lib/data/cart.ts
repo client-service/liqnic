@@ -375,12 +375,16 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
         phone: sanitize(formData.get("shipping_address.phone")),
       },
       email: sanitize(formData.get("email")),
-      // Order-level flag for B2B tax invoicing (see backend invoice module) -
-      // only set metadata keys when the buyer identified as a business, so we
-      // never clobber other cart metadata that may already exist.
-      ...(isBusiness && panVat
-        ? { metadata: { pan_vat: panVat, business_name: businessName } }
-        : {}),
+      // Order-level flag for B2B tax invoicing (see backend invoice module).
+      // Always send both keys (nulling them out when unchecked) rather than
+      // omitting the metadata field entirely - Medusa's cart update merges
+      // metadata rather than replacing it, so omitting the key would leave a
+      // previously-submitted pan_vat/business_name stuck on the cart even
+      // after the buyer unchecks the business toggle.
+      metadata:
+        isBusiness && panVat
+          ? { pan_vat: panVat, business_name: businessName }
+          : { pan_vat: null, business_name: null },
     } as any
 
     const sameAsBilling = formData.get("same_as_billing")
