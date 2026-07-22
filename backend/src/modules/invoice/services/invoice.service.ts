@@ -41,11 +41,11 @@ class InvoiceModuleService extends MedusaService({
         return existingUnderLock
       }
 
-      const invoicesThisYear = await this.listInvoices({
-        fiscal_year: fiscalYear,
-      })
-      const nextSequence =
-        invoicesThisYear.reduce((max, inv) => Math.max(max, inv.sequence), 0) + 1
+      const [lastInvoiceThisYear] = await this.listInvoices(
+        { fiscal_year: fiscalYear },
+        { order: { sequence: "DESC" }, take: 1 }
+      )
+      const nextSequence = (lastInvoiceThisYear?.sequence ?? 0) + 1
 
       const invoiceNumber = `INV-${String(nextSequence).padStart(
         4,
