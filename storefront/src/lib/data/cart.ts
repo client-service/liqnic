@@ -41,7 +41,7 @@ export async function retrieveCart(cartId?: string) {
       method: "GET",
       query: {
         fields:
-          "id, currency_code, total, subtotal, tax_total, discount_total, *region, shipping_methods.name, shipping_methods.amount, *items, items.variant.title, items.variant.sku, items.product.title, items.product.handle, items.product.thumbnail",
+          "id, currency_code, total, subtotal, tax_total, discount_total, shipping_total, item_total, email, metadata, region.id, region.name, region.currency_code, region.countries.iso_2, region.countries.display_name, shipping_methods.name, shipping_methods.amount, shipping_address.first_name, shipping_address.last_name, shipping_address.address_1, shipping_address.address_2, shipping_address.city, shipping_address.country_code, shipping_address.province, shipping_address.postal_code, shipping_address.phone, shipping_address.company, billing_address.first_name, billing_address.last_name, billing_address.address_1, billing_address.address_2, billing_address.city, billing_address.country_code, billing_address.province, billing_address.postal_code, billing_address.phone, billing_address.company, items.id, items.title, items.product_title, items.product_handle, items.thumbnail, items.quantity, items.total, items.original_total, items.unit_price, items.subtotal, items.tax_total, items.tax_lines.rate, items.tax_lines.description, items.tax_lines.code, items.variant.id, items.variant.title, items.variant.sku, items.variant.manage_inventory, items.variant.inventory_quantity, items.product.title, items.product.handle, items.product.thumbnail, payment_collection.id, payment_collection.payment_sessions.id, payment_collection.payment_sessions.provider_id, payment_collection.payment_sessions.status",
       },
       headers,
       next,
@@ -357,13 +357,17 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
     const sanitize = (val: FormDataEntryValue | null): string =>
       (val as string) || ""
 
+    const isBusiness = formData.get("is_business") === "on"
+    const businessName = sanitize(formData.get("business_name"))
+    const panVat = sanitize(formData.get("pan_vat"))
+
     const data = {
       shipping_address: {
         first_name: sanitize(formData.get("shipping_address.first_name")),
         last_name: sanitize(formData.get("shipping_address.last_name")),
         address_1: sanitize(formData.get("shipping_address.address_1")),
         address_2: "",
-        company: "",
+        company: isBusiness ? businessName : "",
         postal_code: sanitize(formData.get("shipping_address.postal_code")),
         city: sanitize(formData.get("shipping_address.city")),
         country_code: "np",
@@ -371,6 +375,16 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
         phone: sanitize(formData.get("shipping_address.phone")),
       },
       email: sanitize(formData.get("email")),
+      // Order-level flag for B2B tax invoicing (see backend invoice module).
+      // Always send both keys (nulling them out when unchecked) rather than
+      // omitting the metadata field entirely - Medusa's cart update merges
+      // metadata rather than replacing it, so omitting the key would leave a
+      // previously-submitted pan_vat/business_name stuck on the cart even
+      // after the buyer unchecks the business toggle.
+      metadata:
+        isBusiness && panVat
+          ? { pan_vat: panVat, business_name: businessName }
+          : { pan_vat: null, business_name: null },
     } as any
 
     const sameAsBilling = formData.get("same_as_billing")
@@ -382,7 +396,7 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
         last_name: sanitize(formData.get("billing_address.last_name")),
         address_1: sanitize(formData.get("billing_address.address_1")),
         address_2: "",
-        company: "",
+        company: isBusiness ? businessName : "",
         postal_code: sanitize(formData.get("billing_address.postal_code")),
         city: sanitize(formData.get("billing_address.city")),
         country_code: "np",

@@ -42,6 +42,10 @@ export const ProductAttributeSection = ({
       <SectionRow title={t("fields.midCode")} value={product.mid_code} />
       <SectionRow title={t("fields.hsCode")} value={product.hs_code} />
       <SectionRow
+        title={t("fields.unitOfMeasure")}
+        value={(product.metadata?.uom as string) || null}
+      />
+      <SectionRow
         title={t("fields.countryOfOrigin")}
         value={getFormattedCountry(product.origin_country)}
       />

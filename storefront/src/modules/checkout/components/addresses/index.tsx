@@ -7,8 +7,9 @@ import { HttpTypes } from "@medusajs/types"
 import { useToggleState } from "@medusajs/ui"
 import Divider from "@modules/common/components/divider"
 import Spinner from "@modules/common/icons/spinner"
+import Input from "@modules/common/components/input"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useActionState, useEffect } from "react"
+import { useActionState, useEffect, useState } from "react"
 import BillingAddress from "../billing_address"
 import ErrorMessage from "../error-message"
 import ShippingAddress from "../shipping-address"
@@ -31,6 +32,11 @@ const Addresses = ({
       ? compareAddresses(cart?.shipping_address, cart?.billing_address)
       : true
   )
+
+  const cartMetadata = cart?.metadata as
+    | { pan_vat?: string; business_name?: string }
+    | undefined
+  const [isBusiness, setIsBusiness] = useState(!!cartMetadata?.pan_vat)
 
   const handleEdit = () => router.push(pathname + "?step=address")
 
@@ -80,6 +86,42 @@ const Addresses = ({
               onChange={toggleSameAsBilling}
               cart={cart}
             />
+
+            <div className="flex flex-col gap-4 rounded-xl border border-gray-200 p-4">
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-900">
+                <input
+                  type="checkbox"
+                  name="is_business"
+                  checked={isBusiness}
+                  onChange={(e) => setIsBusiness(e.target.checked)}
+                  className="h-4 w-4"
+                  data-testid="is-business-checkbox"
+                />
+                Ordering as a registered business? (VAT tax invoice)
+              </label>
+              {isBusiness && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Input
+                    label="Business / Company Name"
+                    name="business_name"
+                    defaultValue={cartMetadata?.business_name || ""}
+                    required
+                    data-testid="business-name-input"
+                  />
+                  <Input
+                    label="PAN/VAT No."
+                    name="pan_vat"
+                    defaultValue={cartMetadata?.pan_vat || ""}
+                    required
+                    inputMode="numeric"
+                    pattern="[0-9]{9}"
+                    maxLength={9}
+                    title="Nepal PAN/VAT numbers are 9 digits"
+                    data-testid="pan-vat-input"
+                  />
+                </div>
+              )}
+            </div>
 
             {!sameAsBilling && (
               <div>

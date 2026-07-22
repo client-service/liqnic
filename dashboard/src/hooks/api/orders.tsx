@@ -169,6 +169,34 @@ export const useOrderLineItems = (
   return { ...data, ...rest }
 }
 
+export type AdminTaxInvoice = {
+  id: string
+  order_id: string
+  invoice_number: string
+  sequence: number
+  fiscal_year: string
+  pan_vat: string | null
+  issued_at: string
+}
+
+/**
+ * Issues (or, on repeat calls, re-fetches) the order's Nepal tax invoice.
+ * Idempotent - always resolves to the same invoice_number for a given order.
+ */
+export const useGenerateTaxInvoice = (
+  orderId: string,
+  options?: UseMutationOptions<{ invoice: AdminTaxInvoice }, FetchError, void>
+) => {
+  return useMutation({
+    mutationFn: () =>
+      sdk.client.fetch<{ invoice: AdminTaxInvoice }>(
+        `/admin/orders/${orderId}/tax-invoice`,
+        { method: "POST" }
+      ),
+    ...options,
+  })
+}
+
 export const useCreateOrderFulfillment = (
   orderId: string,
   options?: UseMutationOptions<

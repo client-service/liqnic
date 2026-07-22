@@ -44,7 +44,10 @@ import DisplayId from "../../../../../components/common/display-id/display-id";
 import { Thumbnail } from "../../../../../components/common/thumbnail";
 import { useClaims } from "../../../../../hooks/api/claims";
 import { useExchanges } from "../../../../../hooks/api/exchanges";
-import { useOrderPreview } from "../../../../../hooks/api/orders";
+import {
+  useOrderPreview,
+  useGenerateTaxInvoice,
+} from "../../../../../hooks/api/orders";
 import { useMarkPaymentCollectionAsPaid } from "../../../../../hooks/api/payment-collections";
 import { useReservationItems } from "../../../../../hooks/api/reservations";
 import { useReturns } from "../../../../../hooks/api/returns";
@@ -64,6 +67,7 @@ import { CopyPaymentLink } from "../copy-payment-link/copy-payment-link";
 import ReturnInfoPopover from "./return-info-popover";
 import ShippingInfoPopover from "./shipping-info-popover";
 import { printPosReceipt } from "../../../../../utils/print-receipt";
+import { printTaxInvoice } from "../../../../../utils/print-tax-invoice";
 
 type OrderSummarySectionProps = {
   order: AdminOrder;
@@ -305,6 +309,22 @@ const Header = ({
     orderPreview?.order_change?.change_type === "edit" &&
     orderPreview?.order_change?.status === "pending";
 
+  const isBusinessOrder = !!(order.metadata as Record<string, unknown> | undefined)
+    ?.pan_vat;
+  const { mutate: generateTaxInvoice, isPending: isGeneratingTaxInvoice } =
+    useGenerateTaxInvoice(order.id);
+
+  const handlePrintTaxInvoice = () => {
+    generateTaxInvoice(undefined, {
+      onSuccess: ({ invoice }) => {
+        printTaxInvoice(order, invoice);
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    });
+  };
+
   return (
     <div className="flex items-center justify-between px-6 py-4">
       <Heading level="h2">{t("fields.summary")}</Heading>
@@ -334,6 +354,18 @@ const Header = ({
           </svg>
           Print Invoice
         </Button>
+        {isBusinessOrder && (
+          <Button
+            variant="secondary"
+            size="small"
+            onClick={handlePrintTaxInvoice}
+            isLoading={isGeneratingTaxInvoice}
+            className="gap-2"
+          >
+            <DocumentText />
+            Tax Invoice
+          </Button>
+        )}
         <ActionMenu
           groups={[
             {

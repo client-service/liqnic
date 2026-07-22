@@ -3005,6 +3005,7 @@
     "weight": "Weight",
     "midCode": "MID code",
     "hsCode": "HS code",
+    "unitOfMeasure": "Unit of measure",
     "ean": "EAN",
     "upc": "UPC",
     "inventoryQuantity": "Inventory quantity",
