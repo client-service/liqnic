@@ -90,8 +90,16 @@ function DropdownMenu({ item }: { item: MenuItem }) {
 }
 
 export default async function Navbar() {
-  const regions: StoreRegion[] = await listRegions()
-  const MENU_ITEMS: MenuItem[] = await buildMenuItems()
+  let regions: StoreRegion[] = []
+  let MENU_ITEMS: MenuItem[] = []
+
+  try {
+    regions = await listRegions()
+    MENU_ITEMS = await buildMenuItems()
+  } catch (err: any) {
+    console.warn("Could not fetch navbar data during build:", err.message)
+  }
+
   const countryCode = regions[0]?.countries?.[0]?.iso_2 ?? "np"
 
   return (
